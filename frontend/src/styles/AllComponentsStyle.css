@@ -1,0 +1,19 @@
+.header-main{
+    background-color: #4169e1;
+    width: 100%;
+    height: 80px;
+    display: flex;
+}
+
+.header-label-outer{
+    padding-left: 40px;
+    width:80%;
+    display: table;
+}
+
+.header-label-inner{
+    display: table-cell;
+    vertical-align: middle;
+    font-size: 30px;
+    color: #FFFFFF;
+}

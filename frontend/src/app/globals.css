@@ -1,0 +1,14 @@
+body{
+    background-color: #7cc7e8;
+    font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', 'ヒラギノ角ゴシック', 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', 'ヒラギノ角ゴシック W3', 'Hiragino Maru Gothic Pro', 'ヒラギノ丸ゴ Pro W4', 'Hiragino Mincho Pro', 'ヒラギノ明朝 Pro W3', 'Hiragino Mincho ProN', 'ヒラギノ明朝 ProN W3', 'Hiragino Sans GB', 'Hiragino Kaku Gothic StdN', 'ヒラギノ角ゴ StdN W8', 'Hiragino Kaku Gothic Std', 'ヒラギノ角ゴ Std W8', sans-serif;
+}
+
+.common-buttons{
+    background-color: #1A2421;
+    border: none;
+    color: #FFFFFF;
+}
+.common-buttons:hover{
+    background-color: #4169e1;
+    border:#FFFFFF solid 1px;
+}

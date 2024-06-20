@@ -17,5 +17,5 @@ COPY ./frontend/package.json /app/package.json
 COPY ./frontend/package-lock.json /app/package-lock.json
 RUN npm install
 
-#WORKDIRを変更する
+#フロントエンドの起動
 ENTRYPOINT ["npm", "run", "dev"]

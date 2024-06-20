@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"] });
+import config from "@/config/config.json"
+import "@/app/globals.css";
 
 export const metadata: Metadata = {
-  title: "Classification for PSS",
-  description: "Classification for PSS",
+  title: config.title,
+  description: config.title,
 };
 
 export default function RootLayout({
@@ -16,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body style={{ margin: 0 }}>{children}</body>
     </html>
   );
 }

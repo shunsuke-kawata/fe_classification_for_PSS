@@ -1,0 +1,14 @@
+.buttons-main{
+    margin: 15% auto;
+    width:40%;
+}
+
+.top-buttons{
+    width:200px;
+    height: 80px;
+    font-size: 30px;
+}
+
+.right-button{
+    float: right;
+}
