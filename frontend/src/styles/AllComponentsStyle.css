@@ -17,3 +17,46 @@
     font-size: 30px;
     color: #FFFFFF;
 }
+
+.user-form-main{
+    padding: 25px 5px;
+    background-color: #FFFFFF;
+    width:500px;
+    height: 560px;
+    margin: 80px auto 0px auto;
+}
+.user-form-title{
+    display: grid;
+    font-size: 30px;
+    text-align: center;
+}
+.input-form{
+    width:80%;
+    height: 75%;
+    margin: 24px auto 0 auto;
+}
+.user-form-contents{
+    margin-bottom: 18px;
+}
+.user-form-label{
+    display: block;
+}
+.user-form-input{
+    width:98%;
+    height:28px;
+}
+.auth-radio-button{
+    margin-right: 20px;
+}
+.user-form-button{
+    width:120px;
+    height: 40px;
+    font-size: 18px;
+}
+.user-form-buttons{
+    width:80%;
+    margin:0 auto;
+}
+.error-sentence{
+    color: #FF0000;
+}

@@ -12,3 +12,7 @@ body{
     background-color: #4169e1;
     border:#FFFFFF solid 1px;
 }
+
+.right-button{
+    float: right;
+}
