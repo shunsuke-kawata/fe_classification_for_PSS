@@ -25,7 +25,7 @@
     height: 560px;
     margin: 80px auto 0px auto;
 }
-.user-form-title{
+.form-title{
     display: grid;
     font-size: 30px;
     text-align: center;
@@ -59,4 +59,51 @@
 }
 .error-sentence{
     color: #FF0000;
+}
+
+.project-form-buttons{
+    width:80%;
+    margin:30px auto 0px auto;
+}
+
+.new-project-modal-main {
+    position: fixed;
+    width:500px;
+    height: 480px;
+    padding: 25px 5px;
+    background-color: #FFFFFF;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.project-list-main{
+    padding: 60px 0px;
+    margin: 0 auto;
+    width:80%;
+    height:90%;
+}
+
+.project-button{
+    display: flex;
+    align-items: center;
+    margin:0px auto 20px auto;
+    width:80%;
+    height: 100px;
+    background-color: #FFFFFF;
+    padding:10px;
+}
+
+.project-name{
+    display: table-cell;
+    font-size:24px;
+}
+
+.project-description{
+    height:18px;
+    font-size: 16px;
+}
+
+.name-and-description{
+    margin-left: 20px;
 }

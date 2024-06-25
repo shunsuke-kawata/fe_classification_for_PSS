@@ -3,6 +3,13 @@ import config from "@/config/config.json";
 import "@/styles/AllComponentsStyle.css";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import {
+  executeLogin,
+  loginpUserType,
+  postUser,
+  signupUserType,
+} from "@/api/api";
+import { cookieType, setCookieValue } from "@/utils/utils";
 
 const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,7 +28,10 @@ const validateAdminCode = (code: string): boolean => {
   return parseInt(code) === config.administrator_code;
 };
 
-const UserForm = ({ formType }: { formType: string }) => {
+type UserFromProps = {
+  formType: string;
+};
+const UserForm: React.FC<UserFromProps> = ({ formType }) => {
   const router = useRouter();
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [administratorCodeValue, setAdministratorCodeValue] =
@@ -37,7 +47,7 @@ const UserForm = ({ formType }: { formType: string }) => {
     setAdministratorCodeValue(""); // Clear administrator code value when toggling
   };
 
-  const onSubmitSignup = () => {
+  const onSubmitSignup = async () => {
     const emailValue = email.current?.value || "";
     const handleNameValue = handleName.current?.value || "";
     const passwordValue = password.current?.value || "";
@@ -59,15 +69,23 @@ const UserForm = ({ formType }: { formType: string }) => {
       return;
     }
     setErrorMessage("");
-    console.log("Signup", {
-      emailValue,
-      handleNameValue,
-      passwordValue,
-      isAdminUser,
-    });
+
+    //新規登録処理
+    const signupUser: signupUserType = {
+      email: emailValue,
+      name: handleNameValue,
+      password: passwordValue,
+      authority: isAdminUser,
+    };
+    const res = await postUser(signupUser);
+    if (res.status === 204) {
+      router.push("/project");
+    } else {
+      setErrorMessage("ユーザの新規登録に失敗しました");
+    }
   };
 
-  const onSubmitLogin = () => {
+  const onSubmitLogin = async () => {
     const emailOrhandleNameValue = emailOrhandleName.current?.value || "";
     const emailValue = emailOrhandleNameValue;
     const handleNameValue = emailOrhandleNameValue;
@@ -81,17 +99,37 @@ const UserForm = ({ formType }: { formType: string }) => {
       return;
     }
     setErrorMessage("");
-    console.log("Login", {
-      emailValue,
-      handleNameValue,
-      passwordValue,
-    });
+    //新規登録処理
+    const loginUser: loginpUserType = {
+      email: emailValue,
+      name: handleNameValue,
+      password: passwordValue,
+    };
+    const res = await executeLogin(loginUser);
+    if (res.status === 200) {
+      const user_id = res.data.id;
+      const loginInfo: cookieType = {
+        key: "id",
+        value: user_id,
+        options: null,
+      };
+      const loginString: cookieType = {
+        key: "logined",
+        value: true,
+        options: null,
+      };
+      setCookieValue(loginInfo);
+      setCookieValue(loginString);
+      router.push("/project");
+    } else {
+      setErrorMessage("ログインに失敗しました");
+    }
   };
 
   return (
     <>
       <div className="user-form-main">
-        <label className="user-form-title">
+        <label className="form-title">
           {formType === "signin" ? "新規登録" : "ログイン"}
         </label>
         <div className="input-form">

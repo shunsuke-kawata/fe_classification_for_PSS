@@ -1,4 +1,5 @@
 {
     "title":"Classification for PSS",
-    "administrator_code":123456
+    "administrator_code":123456,
+    "backend_base_url":"http://localhost:8002"
 }
