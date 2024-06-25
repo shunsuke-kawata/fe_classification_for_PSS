@@ -39,7 +39,7 @@ const ProjectDetail: React.FC = () => {
           </div>
         </>
       ) : (
-        <>aaaa</>
+        <></>
       )}
     </>
   );

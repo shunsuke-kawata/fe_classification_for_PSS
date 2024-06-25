@@ -78,7 +78,7 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
       authority: isAdminUser,
     };
     const res = await postUser(signupUser);
-    if (res.status === 204) {
+    if (res.status === 201) {
       router.push("/login");
     } else {
       setErrorMessage("ユーザの新規登録に失敗しました");

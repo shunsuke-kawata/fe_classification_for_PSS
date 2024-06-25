@@ -14,6 +14,10 @@ type newProjectType = {
   description: string;
   owner_id: number;
 };
+type newProjectMembershipType = {
+  user_id: number;
+  project_id: number;
+};
 
 type projectType = {
   id: number;
@@ -23,6 +27,19 @@ type projectType = {
   created_at: string;
   updated_at: string;
 };
+
+type projectMembershipType = {
+  user_id: number;
+  project_id: number;
+  created_at: string;
+  updated_at: string;
+};
+
+type projectMembershipParamType = {
+  user_id: number | null;
+  project_id: number | null;
+};
+
 type loginpUserType = {
   email: string;
   name: string;
@@ -47,6 +64,26 @@ const getProject = async (id: string) => {
   try {
     const url = `${config.backend_base_url}/projects/${id}`;
     const response = await axios.get(url);
+    return response.data; // レスポンスのデータ部分のみを返す
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.error("Error response:", error.response);
+      throw error.response; // エラーレスポンスを投げる
+    } else {
+      console.error("Error:", error);
+      throw error; // その他のエラーを投げる
+    }
+  }
+};
+
+//ユーザとプロジェクトの紐付けを取得する
+//基本的にproject_idかuser_idにnullを指定する
+const getProjectMembership = async (params: projectMembershipParamType) => {
+  try {
+    const url = `${config.backend_base_url}/project_memberships`;
+    const response = await axios.get(url, {
+      params: params,
+    });
     return response.data; // レスポンスのデータ部分のみを返す
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -87,7 +124,23 @@ const postProject = async (newProject: newProjectType) => {
   }
 };
 
-//restから外れたアクション処理
+//プロジェクトユーザ紐づけ作成
+const postProjectMembership = async (
+  newProjectMembership: newProjectMembershipType
+) => {
+  try {
+    const url = `${config.backend_base_url}/project_memberships`;
+    const response = await axios.post(url, newProjectMembership);
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
+//restから外れたアクション処理//
 
 //ログイン処理
 const executeLogin = async (loginUser: loginpUserType) => {
@@ -102,5 +155,21 @@ const executeLogin = async (loginUser: loginpUserType) => {
     return Promise.reject(error);
   }
 };
-export type { signupUserType, newProjectType, projectType, loginpUserType };
-export { getData, getProject, postUser, postProject, executeLogin };
+export type {
+  signupUserType,
+  newProjectType,
+  newProjectMembershipType,
+  projectMembershipType,
+  projectMembershipParamType,
+  projectType,
+  loginpUserType,
+};
+export {
+  getData,
+  getProject,
+  getProjectMembership,
+  postUser,
+  postProjectMembership,
+  postProject,
+  executeLogin,
+};

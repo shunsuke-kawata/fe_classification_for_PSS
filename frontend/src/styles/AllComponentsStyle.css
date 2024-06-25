@@ -85,7 +85,7 @@
     height:90%;
 }
 
-.project-button{
+.project-div{
     display: flex;
     align-items: center;
     margin:0px auto 20px auto;
@@ -107,4 +107,19 @@
 
 .name-and-description{
     margin-left: 20px;
+    width:80%;
+}
+
+.to-project-button{
+    color: #FFFFFF;
+    background-color: #000000;
+    font-size: 40px;
+    text-align: center;
+    width:56px;
+    height:56px;
+
+}
+.to-project-button:hover{
+    background-color: #4169e1;
+    border:#FFFFFF solid 1px;
 }

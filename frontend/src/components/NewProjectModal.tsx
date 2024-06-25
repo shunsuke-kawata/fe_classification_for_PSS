@@ -2,7 +2,11 @@
 import { newProjectType } from "@/api/api";
 import "@/styles/AllComponentsStyle.css";
 import { useRef, useState } from "react";
-import { postProject } from "@/api/api";
+import {
+  postProject,
+  postProjectMembership,
+  newProjectMembershipType,
+} from "@/api/api";
 import { getCookie } from "cookies-next";
 
 //それぞれのバリデーション関数
@@ -37,7 +41,6 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
 
     const userId = getCookie("id");
     const ownerIdValue = userId || "";
-    console.log(ownerIdValue);
 
     //プロジェクト名とパスワードについてバリデーションを行い、説明に関しては特に行わない
     if (!validateProjectName(projectNameValue)) {
@@ -58,11 +61,26 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
       name: projectNameValue,
       password: passwordValue,
       description: descriptionValue,
-      owner_id: 1,
+      owner_id: Number(ownerIdValue),
     };
-    const res = await postProject(newProject);
-    if (res.status === 204) {
-      closeNewProjectModal();
+    const projectRes = await postProject(newProject);
+    if (projectRes.status === 201) {
+      const projectId = projectRes.data.project_id;
+      const ownerId = Number(ownerIdValue);
+      const newProjectMembership: newProjectMembershipType = {
+        project_id: projectId,
+        user_id: ownerId,
+      };
+      const projectMembershipRes = await postProjectMembership(
+        newProjectMembership
+      );
+      if (projectMembershipRes.status === 201) {
+        closeNewProjectModal();
+      } else {
+        setErrorMessage(
+          "プロジェクトは作成されましたが管理者ユーザの追加に失敗しました"
+        );
+      }
     } else {
       setErrorMessage("ユーザの新規登録に失敗しました");
     }
