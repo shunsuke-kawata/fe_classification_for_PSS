@@ -7,6 +7,7 @@ import { getData } from "@/api/api";
 import NewProjectModal from "@/components/NewProjectModal";
 import { projectType } from "@/api/api";
 import ProjectList from "@/components/ProjectList";
+import { getCookies } from "cookies-next";
 
 const Projects = () => {
   const [isOpenNewProjectModal, setIsOpenNewProjectModal] =
@@ -24,8 +25,7 @@ const Projects = () => {
       }
     };
     getAllProjects();
-  }, []);
-  useEffect(() => {}, [projects]);
+  }, [projects, isOpenNewProjectModal]);
 
   const openNewProjectModal = () => {
     setIsOpenNewProjectModal(true);

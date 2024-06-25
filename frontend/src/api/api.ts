@@ -28,9 +28,24 @@ type loginpUserType = {
   name: string;
   password: string;
 };
-//汎用的なデータ取得処理
+//汎用的なデータ一覧取得処理
 const getData = async (url: string) => {
   try {
+    const response = await axios.get(url);
+    return response.data; // レスポンスのデータ部分のみを返す
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.error("Error response:", error.response);
+      throw error.response; // エラーレスポンスを投げる
+    } else {
+      console.error("Error:", error);
+      throw error; // その他のエラーを投げる
+    }
+  }
+};
+const getProject = async (id: string) => {
+  try {
+    const url = `${config.backend_base_url}/projects/${id}`;
     const response = await axios.get(url);
     return response.data; // レスポンスのデータ部分のみを返す
   } catch (error) {
@@ -88,4 +103,4 @@ const executeLogin = async (loginUser: loginpUserType) => {
   }
 };
 export type { signupUserType, newProjectType, projectType, loginpUserType };
-export { getData, postUser, postProject, executeLogin };
+export { getData, getProject, postUser, postProject, executeLogin };

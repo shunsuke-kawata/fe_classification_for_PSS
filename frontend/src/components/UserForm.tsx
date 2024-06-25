@@ -9,7 +9,7 @@ import {
   postUser,
   signupUserType,
 } from "@/api/api";
-import { cookieType, setCookieValue } from "@/utils/utils";
+import { setCookie, getCookie } from "cookies-next";
 
 const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -79,7 +79,7 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
     };
     const res = await postUser(signupUser);
     if (res.status === 204) {
-      router.push("/project");
+      router.push("/login");
     } else {
       setErrorMessage("ユーザの新規登録に失敗しました");
     }
@@ -107,19 +107,12 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
     };
     const res = await executeLogin(loginUser);
     if (res.status === 200) {
-      const user_id = res.data.id;
-      const loginInfo: cookieType = {
-        key: "id",
-        value: user_id,
-        options: null,
-      };
-      const loginString: cookieType = {
-        key: "logined",
-        value: true,
-        options: null,
-      };
-      setCookieValue(loginInfo);
-      setCookieValue(loginString);
+      //cookieにログイン情報を追加
+      const userData = res.data;
+      setCookie("id", userData.id);
+      setCookie("name", userData.name);
+      setCookie("email", userData.email);
+      setCookie("authority", userData.authority);
       router.push("/project");
     } else {
       setErrorMessage("ログインに失敗しました");
