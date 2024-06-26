@@ -2,7 +2,7 @@
 import config from "@/config/config.json";
 import "@/styles/AllComponentsStyle.css";
 
-const Header = () => {
+const Header: React.FC = () => {
   return (
     <>
       <div className="header-main">

@@ -13,7 +13,7 @@ import {
 import ProjectList from "@/components/ProjectList";
 import { getCookie } from "cookies-next";
 
-const Projects = () => {
+const Projects: React.FC = () => {
   const [isOpenNewProjectModal, setIsOpenNewProjectModal] =
     useState<boolean>(false);
   const [projects, setProjects] = useState<projectType[]>([]);
@@ -24,8 +24,9 @@ const Projects = () => {
   useEffect(() => {
     const getAllProjects = async () => {
       try {
+        const userId = getCookie("id");
         const url = `${config.backend_base_url}/projects`;
-        const allProjects = await getData(url);
+        const allProjects = await getData(url, { user_id: userId });
         setProjects(allProjects);
       } catch (error) {
         console.error("Failed to get projects:", error);
@@ -34,22 +35,8 @@ const Projects = () => {
     getAllProjects();
   }, [isOpenNewProjectModal]);
 
-  //紐付けテーブルの取得
   useEffect(() => {
-    const getJoinedProject = async () => {
-      try {
-        const userId = getCookie("id");
-        const params: projectMembershipParamType = {
-          user_id: Number(userId),
-          project_id: null,
-        };
-        const myProjectMemberships = await getProjectMembership(params);
-        setProjectMemberships(myProjectMemberships);
-      } catch (error) {
-        console.error("Failed to get project memberships:", error);
-      }
-    };
-    getJoinedProject();
+    console.log(projects);
   }, [isOpenNewProjectModal]);
 
   const openNewProjectModal = () => {
@@ -67,10 +54,7 @@ const Projects = () => {
           onClick={() => openNewProjectModal()}
         />
 
-        <ProjectList
-          projects={projects}
-          projectMemberships={projectMemberships}
-        />
+        <ProjectList projects={projects} />
       </div>
       {isOpenNewProjectModal ? (
         <NewProjectModal setIsOpenNewProjectModal={setIsOpenNewProjectModal} />

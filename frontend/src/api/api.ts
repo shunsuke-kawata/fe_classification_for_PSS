@@ -22,8 +22,9 @@ type newProjectMembershipType = {
 type projectType = {
   id: number;
   name: string;
-  password: string;
+  owner_id: number;
   description: string;
+  joined: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -45,10 +46,18 @@ type loginpUserType = {
   name: string;
   password: string;
 };
+
+type joinUserType = {
+  user_id: number;
+  project_id: number;
+  project_password: string;
+};
 //汎用的なデータ一覧取得処理
-const getData = async (url: string) => {
+const getData = async (url: string, params: any) => {
   try {
-    const response = await axios.get(url);
+    const response = await axios.get(url, {
+      params: params,
+    });
     return response.data; // レスポンスのデータ部分のみを返す
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -155,6 +164,22 @@ const executeLogin = async (loginUser: loginpUserType) => {
     return Promise.reject(error);
   }
 };
+
+const executeJoinProject = async (
+  project_id: number,
+  joinUser: joinUserType
+) => {
+  try {
+    const url = `${config.backend_base_url}/auth/join/${project_id}`;
+    const response = await axios.post(url, joinUser);
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
 export type {
   signupUserType,
   newProjectType,
@@ -163,6 +188,7 @@ export type {
   projectMembershipParamType,
   projectType,
   loginpUserType,
+  joinUserType,
 };
 export {
   getData,
@@ -172,4 +198,5 @@ export {
   postProjectMembership,
   postProject,
   executeLogin,
+  executeJoinProject,
 };

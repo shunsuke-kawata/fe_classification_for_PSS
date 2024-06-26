@@ -9,7 +9,7 @@ import {
   postUser,
   signupUserType,
 } from "@/api/api";
-import { setCookie, getCookie } from "cookies-next";
+import { setCookie } from "cookies-next";
 
 const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

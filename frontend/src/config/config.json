@@ -1,5 +1,6 @@
 {
     "title":"Classification for PSS",
+    "description":"Classification for PSS",
     "administrator_code":123456,
     "frontend_base_url":"http://localhost:5002",
     "backend_base_url":"http://localhost:8002"

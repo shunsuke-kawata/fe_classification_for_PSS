@@ -91,8 +91,14 @@
     margin:0px auto 20px auto;
     width:80%;
     height: 100px;
-    background-color: #FFFFFF;
     padding:10px;
+    border-radius: 5px;
+}
+.unlocked-project-div{
+    background-color: #FFFFFF;
+}
+.locked-project-div{
+    background-color: #a9a9a9;
 }
 
 .project-name{
@@ -110,16 +116,37 @@
     width:80%;
 }
 
-.to-project-button{
+.to-project-button {
     color: #FFFFFF;
     background-color: #000000;
-    font-size: 40px;
+    font-size: 34px;
     text-align: center;
-    width:56px;
-    height:56px;
-
+    width: 56px;
+    border-radius: 5px;
+    height: 56px;
+    display: flex;           
+    align-items: center;     
+    justify-content: center;
 }
 .to-project-button:hover{
     background-color: #4169e1;
     border:#FFFFFF solid 1px;
+}
+
+.join-project-modal-main {
+    position: fixed;
+    width:500px;
+    height: 300px;
+    padding: 25px 5px;
+    background-color: #FFFFFF;
+    border: #000000 solid 3px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.join-project-input-form{
+    width:80%;
+    height: 50%;
+    margin: 24px auto 0 auto;
 }

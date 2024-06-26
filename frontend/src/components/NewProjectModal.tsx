@@ -21,15 +21,16 @@ const validateOwnerId = (ownerId: string): boolean => {
   return numericRegex.test(ownerId);
 };
 
-type NewProjectModalProps = {
+type newProjectModalProps = {
   setIsOpenNewProjectModal: React.Dispatch<React.SetStateAction<boolean>>;
 };
-const NewProjectModal: React.FC<NewProjectModalProps> = ({
+const NewProjectModal: React.FC<newProjectModalProps> = ({
   setIsOpenNewProjectModal,
 }) => {
   const projectName = useRef<HTMLInputElement>(null);
   const description = useRef<HTMLInputElement>(null);
   const password = useRef<HTMLInputElement>(null);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const closeNewProjectModal = () => {
     setIsOpenNewProjectModal(false);
@@ -85,7 +86,6 @@ const NewProjectModal: React.FC<NewProjectModalProps> = ({
       setErrorMessage("ユーザの新規登録に失敗しました");
     }
   };
-  const [errorMessage, setErrorMessage] = useState<string>("");
   return (
     <>
       <div className="new-project-modal-main">

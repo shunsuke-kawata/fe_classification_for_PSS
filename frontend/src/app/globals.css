@@ -7,6 +7,7 @@ body{
     background-color: #1A2421;
     border: none;
     color: #FFFFFF;
+    border-radius:5px;
 }
 .common-buttons:hover{
     background-color: #4169e1;
