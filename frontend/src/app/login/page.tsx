@@ -1,4 +1,5 @@
 "use client";
+import "@/app/globals.css";
 import "./page.modules.css";
 import Header from "@/components/Header";
 import UserForm from "@/components/UserForm";

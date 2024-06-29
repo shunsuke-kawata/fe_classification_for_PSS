@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import "@/app/globals.css";
 import "./page.modules.css";
 import Header from "@/components/Header";
 import config from "@/config/config.json";
@@ -33,10 +34,6 @@ const Projects: React.FC = () => {
       }
     };
     getAllProjects();
-  }, [isOpenNewProjectModal]);
-
-  useEffect(() => {
-    console.log(projects);
   }, [isOpenNewProjectModal]);
 
   const openNewProjectModal = () => {

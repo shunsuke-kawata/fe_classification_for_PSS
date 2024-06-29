@@ -1,5 +1,6 @@
 "use client";
 import Header from "@/components/Header";
+import "@/app/globals.css";
 import "./page.modules.css";
 import { getProject, projectType } from "@/api/api";
 import { useEffect, useState } from "react";

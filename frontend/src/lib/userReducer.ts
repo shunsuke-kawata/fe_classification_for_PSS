@@ -7,6 +7,7 @@ export interface LoginUserState {
   authority: boolean;
 }
 
+//ユーザ情報の初期値
 const initialState: LoginUserState = {
   id: null,
   name: "",
