@@ -1,6 +1,7 @@
 .buttons-main{
     margin: 15% auto;
     width:40%;
+    min-width:600px;
 }
 
 .top-buttons{

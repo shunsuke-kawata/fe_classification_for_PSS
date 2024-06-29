@@ -17,7 +17,7 @@ const validatePassword = (password: string): boolean => {
   return password.length >= 4;
 };
 const validateOwnerId = (ownerId: string): boolean => {
-  const numericRegex = /^[+-]?\d+(\.\d+)?$/;
+  const numericRegex = /\d+/;
   return numericRegex.test(ownerId);
 };
 

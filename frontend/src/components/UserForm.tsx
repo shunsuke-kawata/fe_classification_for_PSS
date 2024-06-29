@@ -3,13 +3,16 @@ import config from "@/config/config.json";
 import "@/styles/AllComponentsStyle.css";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { setLoginedUser, LoginUserState } from "@/lib/userReducer";
 import {
   executeLogin,
-  loginpUserType,
+  loginUserType,
   postUser,
   signupUserType,
 } from "@/api/api";
 import { setCookie } from "cookies-next";
+import { AppDispatch } from "@/lib/store";
+import { useDispatch } from "react-redux";
 
 const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,6 +36,7 @@ type UserFromProps = {
 };
 const UserForm: React.FC<UserFromProps> = ({ formType }) => {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [administratorCodeValue, setAdministratorCodeValue] =
     useState<string>("");
@@ -100,7 +104,7 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
     }
     setErrorMessage("");
     //新規登録処理
-    const loginUser: loginpUserType = {
+    const loginUser: loginUserType = {
       email: emailValue,
       name: handleNameValue,
       password: passwordValue,
@@ -109,6 +113,15 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
     if (res.status === 200) {
       //cookieにログイン情報を追加
       const userData = res.data;
+
+      const loginedUserInfo: LoginUserState = {
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        authority: userData.authority,
+      };
+      dispatch(setLoginedUser(loginedUserInfo));
+
       setCookie("id", userData.id);
       setCookie("name", userData.name);
       setCookie("email", userData.email);

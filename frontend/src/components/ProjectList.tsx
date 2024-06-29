@@ -4,7 +4,6 @@ import { projectMembershipType, projectType } from "@/api/api";
 import "@/styles/AllComponentsStyle.css";
 import { useRouter } from "next/navigation";
 import JoinProjectModal from "./JoinProjectModal";
-import { join } from "path";
 type projectListProps = {
   projects: projectType[];
 };

@@ -24,6 +24,8 @@ type projectType = {
   name: string;
   owner_id: number;
   description: string;
+  images_folder_path: string;
+  object_images_folder_path: string;
   joined: boolean;
   created_at: string;
   updated_at: string;
@@ -41,7 +43,7 @@ type projectMembershipParamType = {
   project_id: number | null;
 };
 
-type loginpUserType = {
+type loginUserType = {
   email: string;
   name: string;
   password: string;
@@ -152,7 +154,7 @@ const postProjectMembership = async (
 //restから外れたアクション処理//
 
 //ログイン処理
-const executeLogin = async (loginUser: loginpUserType) => {
+const executeLogin = async (loginUser: loginUserType) => {
   try {
     const url = `${config.backend_base_url}/auth/login`;
     const response = await axios.post(url, loginUser);
@@ -187,7 +189,7 @@ export type {
   projectMembershipType,
   projectMembershipParamType,
   projectType,
-  loginpUserType,
+  loginUserType,
   joinUserType,
 };
 export {
