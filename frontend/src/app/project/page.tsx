@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser, AppDispatch } from "@/lib/store";
 import { getLoginedUser } from "@/utils/utils";
 import { setLoginedUser } from "@/lib/userReducer";
+import { setSidebarStatus } from "@/lib/sidebarReducer";
 
 const Projects: React.FC = () => {
   const [isOpenNewProjectModal, setIsOpenNewProjectModal] =
@@ -24,6 +25,7 @@ const Projects: React.FC = () => {
     // Cookie からユーザー情報を取得し、Redux ストアに設定する
     const loginedUser = getLoginedUser();
     dispatch(setLoginedUser(loginedUser));
+    dispatch(setSidebarStatus(false));
 
     const getAllProjects = async () => {
       try {

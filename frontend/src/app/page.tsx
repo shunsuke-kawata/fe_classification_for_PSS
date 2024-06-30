@@ -3,15 +3,18 @@ import "./page.modules.css";
 import "@/app/globals.css";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
-import { selectUser } from "@/lib/store";
+import { AppDispatch, selectUser } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setSidebarStatus } from "@/lib/sidebarReducer";
 const Top = () => {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
 
   const userInfo = useSelector(selectUser);
   useEffect(() => {
+    dispatch(setSidebarStatus(false));
     console.log(userInfo);
   }, []);
 

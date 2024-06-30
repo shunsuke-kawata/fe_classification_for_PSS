@@ -5,8 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectSidebar, AppDispatch } from "@/lib/store";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
 import Sidebar from "./Sidebar";
+import { useRouter } from "next/navigation";
 
 const Header: React.FC = () => {
+  const router = useRouter();
   const isOpenSidebar = useSelector(selectSidebar);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -18,14 +20,20 @@ const Header: React.FC = () => {
     <>
       <div className="header-main">
         <div className="hamburger-menu" onClick={() => openSidebar()}>
-          <img
+          ≡
+          {/* <img
             className="hamburger-menu-icon"
             src="/assets/hamburger-menu-icon.svg"
             alt="ハンバーガーメニュー"
-          />
+          /> */}
         </div>
         <div className="header-label-outer">
-          <label className="header-label-inner">{config.title}</label>
+          <label
+            className="header-label-inner"
+            onClick={() => router.push("/")}
+          >
+            {config.title}
+          </label>
         </div>
       </div>
       {isOpenSidebar && <Sidebar />}
