@@ -13,6 +13,7 @@ import { setCookie } from "cookies-next";
 import { setLoginedUser, LoginUserState } from "@/lib/userReducer";
 import { AppDispatch } from "@/lib/store";
 import { useDispatch } from "react-redux";
+import { getLoginedUser } from "@/utils/utils";
 
 const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -126,7 +127,8 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
       setCookie("email", userData.email);
       setCookie("authority", userData.authority);
       //storeにユーザ情報を入れる
-      dispatch(setLoginedUser(loginedUserInfo));
+      const tmpUser = getLoginedUser();
+      dispatch(setLoginedUser(tmpUser));
       router.push("/project");
     } else {
       setErrorMessage("ログインに失敗しました");

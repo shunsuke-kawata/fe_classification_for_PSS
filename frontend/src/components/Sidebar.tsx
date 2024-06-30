@@ -17,6 +17,7 @@ const Sidebar: React.FC = () => {
   const handleLogout = () => {
     logout();
     const tmpUser = getLoginedUser();
+    console.log(tmpUser);
     dispatch(setLoginedUser(tmpUser));
     transitFromSidebar("/");
   };

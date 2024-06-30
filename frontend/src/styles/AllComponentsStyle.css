@@ -7,7 +7,6 @@
 
 .header-label-outer{
     padding-left: 20px;
-    width:80%;
     display: table;
 }
 
@@ -23,7 +22,7 @@
     background-color: #FFFFFF;
     width:500px;
     height: 560px;
-    margin: 80px auto 0px auto;
+    margin: 60px auto 0px auto;
 }
 .form-title{
     display: grid;
@@ -219,4 +218,16 @@
 .sidebar-menu-value:hover{
     background-color: #3b5fcc;
 }
-  
+
+.user-info-div{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height:50px;
+    font-size: 30px;
+    margin:15px 15px 15px auto;
+    background-color: #FFFFFF;
+    border-radius: 25px;
+    color: #4169e1;
+}

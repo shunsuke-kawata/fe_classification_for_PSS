@@ -11,6 +11,7 @@ const Header: React.FC = () => {
   const router = useRouter();
   const isOpenSidebar = useSelector(selectSidebar);
   const tmpUserInfo = useSelector(selectUser);
+  console.log(tmpUserInfo);
   const dispatch = useDispatch<AppDispatch>();
 
   const openSidebar = () => {
@@ -35,7 +36,7 @@ const Header: React.FC = () => {
             {config.title}
           </label>
         </div>
-        <div className="logined-user-info"></div>
+        <div className="user-info-div">{tmpUserInfo.name.slice(0, 1)}</div>
       </div>
       {isOpenSidebar && <Sidebar />}
     </>

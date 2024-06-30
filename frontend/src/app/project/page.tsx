@@ -28,6 +28,7 @@ const Projects: React.FC = () => {
   useEffect(() => {
     const initializeUser = async () => {
       const user = getLoginedUser();
+      console.log(user);
       if (user) {
         dispatch(setLoginedUser(user));
         dispatch(setSidebarStatus(false));
