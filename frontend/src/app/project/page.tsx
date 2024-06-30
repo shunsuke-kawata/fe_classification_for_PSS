@@ -19,17 +19,25 @@ const Projects: React.FC = () => {
   const [isOpenNewProjectModal, setIsOpenNewProjectModal] =
     useState<boolean>(false);
   const [projects, setProjects] = useState<projectType[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
+  const loginedUser = useSelector(selectUser);
 
   useEffect(() => {
-    // Cookie からユーザー情報を取得し、Redux ストアに設定する
-    const loginedUser = getLoginedUser();
-    dispatch(setLoginedUser(loginedUser));
-    dispatch(setSidebarStatus(false));
+    const initializeUser = async () => {
+      const user = getLoginedUser();
+      dispatch(setLoginedUser(user));
+      dispatch(setSidebarStatus(false));
+      setIsLoading(false);
+    };
 
+    initializeUser();
+  }, [dispatch]);
+
+  useEffect(() => {
     const getAllProjects = async () => {
       try {
-        const userId = getCookie("id");
+        const userId = loginedUser.id;
         const url = `${config.backend_base_url}/projects`;
         const allProjects = await getData(url, { user_id: userId });
         setProjects(allProjects);
@@ -37,17 +45,23 @@ const Projects: React.FC = () => {
         console.error("Failed to get projects:", error);
       }
     };
-    getAllProjects();
-  }, [dispatch, isOpenNewProjectModal]);
+
+    if (!isLoading) {
+      getAllProjects();
+    }
+  }, [isOpenNewProjectModal, loginedUser, isLoading]);
 
   const openNewProjectModal = () => {
     setIsOpenNewProjectModal(true);
   };
 
-  const userInfo = useSelector(selectUser);
-  useEffect(() => {
-    console.log(userInfo); // userInfo が変更されたときにログに出力
-  }, [userInfo]);
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+      </>
+    );
+  }
 
   return (
     <>
@@ -56,20 +70,17 @@ const Projects: React.FC = () => {
         <input
           type="button"
           className={`add-project-button ${
-            userInfo.authority ? "common-buttons" : "locked-common-buttons"
+            loginedUser.authority ? "common-buttons" : "locked-common-buttons"
           }`}
           value="作成    ＋"
           onClick={() => openNewProjectModal()}
-          disabled={!userInfo.authority}
+          disabled={!loginedUser.authority}
         />
-
         <ProjectList projects={projects} />
       </div>
       {isOpenNewProjectModal ? (
         <NewProjectModal setIsOpenNewProjectModal={setIsOpenNewProjectModal} />
-      ) : (
-        <></>
-      )}
+      ) : null}
     </>
   );
 };

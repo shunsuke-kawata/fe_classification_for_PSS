@@ -4,15 +4,24 @@ import Header from "@/components/Header";
 import UserForm from "@/components/UserForm";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, selectUser } from "@/lib/store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
+import { setLoginedUser } from "@/lib/userReducer";
+import { getLoginedUser } from "@/utils/utils";
 const Signup: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const userInfo = useSelector(selectUser);
+  const [isLoading, setIsLoading] = useState(true);
+  const loginedUser = useSelector(selectUser);
   useEffect(() => {
-    dispatch(setSidebarStatus(false));
-    console.log(userInfo);
-  }, []);
+    const initializeUser = async () => {
+      const user = getLoginedUser();
+      dispatch(setLoginedUser(user));
+      dispatch(setSidebarStatus(false));
+      setIsLoading(false);
+    };
+
+    initializeUser();
+  }, [dispatch]);
   return (
     <>
       <Header />

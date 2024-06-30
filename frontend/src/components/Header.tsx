@@ -2,7 +2,7 @@
 import config from "@/config/config.json";
 import "@/styles/AllComponentsStyle.css";
 import { useDispatch, useSelector } from "react-redux";
-import { selectSidebar, AppDispatch } from "@/lib/store";
+import { selectSidebar, AppDispatch, selectUser } from "@/lib/store";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
 import Sidebar from "./Sidebar";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 const Header: React.FC = () => {
   const router = useRouter();
   const isOpenSidebar = useSelector(selectSidebar);
+  const tmpUserInfo = useSelector(selectUser);
   const dispatch = useDispatch<AppDispatch>();
 
   const openSidebar = () => {
@@ -20,12 +21,11 @@ const Header: React.FC = () => {
     <>
       <div className="header-main">
         <div className="hamburger-menu" onClick={() => openSidebar()}>
-          ≡
-          {/* <img
+          <img
             className="hamburger-menu-icon"
             src="/assets/hamburger-menu-icon.svg"
             alt="ハンバーガーメニュー"
-          /> */}
+          />
         </div>
         <div className="header-label-outer">
           <label
@@ -35,6 +35,7 @@ const Header: React.FC = () => {
             {config.title}
           </label>
         </div>
+        <div className="logined-user-info"></div>
       </div>
       {isOpenSidebar && <Sidebar />}
     </>

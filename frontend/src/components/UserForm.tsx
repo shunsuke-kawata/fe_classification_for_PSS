@@ -126,8 +126,8 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
       setCookie("email", userData.email);
       setCookie("authority", userData.authority);
       //storeにユーザ情報を入れる
-      dispatch(setLoginedUser(loginedUserInfo));
       router.push("/project");
+      dispatch(setLoginedUser(loginedUserInfo));
     } else {
       setErrorMessage("ログインに失敗しました");
     }
@@ -143,103 +143,107 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
           {formType === "signin" ? (
             <>
               <div className="user-form-contents">
-                <label className="user-form-label" htmlFor="name">
+                <label className="user-form-label">
                   メールアドレス
+                  <input
+                    className="user-form-input"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="メールアドレスを入力してください"
+                    ref={email}
+                  />
                 </label>
-                <input
-                  className="user-form-input"
-                  type="text"
-                  autoComplete="off"
-                  placeholder="メールアドレスを入力してください"
-                  ref={email}
-                />
               </div>
               <div className="user-form-contents">
-                <label className="user-form-label" htmlFor="name">
+                <label className="user-form-label">
                   ハンドルネーム
+                  <input
+                    className="user-form-input"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="ハンドルネームを入力してください"
+                    ref={handleName}
+                  />
                 </label>
-                <input
-                  className="user-form-input"
-                  type="text"
-                  autoComplete="off"
-                  placeholder="ハンドルネームを入力してください"
-                  ref={handleName}
-                />
               </div>
               <div className="user-form-contents">
-                <label className="user-form-label" htmlFor="password">
+                <label className="user-form-label">
                   パスワード
+                  <input
+                    className="user-form-input"
+                    type="password"
+                    autoComplete="off"
+                    placeholder="パスワードを入力してください"
+                    ref={password}
+                  />
                 </label>
-                <input
-                  className="user-form-input"
-                  type="password"
-                  autoComplete="off"
-                  placeholder="パスワードを入力してください"
-                  ref={password}
-                />
               </div>
               <div className="user-form-contents">
-                <label htmlFor="normal">一般ユーザ</label>
-                <input
-                  type="radio"
-                  id="normal"
-                  name="authority"
-                  className="auth-radio-button"
-                  value={0}
-                  checked={!isAdminUser}
-                  onChange={() => onChangeUserAuth(false)}
-                />
-                <label htmlFor="admin">管理者ユーザ</label>
-                <input
-                  type="radio"
-                  id="admin"
-                  name="authority"
-                  className="auth-radio-button"
-                  value={1}
-                  checked={isAdminUser}
-                  onChange={() => onChangeUserAuth(true)}
-                />
+                <label>
+                  一般ユーザ
+                  <input
+                    type="radio"
+                    id="normal"
+                    name="authority"
+                    className="auth-radio-button"
+                    value={0}
+                    checked={!isAdminUser}
+                    onChange={() => onChangeUserAuth(false)}
+                  />
+                </label>
+                <label>
+                  管理者ユーザ
+                  <input
+                    type="radio"
+                    id="admin"
+                    name="authority"
+                    className="auth-radio-button"
+                    value={1}
+                    checked={isAdminUser}
+                    onChange={() => onChangeUserAuth(true)}
+                  />
+                </label>
               </div>
               <div className="user-form-contents">
-                <label className="user-form-label" htmlFor="administratorCode">
+                <label className="user-form-label">
                   管理者コード
+                  <input
+                    className="user-form-input"
+                    type="number"
+                    autoComplete="off"
+                    placeholder="管理者コードを入力してください"
+                    disabled={!isAdminUser}
+                    value={administratorCodeValue}
+                    onChange={(e) => setAdministratorCodeValue(e.target.value)}
+                  />
                 </label>
-                <input
-                  className="user-form-input"
-                  type="number"
-                  autoComplete="off"
-                  placeholder="管理者コードを入力してください"
-                  disabled={!isAdminUser}
-                  value={administratorCodeValue}
-                  onChange={(e) => setAdministratorCodeValue(e.target.value)}
-                />
               </div>
             </>
           ) : (
             <>
               <div className="user-form-contents">
-                <label className="user-form-label" htmlFor="name">
+                <label className="user-form-label">
                   メールアドレス or ハンドルネーム
+                  <input
+                    className="user-form-input"
+                    type="text"
+                    autoComplete="off"
+                    placeholder="メールアドレスかハンドルネームを入力してください"
+                    ref={emailOrhandleName}
+                  />
                 </label>
-                <input
-                  className="user-form-input"
-                  type="text"
-                  autoComplete="off"
-                  placeholder="メールアドレスかハンドルネームを入力してください"
-                  ref={emailOrhandleName}
-                />
               </div>
               <div className="user-form-contents">
-                <label className="user-form-label" htmlFor="password">
+                <label className="user-form-label">
                   パスワード
+                  <input
+                    className="user-form-input"
+                    type="password"
+                    autoComplete="off"
+                    placeholder="パスワードを入力してください"
+                    ref={password}
+                  />
                 </label>
-                <input
-                  className="user-form-input"
-                  type="password"
-                  autoComplete="off"
-                  placeholder="パスワードを入力してください"
-                  ref={password}
-                />
               </div>
             </>
           )}

@@ -5,12 +5,30 @@ import "./page.modules.css";
 import { getProject, projectType } from "@/api/api";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { getLoginedUser } from "@/utils/utils";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/lib/store";
+import { setLoginedUser } from "@/lib/userReducer";
+import { setSidebarStatus } from "@/lib/sidebarReducer";
 
 const ProjectDetail: React.FC = () => {
   const router = useRouter();
   const { projectId } = useParams<{ projectId: string }>();
   const [project, setProject] = useState<projectType | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [displayStatus, setDisplayStatus] = useState<string>("origin");
+  const dispatch = useDispatch<AppDispatch>();
+  const loginedUser = getLoginedUser();
+  useEffect(() => {
+    const initializeUser = async () => {
+      const user = getLoginedUser();
+      dispatch(setLoginedUser(user));
+      dispatch(setSidebarStatus(false));
+      setIsLoading(false);
+    };
+
+    initializeUser();
+  }, [dispatch]);
 
   //プロジェクト情報の取得
   useEffect(() => {
