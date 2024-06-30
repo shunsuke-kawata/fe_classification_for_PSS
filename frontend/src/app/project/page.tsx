@@ -4,25 +4,27 @@ import "@/app/globals.css";
 import "./page.modules.css";
 import Header from "@/components/Header";
 import config from "@/config/config.json";
-import { getData, getProjectMembership } from "@/api/api";
+import { getData } from "@/api/api";
 import NewProjectModal from "@/components/NewProjectModal";
-import {
-  projectType,
-  projectMembershipParamType,
-  projectMembershipType,
-} from "@/api/api";
+import { projectType, projectMembershipType } from "@/api/api";
 import ProjectList from "@/components/ProjectList";
 import { getCookie } from "cookies-next";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser, AppDispatch } from "@/lib/store";
+import { getLoginedUser } from "@/utils/utils";
+import { setLoginedUser } from "@/lib/userReducer";
 
 const Projects: React.FC = () => {
   const [isOpenNewProjectModal, setIsOpenNewProjectModal] =
     useState<boolean>(false);
   const [projects, setProjects] = useState<projectType[]>([]);
-  const [projectMemberships, setProjectMemberships] = useState<
-    projectMembershipType[]
-  >([]);
+  const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
+    // Cookie からユーザー情報を取得し、Redux ストアに設定する
+    const loginedUser = getLoginedUser();
+    dispatch(setLoginedUser(loginedUser));
+
     const getAllProjects = async () => {
       try {
         const userId = getCookie("id");
@@ -34,11 +36,16 @@ const Projects: React.FC = () => {
       }
     };
     getAllProjects();
-  }, [isOpenNewProjectModal]);
+  }, [dispatch, isOpenNewProjectModal]);
 
   const openNewProjectModal = () => {
     setIsOpenNewProjectModal(true);
   };
+
+  const userInfo = useSelector(selectUser);
+  useEffect(() => {
+    console.log(userInfo); // userInfo が変更されたときにログに出力
+  }, [userInfo]);
 
   return (
     <>
@@ -46,9 +53,12 @@ const Projects: React.FC = () => {
       <div className="project-main-div">
         <input
           type="button"
-          className="common-buttons add-project-button"
+          className={`add-project-button ${
+            userInfo.authority ? "common-buttons" : "locked-common-buttons"
+          }`}
           value="作成    ＋"
           onClick={() => openNewProjectModal()}
+          disabled={!userInfo.authority}
         />
 
         <ProjectList projects={projects} />
@@ -61,4 +71,5 @@ const Projects: React.FC = () => {
     </>
   );
 };
+
 export default Projects;

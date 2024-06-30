@@ -7,7 +7,8 @@ import {
   postProjectMembership,
   newProjectMembershipType,
 } from "@/api/api";
-import { getCookie } from "cookies-next";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser } from "@/lib/store";
 
 //それぞれのバリデーション関数
 const validateProjectName = (projectName: string): boolean => {
@@ -16,9 +17,8 @@ const validateProjectName = (projectName: string): boolean => {
 const validatePassword = (password: string): boolean => {
   return password.length >= 4;
 };
-const validateOwnerId = (ownerId: string): boolean => {
-  const numericRegex = /\d+/;
-  return numericRegex.test(ownerId);
+const validateOwnerId = (ownerId: number | null): boolean => {
+  return ownerId !== null;
 };
 
 type newProjectModalProps = {
@@ -32,6 +32,7 @@ const NewProjectModal: React.FC<newProjectModalProps> = ({
   const password = useRef<HTMLInputElement>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
+  const userInfo = useSelector(selectUser);
   const closeNewProjectModal = () => {
     setIsOpenNewProjectModal(false);
   };
@@ -40,8 +41,7 @@ const NewProjectModal: React.FC<newProjectModalProps> = ({
     const passwordValue = password.current?.value || "";
     const descriptionValue = description.current?.value || "";
 
-    const userId = getCookie("id");
-    const ownerIdValue = userId || "";
+    const ownerIdValue = userInfo.id;
 
     //プロジェクト名とパスワードについてバリデーションを行い、説明に関しては特に行わない
     if (!validateProjectName(projectNameValue)) {

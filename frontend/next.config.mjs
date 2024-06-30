@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const nextConfig = {
+  reactStrictMode: false,
   env: {
     PORT: process.env.PORT,
   },

@@ -2,7 +2,8 @@
 import { executeJoinProject, joinUserType, projectType } from "@/api/api";
 import "@/styles/AllComponentsStyle.css";
 import { useRef, useState } from "react";
-import { getCookie } from "cookies-next";
+import { useSelector } from "react-redux";
+import { selectUser } from "@/lib/store";
 
 type newProjectModalProps = {
   project: projectType;
@@ -21,6 +22,7 @@ const JoinProjectModal: React.FC<newProjectModalProps> = ({
   const password = useRef<HTMLInputElement>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
+  const userInfo = useSelector(selectUser);
   const onSubmitJoinProject = async () => {
     const passwordValue = password.current?.value || "";
     if (!validatePassword(passwordValue)) {
@@ -28,10 +30,9 @@ const JoinProjectModal: React.FC<newProjectModalProps> = ({
       return;
     }
     setErrorMessage("");
-    const userId = getCookie("id");
     const joinUser: joinUserType = {
       project_id: project.id,
-      user_id: Number(userId),
+      user_id: Number(userInfo.id),
       project_password: passwordValue,
     };
     const joinProjectRes = await executeJoinProject(project.id, joinUser);

@@ -2,9 +2,17 @@
 import "./page.modules.css";
 import "@/app/globals.css";
 import Header from "@/components/Header";
+import { selectUser } from "@/lib/store";
 import { useRouter } from "next/navigation";
-const Home = () => {
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+const Top = () => {
   const router = useRouter();
+
+  const userInfo = useSelector(selectUser);
+  useEffect(() => {
+    console.log(userInfo);
+  }, []);
 
   return (
     <main>
@@ -27,4 +35,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Top;

@@ -36,7 +36,7 @@ const ProjectDetail: React.FC = () => {
       {project ? (
         <>
           <div className="project-detail-main">
-            <div>{project.name}</div>
+            <div className="project-detail-title">{project.name}</div>
           </div>
         </>
       ) : (

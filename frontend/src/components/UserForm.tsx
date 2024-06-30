@@ -3,7 +3,6 @@ import config from "@/config/config.json";
 import "@/styles/AllComponentsStyle.css";
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { setLoginedUser, LoginUserState } from "@/lib/userReducer";
 import {
   executeLogin,
   loginUserType,
@@ -11,6 +10,7 @@ import {
   signupUserType,
 } from "@/api/api";
 import { setCookie } from "cookies-next";
+import { setLoginedUser, LoginUserState } from "@/lib/userReducer";
 import { AppDispatch } from "@/lib/store";
 import { useDispatch } from "react-redux";
 
@@ -120,12 +120,13 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
         email: userData.email,
         authority: userData.authority,
       };
-      dispatch(setLoginedUser(loginedUserInfo));
 
       setCookie("id", userData.id);
       setCookie("name", userData.name);
       setCookie("email", userData.email);
       setCookie("authority", userData.authority);
+      //storeにユーザ情報を入れる
+      dispatch(setLoginedUser(loginedUserInfo));
       router.push("/project");
     } else {
       setErrorMessage("ログインに失敗しました");
