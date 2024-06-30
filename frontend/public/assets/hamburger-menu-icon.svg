@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <defs>
+    <style>
+      .cls-2 {
+        stroke: #FFFFFF;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 4px;
+      }
+    </style>
+  </defs>
+  <title>bars_24</title>
+  <g id="レイヤー_2" data-name="レイヤー 2">
+    <g id="icon">
+      <line class="cls-2" x1="10" y1="12" x2="38" y2="12"/>
+      <line class="cls-2" x1="10" y1="24" x2="38" y2="24"/>
+      <line class="cls-2" x1="10" y1="36" x2="38" y2="36"/>
+    </g>
+  </g>
+</svg>

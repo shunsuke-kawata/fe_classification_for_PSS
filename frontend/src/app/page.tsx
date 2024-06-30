@@ -2,6 +2,7 @@
 import "./page.modules.css";
 import "@/app/globals.css";
 import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
 import { selectUser } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

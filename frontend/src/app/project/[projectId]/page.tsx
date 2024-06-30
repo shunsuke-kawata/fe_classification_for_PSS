@@ -3,14 +3,14 @@ import Header from "@/components/Header";
 import "@/app/globals.css";
 import "./page.modules.css";
 import { getProject, projectType } from "@/api/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 
 const ProjectDetail: React.FC = () => {
   const router = useRouter();
   const { projectId } = useParams<{ projectId: string }>();
-
   const [project, setProject] = useState<projectType | null>(null);
+  const [displayStatus, setDisplayStatus] = useState<string>("origin");
 
   //プロジェクト情報の取得
   useEffect(() => {
@@ -36,7 +36,16 @@ const ProjectDetail: React.FC = () => {
       {project ? (
         <>
           <div className="project-detail-main">
+            <input
+              type="button"
+              className="project-detail-button upload-img-button common-buttons"
+              value="アップロード"
+            />
             <div className="project-detail-title">{project.name}</div>
+            <div className="menu-outer-flex">
+              <div className="select-display-status">表示状態選択ボタン</div>
+              <div>表示状態に応じたメニュー表示</div>
+            </div>
           </div>
         </>
       ) : (
