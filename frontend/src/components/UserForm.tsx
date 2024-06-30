@@ -126,8 +126,8 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
       setCookie("email", userData.email);
       setCookie("authority", userData.authority);
       //storeにユーザ情報を入れる
-      router.push("/project");
       dispatch(setLoginedUser(loginedUserInfo));
+      router.push("/project");
     } else {
       setErrorMessage("ログインに失敗しました");
     }

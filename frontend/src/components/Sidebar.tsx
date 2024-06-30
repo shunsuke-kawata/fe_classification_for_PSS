@@ -4,7 +4,8 @@ import { setSidebarStatus } from "@/lib/sidebarReducer";
 import { AppDispatch, selectSidebar } from "@/lib/store";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
-import { logout } from "@/utils/utils";
+import { getLoginedUser, logout } from "@/utils/utils";
+import { setLoginedUser } from "@/lib/userReducer";
 
 const Sidebar: React.FC = () => {
   const router = useRouter();
@@ -15,6 +16,8 @@ const Sidebar: React.FC = () => {
 
   const handleLogout = () => {
     logout();
+    const tmpUser = getLoginedUser();
+    dispatch(setLoginedUser(tmpUser));
     transitFromSidebar("/");
   };
 

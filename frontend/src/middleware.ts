@@ -6,11 +6,11 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const referer = request.headers.get("referer");
 
-  // ログインページとサインアップページには認証を要求しない
   if (
     pathname === "/" ||
     pathname.startsWith("/login") ||
-    pathname.startsWith("/signup")
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/assets")
   ) {
     return NextResponse.next();
   }

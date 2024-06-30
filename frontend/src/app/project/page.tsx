@@ -14,8 +14,10 @@ import { selectUser, AppDispatch } from "@/lib/store";
 import { getLoginedUser } from "@/utils/utils";
 import { setLoginedUser } from "@/lib/userReducer";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
+import { useRouter } from "next/navigation";
 
 const Projects: React.FC = () => {
+  const router = useRouter();
   const [isOpenNewProjectModal, setIsOpenNewProjectModal] =
     useState<boolean>(false);
   const [projects, setProjects] = useState<projectType[]>([]);
@@ -26,8 +28,13 @@ const Projects: React.FC = () => {
   useEffect(() => {
     const initializeUser = async () => {
       const user = getLoginedUser();
-      dispatch(setLoginedUser(user));
-      dispatch(setSidebarStatus(false));
+      if (user) {
+        dispatch(setLoginedUser(user));
+        dispatch(setSidebarStatus(false));
+      } else {
+        router.push("/");
+        return;
+      }
       setIsLoading(false);
     };
 

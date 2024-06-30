@@ -19,11 +19,15 @@ const ProjectDetail: React.FC = () => {
   const [displayStatus, setDisplayStatus] = useState<string>("origin");
   const dispatch = useDispatch<AppDispatch>();
   const loginedUser = getLoginedUser();
+
   useEffect(() => {
     const initializeUser = async () => {
       const user = getLoginedUser();
+      console.log(user);
+
       dispatch(setLoginedUser(user));
       dispatch(setSidebarStatus(false));
+
       setIsLoading(false);
     };
 
@@ -47,6 +51,14 @@ const ProjectDetail: React.FC = () => {
       router.push("/project");
     }
   }, [projectId]);
+
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+      </>
+    );
+  }
 
   return (
     <>

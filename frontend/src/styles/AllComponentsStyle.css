@@ -72,7 +72,7 @@
     height: 480px;
     padding: 25px 5px;
     background-color: #FFFFFF;
-    border: #000000 solid 3px;
+    border: #1A2421 solid 3px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -118,7 +118,7 @@
 
 .to-project-button {
     color: #FFFFFF;
-    background-color: #000000;
+    background-color: #1A2421;
     font-size: 34px;
     text-align: center;
     width: 56px;
@@ -139,7 +139,7 @@
     height: 300px;
     padding: 25px 5px;
     background-color: #FFFFFF;
-    border: #000000 solid 3px;
+    border: #1A2421 solid 3px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -175,7 +175,7 @@
     background-color: #4169e1;
     height: 100vh;
     width: 300px;
-    border-right: #000000 solid 2px;
+    border-right: #1A2421 solid 2px;
     z-index: 100;
 }
 
@@ -190,12 +190,12 @@
     width:50px;
     height:50px;
     color: #FFFFFF;
-    background-color: #000000;
+    background-color: #1A2421;
     
 }
 .close-sidebar-button:hover{
     background-color: #4169e1;
-    border: #000000 solid 1px;
+    border: #1A2421 solid 1px;
 }
 .close-sidebar-button-icon{
     width: 70%;
@@ -214,5 +214,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.sidebar-menu-value:hover{
+    background-color: #3b5fcc;
 }
   

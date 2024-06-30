@@ -50,14 +50,14 @@ const JoinProjectModal: React.FC<newProjectModalProps> = ({
           <div className="user-form-contents">
             <label className="user-form-label" htmlFor="password">
               パスワード
+              <input
+                className="user-form-input"
+                type="password"
+                autoComplete="off"
+                placeholder="パスワードを入力してください"
+                ref={password}
+              />
             </label>
-            <input
-              className="user-form-input"
-              type="password"
-              autoComplete="off"
-              placeholder="パスワードを入力してください"
-              ref={password}
-            />
           </div>
           <div className="error-div user-form-contents">
             <label className="error-sentence">{errorMessage}</label>

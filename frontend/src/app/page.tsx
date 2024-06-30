@@ -5,18 +5,36 @@ import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import { AppDispatch, selectUser } from "@/lib/store";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
+import { setLoginedUser } from "@/lib/userReducer";
+import { getLoginedUser } from "@/utils/utils";
 const Top = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
+  const [isLoading, setIsLoading] = useState(true);
+  const loginedUser = useSelector(selectUser);
 
-  const userInfo = useSelector(selectUser);
   useEffect(() => {
-    dispatch(setSidebarStatus(false));
-    console.log(userInfo);
-  }, []);
+    const initializeUser = async () => {
+      const user = getLoginedUser();
+      dispatch(setLoginedUser(user));
+      dispatch(setSidebarStatus(false));
+      setIsLoading(false);
+      console.log(user);
+    };
+
+    initializeUser();
+  }, [dispatch]);
+
+  if (isLoading) {
+    return (
+      <>
+        <Header />
+      </>
+    );
+  }
 
   return (
     <main>
