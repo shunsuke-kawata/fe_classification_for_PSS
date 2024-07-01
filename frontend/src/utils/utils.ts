@@ -10,7 +10,8 @@ export const getLoginedUser = () => {
     id: userId !== undefined ? Number(userId) : null,
     name: userName !== undefined ? userName : "",
     email: userEmail !== undefined ? userEmail : "",
-    authority: userAuthority !== undefined ? Boolean(userAuthority) : false,
+    authority:
+      userAuthority !== undefined ? Boolean(Number(userAuthority)) : false,
   };
 
   return tmpUser;

@@ -11,7 +11,6 @@ const Header: React.FC = () => {
   const router = useRouter();
   const isOpenSidebar = useSelector(selectSidebar);
   const tmpUserInfo = useSelector(selectUser);
-  console.log(tmpUserInfo);
   const dispatch = useDispatch<AppDispatch>();
 
   const openSidebar = () => {

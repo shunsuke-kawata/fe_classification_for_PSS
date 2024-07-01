@@ -114,6 +114,7 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
     if (res.status === 200) {
       //cookieにログイン情報を追加
       const userData = res.data;
+      console.log(userData);
 
       const loginedUserInfo: LoginUserState = {
         id: userData.id,
@@ -128,6 +129,7 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
       setCookie("authority", userData.authority);
       //storeにユーザ情報を入れる
       const tmpUser = getLoginedUser();
+      console.log(tmpUser);
       dispatch(setLoginedUser(tmpUser));
       router.push("/project");
     } else {

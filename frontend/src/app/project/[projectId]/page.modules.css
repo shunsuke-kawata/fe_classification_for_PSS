@@ -25,9 +25,48 @@
 }
 
 .menu-outer-flex{
+    margin-top: 30px;
+    height:50px;
     display: flex;
+    background-color: aqua;
 }
 
-.select-display-status{
-    background-color: #FFFF00;
-}
+.select-display-status {
+    position: relative;
+    margin-left: 20px;
+    width: 260px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .pulldown-icon {
+    width: 20px;
+  }
+  .checked-icon{
+    width: 16px;
+    margin-left: 20px;
+  }
+  
+  .select-status-label {
+    padding-left: 10px;
+    width: 210px;
+    font-size: 16px;
+  }
+  
+  .select-status-menu {
+    position: absolute;
+    top: 50px;
+    left: 0px;
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .menu-content {
+    display: flex;
+    align-items: center; 
+    padding-left: 10px;
+    font-size: 16px;
+    height: 50px;
+    width: 100%;
+  }  

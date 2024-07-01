@@ -10,13 +10,21 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/lib/store";
 import { setLoginedUser } from "@/lib/userReducer";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
+const statusString: { [key in "origin" | "object" | "group"]: string } = {
+  origin: "元画像一覧",
+  object: "オブジェクト画像一覧",
+  group: "分類結果一覧",
+};
 
 const ProjectDetail: React.FC = () => {
   const router = useRouter();
   const { projectId } = useParams<{ projectId: string }>();
   const [project, setProject] = useState<projectType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [displayStatus, setDisplayStatus] = useState<string>("origin");
+  const [displayStatus, setDisplayStatus] = useState<
+    "origin" | "object" | "group"
+  >("object");
+  const [isOpenPullDown, setIsPullDown] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const loginedUser = getLoginedUser();
 
@@ -52,6 +60,19 @@ const ProjectDetail: React.FC = () => {
     }
   }, [projectId]);
 
+  useEffect(() => {
+    console.log(displayStatus);
+  }, [displayStatus]);
+
+  const closePulldown = () => {
+    setIsPullDown(false);
+  };
+
+  const handleChangeDisplayStatus = (status: "origin" | "object" | "group") => {
+    setDisplayStatus(status);
+    closePulldown();
+  };
+
   if (isLoading) {
     return (
       <>
@@ -73,8 +94,49 @@ const ProjectDetail: React.FC = () => {
             />
             <div className="project-detail-title">{project.name}</div>
             <div className="menu-outer-flex">
-              <div className="select-display-status">表示状態選択ボタン</div>
-              <div>表示状態に応じたメニュー表示</div>
+              <div className="select-display-status">
+                <label className="select-status-label">
+                  {statusString[displayStatus]}
+                </label>
+                <img
+                  className="pulldown-icon"
+                  src={
+                    isOpenPullDown
+                      ? "/assets/pulldown-open-icon.svg"
+                      : "/assets/pulldown-icon.svg"
+                  }
+                  alt=""
+                  onClick={() => setIsPullDown(!isOpenPullDown)}
+                />
+                {isOpenPullDown ? (
+                  <div className="select-status-menu">
+                    {Object.entries(statusString).map(([key, value]) => (
+                      <div
+                        key={key}
+                        onClick={() =>
+                          handleChangeDisplayStatus(
+                            key as "origin" | "object" | "group"
+                          )
+                        }
+                      >
+                        <label className="menu-content">
+                          <span>{value}</span>
+                          {key === displayStatus && (
+                            <img
+                              className="checked-icon"
+                              src="/assets/checked-icon.svg"
+                              alt=""
+                            />
+                          )}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <></>
+                )}
+              </div>
+              <div></div>
             </div>
           </div>
         </>
