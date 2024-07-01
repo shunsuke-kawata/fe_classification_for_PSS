@@ -5,11 +5,12 @@
     margin: 20px auto 0px auto;
     background-color: #FFFFFF;
     min-width:900px;
+    border-radius:5px;
 }
 
 .project-detail-title{
     text-align: center;
-    padding-top: 10px;
+    padding-top: 15px;
     font-size: 30px;
 }
 .upload-img-button{
@@ -25,18 +26,22 @@
 }
 
 .menu-outer-flex{
-    margin-top: 30px;
+    margin-top: 25px;
     height:50px;
     display: flex;
-    background-color: aqua;
+    margin-right: 30px;
+    margin-left: 10px;
+    
 }
-
 .select-display-status {
     position: relative;
     margin-left: 20px;
     width: 260px;
     display: flex;
     align-items: center;
+    background-color: #FFFFFF;
+    border: #000000 solid 1px;
+    border-radius:5px;
   }
   
   .pulldown-icon {
@@ -60,6 +65,8 @@
     width: 260px;
     display: flex;
     flex-direction: column;
+    border: #a9a9a9 solid 0.2px;
+    border-radius:5px;
   }
   
   .menu-content {
@@ -68,5 +75,30 @@
     padding-left: 10px;
     font-size: 16px;
     height: 50px;
-    width: 100%;
-  }  
+    background-color: #FFFFFF;
+  } 
+  .menu-content:hover{
+    background-color: #d3d3d3;
+  }
+
+  .option-buttons-div{
+    margin-left: auto;
+    width:400px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .option-buttons{
+    margin-left: 30px;
+    border-radius:5px;
+    border:none;
+    color: #FFFFFF;
+    font-size: 20px;
+  }
+
+  .display-area{
+    margin:20px auto 20px auto;
+    background-color: aqua;
+    width:95%;
+    height:73%;
+  }

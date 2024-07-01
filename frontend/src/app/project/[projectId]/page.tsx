@@ -23,7 +23,7 @@ const ProjectDetail: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [displayStatus, setDisplayStatus] = useState<
     "origin" | "object" | "group"
-  >("object");
+  >("group");
   const [isOpenPullDown, setIsPullDown] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const loginedUser = getLoginedUser();
@@ -60,9 +60,7 @@ const ProjectDetail: React.FC = () => {
     }
   }, [projectId]);
 
-  useEffect(() => {
-    console.log(displayStatus);
-  }, [displayStatus]);
+  useEffect(() => {}, [displayStatus]);
 
   const closePulldown = () => {
     setIsPullDown(false);
@@ -87,11 +85,6 @@ const ProjectDetail: React.FC = () => {
       {project ? (
         <>
           <div className="project-detail-main">
-            <input
-              type="button"
-              className="project-detail-button upload-img-button common-buttons"
-              value="アップロード"
-            />
             <div className="project-detail-title">{project.name}</div>
             <div className="menu-outer-flex">
               <div className="select-display-status">
@@ -136,7 +129,39 @@ const ProjectDetail: React.FC = () => {
                   <></>
                 )}
               </div>
-              <div></div>
+              <div className="option-buttons-div">
+                {displayStatus === "origin" ? (
+                  <>
+                    <input
+                      type="button"
+                      className="option-buttons upload-buttons"
+                      value="アップロード"
+                    />
+                    <input
+                      type="button"
+                      className="option-buttons delete-buttons"
+                      value="削除"
+                    />
+                  </>
+                ) : displayStatus === "object" ? (
+                  <input
+                    type="button"
+                    className="option-buttons delete-buttons"
+                    value="削除"
+                  />
+                ) : displayStatus == "group" ? (
+                  <input
+                    type="button"
+                    className="option-buttons edit-buttons"
+                    value="編集"
+                  />
+                ) : (
+                  ""
+                )}
+              </div>
+            </div>
+            <div className="display-area">
+              {statusString[displayStatus]}表示
             </div>
           </div>
         </>
