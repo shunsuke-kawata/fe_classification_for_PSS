@@ -38,7 +38,15 @@ const Header: React.FC = () => {
             {config.title}
           </label>
         </div>
-        <div className="user-info-div">{tmpUserInfo.name.slice(0, 1)}</div>
+        <div
+          className={`user-info-div ${
+            tmpUserInfo.authority
+              ? "admin-user-info-div"
+              : "normal-user-info-div"
+          }`}
+        >
+          {tmpUserInfo.name.slice(0, 1)}
+        </div>
       </div>
       {isOpenSidebar && (
         <>

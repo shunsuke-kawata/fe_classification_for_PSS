@@ -92,40 +92,40 @@ const NewProjectModal: React.FC<newProjectModalProps> = ({
         <label className="form-title">新規作成</label>
         <div className="input-form">
           <div className="user-form-contents">
-            <label className="user-form-label" htmlFor="name">
+            <label className="user-form-label">
               プロジェクト名
+              <input
+                className="user-form-input"
+                type="text"
+                autoComplete="off"
+                placeholder="プロジェクト名を入力してください"
+                ref={projectName}
+              />
             </label>
-            <input
-              className="user-form-input"
-              type="text"
-              autoComplete="off"
-              placeholder="プロジェクト名を入力してください"
-              ref={projectName}
-            />
           </div>
           <div className="user-form-contents">
-            <label className="user-form-label" htmlFor="description">
+            <label className="user-form-label">
               説明
+              <input
+                className="user-form-input"
+                type="text"
+                autoComplete="off"
+                placeholder="プロジェクトの説明を入力してください"
+                ref={description}
+              />
             </label>
-            <input
-              className="user-form-input"
-              type="text"
-              autoComplete="off"
-              placeholder="プロジェクトの説明を入力してください"
-              ref={description}
-            />
           </div>
           <div className="user-form-contents">
-            <label className="user-form-label" htmlFor="password">
+            <label className="user-form-label">
               パスワード
+              <input
+                className="user-form-input"
+                type="password"
+                autoComplete="off"
+                placeholder="パスワードを入力してください"
+                ref={password}
+              />
             </label>
-            <input
-              className="user-form-input"
-              type="password"
-              autoComplete="off"
-              placeholder="パスワードを入力してください"
-              ref={password}
-            />
           </div>
           <div className="error-div user-form-contents">
             <label className="error-sentence">{errorMessage}</label>
