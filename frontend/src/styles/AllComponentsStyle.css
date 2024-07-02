@@ -71,10 +71,10 @@
     height: 480px;
     padding: 25px 5px;
     background-color: #FFFFFF;
-    border: #1A2421 solid 3px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 90000;
 }
 
 .project-list-main{
@@ -117,7 +117,7 @@
 
 .to-project-button {
     color: #FFFFFF;
-    background-color: #1A2421;
+    background-color: #4169e1;
     font-size: 34px;
     text-align: center;
     width: 56px;
@@ -128,8 +128,7 @@
     justify-content: center;
 }
 .to-project-button:hover{
-    background-color: #4169e1;
-    border:#FFFFFF solid 1px;
+    background-color: #3453b3;
 }
 
 .join-project-modal-main {
@@ -138,10 +137,10 @@
     height: 300px;
     padding: 25px 5px;
     background-color: #FFFFFF;
-    border: #1A2421 solid 3px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 90000;
 }
 
 .join-project-input-form{
@@ -174,8 +173,7 @@
     background-color: #4169e1;
     height: 100vh;
     width: 300px;
-    border-right: #1A2421 solid 2px;
-    z-index: 100;
+    z-index: 100000;
 }
 
 
@@ -189,13 +187,12 @@
     width:50px;
     height:50px;
     color: #FFFFFF;
-    background-color: #1A2421;
+    background-color: none;
     
 }
-.close-sidebar-button:hover{
-    background-color: #4169e1;
-    border: #1A2421 solid 1px;
-}
+/* .close-sidebar-button:hover{
+    background-color: #3b5fcc;
+} */
 .close-sidebar-button-icon{
     width: 70%;
     height: 70%;
@@ -231,3 +228,13 @@
     border-radius: 25px;
     color: #4169e1;
 }
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+  }

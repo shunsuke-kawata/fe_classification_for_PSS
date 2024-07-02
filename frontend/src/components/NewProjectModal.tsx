@@ -148,6 +148,7 @@ const NewProjectModal: React.FC<newProjectModalProps> = ({
           />
         </div>
       </div>
+      <div className="overlay"></div>
     </>
   );
 };

@@ -79,6 +79,7 @@ const JoinProjectModal: React.FC<newProjectModalProps> = ({
           />
         </div>
       </div>
+      <div className="overlay"></div>
     </>
   );
 };

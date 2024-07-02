@@ -16,6 +16,9 @@ const Header: React.FC = () => {
   const openSidebar = () => {
     dispatch(setSidebarStatus(true));
   };
+  const closeSidebar = () => {
+    dispatch(setSidebarStatus(false));
+  };
 
   return (
     <>
@@ -37,7 +40,12 @@ const Header: React.FC = () => {
         </div>
         <div className="user-info-div">{tmpUserInfo.name.slice(0, 1)}</div>
       </div>
-      {isOpenSidebar && <Sidebar />}
+      {isOpenSidebar && (
+        <>
+          <Sidebar />
+          <div className="overlay" onClick={() => closeSidebar()}></div>
+        </>
+      )}
     </>
   );
 };

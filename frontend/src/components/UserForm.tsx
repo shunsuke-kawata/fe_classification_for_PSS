@@ -129,7 +129,6 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
       setCookie("authority", userData.authority);
       //storeにユーザ情報を入れる
       const tmpUser = getLoginedUser();
-      console.log(tmpUser);
       dispatch(setLoginedUser(tmpUser));
       router.push("/project");
     } else {
