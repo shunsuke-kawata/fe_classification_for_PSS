@@ -47,7 +47,7 @@ const Projects: React.FC = () => {
         const userId = loginedUser.id;
         const url = `${config.backend_base_url}/projects`;
         const allProjects = await getData(url, { user_id: userId });
-        setProjects(allProjects);
+        setProjects(allProjects.data);
       } catch (error) {
         console.error("Failed to get projects:", error);
       }

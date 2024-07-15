@@ -29,13 +29,6 @@ const Sidebar: React.FC = () => {
   return (
     <>
       <div className="sidebar-main">
-        {/* <div className="close-sidebar-button" onClick={() => closeSidebar()}>
-          <img
-            className="close-sidebar-button-icon"
-            src="/assets/batsu-icon.svg"
-            alt="バツボタン"
-          />
-        </div> */}
         <div className="sidebar-menu">
           <div
             className="sidebar-menu-value"

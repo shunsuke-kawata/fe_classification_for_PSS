@@ -1,7 +1,9 @@
 "use client";
-import Header from "@/components/Header";
 import "@/app/globals.css";
 import "./page.modules.css";
+import config from "@/config/config.json";
+import Header from "@/components/Header";
+import ImageList from "@/components/ImageList";
 import { getProject, projectType } from "@/api/api";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -47,7 +49,7 @@ const ProjectDetail: React.FC = () => {
     const fetchProject = async () => {
       try {
         const projectRes = await getProject(projectId);
-        setProject(projectRes);
+        setProject(projectRes.data);
       } catch (error) {
         console.error("Failed to get projects:", error);
         router.push("/project");
@@ -161,7 +163,7 @@ const ProjectDetail: React.FC = () => {
               </div>
             </div>
             <div className="display-area">
-              {statusString[displayStatus]}表示
+              <ImageList displayStatus={displayStatus} />
             </div>
           </div>
         </>
