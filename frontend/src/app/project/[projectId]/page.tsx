@@ -4,6 +4,7 @@ import "./page.modules.css";
 import config from "@/config/config.json";
 import Header from "@/components/Header";
 import ImageList from "@/components/ImageList";
+import GroupList from "@/components/GroupList";
 import { getProject, projectType } from "@/api/api";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -19,6 +20,14 @@ const statusString: { [key in "origin" | "object" | "group"]: string } = {
 };
 
 const ProjectDetail: React.FC = () => {
+  //中間発表用の値を表示する
+  const [originalImagesPath, setOriginalImagesPath] = useState<string[]>([]);
+  const [objectImagesPath, setObjectImagesPath] = useState<string[]>([]);
+  const [objectGroups, setObjectGroups] = useState<{
+    [key: string]: string[];
+  }>({});
+  //実際の研究ではデータベースからfetch
+
   const router = useRouter();
   const { projectId } = useParams<{ projectId: string }>();
   const [project, setProject] = useState<projectType | null>(null);
@@ -30,6 +39,7 @@ const ProjectDetail: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const loginedUser = getLoginedUser();
 
+  //ユーザ情報の読み込み
   useEffect(() => {
     const initializeUser = async () => {
       const user = getLoginedUser();
@@ -57,6 +67,11 @@ const ProjectDetail: React.FC = () => {
     };
 
     fetchProject();
+
+    //テストデータのパスをセット
+    setOriginalImagesPath(config.images_path.original_images);
+    setObjectImagesPath(Object.values(config.images_path.object_images).flat());
+    setObjectGroups(config.images_path.object_images);
     if (!projectId) {
       router.push("/project");
     }
@@ -162,8 +177,17 @@ const ProjectDetail: React.FC = () => {
                 )}
               </div>
             </div>
+
             <div className="display-area">
-              <ImageList displayStatus={displayStatus} />
+              {displayStatus === "origin" ? (
+                <ImageList imagesPath={originalImagesPath} />
+              ) : displayStatus === "object" ? (
+                <ImageList imagesPath={objectImagesPath} />
+              ) : displayStatus === "group" ? (
+                <GroupList objectGroups={objectGroups} />
+              ) : (
+                <></>
+              )}
             </div>
           </div>
         </>

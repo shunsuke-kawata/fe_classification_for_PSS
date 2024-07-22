@@ -67,6 +67,7 @@
     flex-direction: column;
     border: #a9a9a9 solid 0.2px;
     border-radius:5px;
+    z-index: 20;
   }
   
   .menu-content {
@@ -96,9 +97,26 @@
     font-size: 20px;
   }
 
-  .display-area{
-    margin:20px auto 20px auto;
-    background-color: #e0ffff;
-    width:95%;
-    height:76%;
-  }
+.display-area{
+  margin:20px auto 20px auto;
+  width:95%;
+  height:76%;
+  display: flex;
+  flex-wrap: wrap; 
+  justify-content: left; 
+  overflow-y: scroll;
+}
+
+.display-area::-webkit-scrollbar {
+  height: 20px;
+  border-radius: 5px;
+}
+
+.display-area::-webkit-scrollbar-thumb {
+background-color: #4169e1;
+border-radius: 5px;
+
+}
+.display-area::-webkit-scrollbar-thumb:hover {
+background-color: #3453b3;
+}

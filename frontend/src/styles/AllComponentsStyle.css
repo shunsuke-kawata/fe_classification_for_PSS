@@ -256,4 +256,38 @@ background-color: #3453b3;
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
-  }
+}
+
+.display-image-div {
+    width: 140px; 
+    height: 140px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0px 20px 20px 0px;
+}
+
+.display-img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.object-group-thumb-div{
+    position: relative;
+    width: 140px; 
+    height: 140px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0px 20px 20px 0px;
+}
+
+.group-title{
+    position:absolute;
+    top:0;
+    margin: 1px;
+    text-align: center;
+    background-color: #FFFFFF;
+    border: solid 1px #4169e1;
+}
