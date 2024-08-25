@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
+import { newImageType, postImage } from "@/api/api";
 
 type uploadImageModalProps = {
+  projectId: number;
   setIsUploadImageModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 type uploadingFile = {
@@ -8,6 +10,7 @@ type uploadingFile = {
   uploadStatus: "waiting" | "success" | "failed";
 };
 const UploadImageModal: React.FC<uploadImageModalProps> = ({
+  projectId,
   setIsUploadImageModalOpen,
 }) => {
   const [inputImages, setInputImages] = useState<FileList | null>(null);
@@ -58,7 +61,13 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
 
     for (let i = 0; i < uploadingImages.length; i++) {
       uploadingImageNow.current = uploadingImages[i].file;
-      console.log(uploadingImageNow.current);
+      const tmpNewImage: newImageType = {
+        name: uploadingImageNow.current.name,
+        project_id_form: projectId,
+        image_file: uploadingImageNow.current,
+      };
+      console.log(tmpNewImage);
+      postImage(tmpNewImage);
     }
   };
 

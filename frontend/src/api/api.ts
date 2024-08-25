@@ -18,6 +18,12 @@ type newProjectMembershipType = {
   project_id: number;
 };
 
+type newImageType = {
+  name: string;
+  project_id_form: number;
+  image_file: File;
+};
+
 type projectType = {
   id: number;
   name: string;
@@ -151,6 +157,32 @@ const postProjectMembership = async (
   }
 };
 
+//新たな画像のアップロード
+const postImage = async (newImage: newImageType) => {
+  try {
+    const url = `${config.backend_base_url}/images/${newImage.project_id_form}`;
+
+    // FormData を作成してデータを追加
+    const formData = new FormData();
+    formData.append("name", newImage.name);
+    formData.append("project_id_form", newImage.project_id_form.toString());
+    formData.append("image_file", newImage.image_file);
+
+    const response = await axios.post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
 //restから外れたアクション処理//
 
 //ログイン処理
@@ -186,6 +218,7 @@ export type {
   signupUserType,
   newProjectType,
   newProjectMembershipType,
+  newImageType,
   projectMembershipType,
   projectMembershipParamType,
   projectType,
@@ -199,6 +232,7 @@ export {
   postUser,
   postProjectMembership,
   postProject,
+  postImage,
   executeLogin,
   executeJoinProject,
 };

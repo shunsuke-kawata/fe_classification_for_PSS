@@ -207,6 +207,7 @@ const ProjectDetail: React.FC = () => {
       )}
       {isOpenUploadImageModal ? (
         <UploadImageModal
+          projectId={Number(projectId)}
           setIsUploadImageModalOpen={setIsOpenUploadImageModal}
         />
       ) : null}
