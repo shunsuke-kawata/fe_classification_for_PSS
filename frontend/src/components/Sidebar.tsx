@@ -1,4 +1,3 @@
-"use client";
 import "@/styles/AllComponentsStyle.css";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
 import { AppDispatch, selectSidebar } from "@/lib/store";

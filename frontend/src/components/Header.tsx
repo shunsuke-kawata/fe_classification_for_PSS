@@ -1,4 +1,3 @@
-"use client";
 import config from "@/config/config.json";
 import "@/styles/AllComponentsStyle.css";
 import { useDispatch, useSelector } from "react-redux";

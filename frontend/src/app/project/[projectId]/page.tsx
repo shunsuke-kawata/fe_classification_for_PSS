@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/lib/store";
 import { setLoginedUser } from "@/lib/userReducer";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
+import UploadImageModal from "@/components/UploadImageModal";
 const statusString: { [key in "origin" | "object" | "group"]: string } = {
   origin: "元画像一覧",
   object: "オブジェクト画像一覧",
@@ -26,6 +27,8 @@ const ProjectDetail: React.FC = () => {
   const [objectGroups, setObjectGroups] = useState<{
     [key: string]: string[];
   }>({});
+  const [isOpenUploadImageModal, setIsOpenUploadImageModal] =
+    useState<boolean>(false);
   //実際の研究ではデータベースからfetch
 
   const router = useRouter();
@@ -34,7 +37,7 @@ const ProjectDetail: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [displayStatus, setDisplayStatus] = useState<
     "origin" | "object" | "group"
-  >("group");
+  >("origin");
   const [isOpenPullDown, setIsPullDown] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const loginedUser = getLoginedUser();
@@ -78,9 +81,16 @@ const ProjectDetail: React.FC = () => {
   }, [projectId]);
 
   useEffect(() => {}, [displayStatus]);
+  useEffect(() => {
+    console.log(project);
+  }, [project]);
 
   const closePulldown = () => {
     setIsPullDown(false);
+  };
+
+  const openUploadImageModal = () => {
+    setIsOpenUploadImageModal(true);
   };
 
   const handleChangeDisplayStatus = (status: "origin" | "object" | "group") => {
@@ -153,6 +163,7 @@ const ProjectDetail: React.FC = () => {
                       type="button"
                       className="option-buttons upload-buttons"
                       value="アップロード"
+                      onClick={() => openUploadImageModal()}
                     />
                     <input
                       type="button"
@@ -194,6 +205,11 @@ const ProjectDetail: React.FC = () => {
       ) : (
         <></>
       )}
+      {isOpenUploadImageModal ? (
+        <UploadImageModal
+          setIsUploadImageModalOpen={setIsOpenUploadImageModal}
+        />
+      ) : null}
     </>
   );
 };

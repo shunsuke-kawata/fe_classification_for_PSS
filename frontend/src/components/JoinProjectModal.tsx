@@ -1,4 +1,3 @@
-"use client";
 import { executeJoinProject, joinUserType, projectType } from "@/api/api";
 import "@/styles/AllComponentsStyle.css";
 import { useRef, useState } from "react";

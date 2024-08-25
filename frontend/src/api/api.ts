@@ -1,6 +1,5 @@
 import config from "@/config/config.json";
 import axios from "axios";
-import { log } from "console";
 
 type signupUserType = {
   email: string;
@@ -24,6 +23,7 @@ type projectType = {
   name: string;
   owner_id: number;
   description: string;
+  root_folder_path: string;
   images_folder_path: string;
   object_images_folder_path: string;
   joined: boolean;

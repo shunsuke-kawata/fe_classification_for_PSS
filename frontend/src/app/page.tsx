@@ -23,6 +23,7 @@ const Top = () => {
       dispatch(setSidebarStatus(false));
       setIsLoading(false);
       console.log(user);
+      console.log(process.env.ACCESS_KEY_ID);
     };
 
     initializeUser();
