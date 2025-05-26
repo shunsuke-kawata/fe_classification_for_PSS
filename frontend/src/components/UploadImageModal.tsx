@@ -51,12 +51,10 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
       }
     );
     setUploadingImages(tmpUploadingImages);
-    console.log(tmpUploadingImages);
-
     setUploadModalStatus("uploading");
   };
 
-  const uploadImages = () => {
+  const uploadImages = async () => {
     if (uploadingImages === null) return;
 
     for (let i = 0; i < uploadingImages.length; i++) {
@@ -66,9 +64,10 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
         project_id_form: projectId,
         image_file: uploadingImageNow.current,
       };
-      console.log(tmpNewImage);
-      postImage(tmpNewImage);
+      const res = await postImage(tmpNewImage);
+      console.log(res);
     }
+    setIsUploadImageModalOpen(false);
   };
 
   return (
@@ -82,7 +81,7 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
               <input
                 type="file"
                 multiple
-                accept="image/*"
+                accept="image/jpeg, image/png, image/webp, image/bmp, image/tiff, image/svg+xml"
                 className="select-image-input"
                 onChange={handleChangeUploadImages}
               />

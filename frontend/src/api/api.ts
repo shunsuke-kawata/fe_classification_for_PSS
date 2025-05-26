@@ -33,15 +33,11 @@ type projectType = {
   images_folder_path: string;
   object_images_folder_path: string;
   joined: boolean;
-  created_at: string;
-  updated_at: string;
 };
 
 type projectMembershipType = {
   user_id: number;
   project_id: number;
-  created_at: string;
-  updated_at: string;
 };
 
 type projectMembershipParamType = {
@@ -80,6 +76,22 @@ const getData = async (url: string, params: any) => {
 const getProject = async (id: string) => {
   try {
     const url = `${config.backend_base_url}/projects/${id}`;
+    const response = await axios.get(url);
+    return response.data; // レスポンスのデータ部分のみを返す
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.error("Error response:", error.response);
+      throw error.response; // エラーレスポンスを投げる
+    } else {
+      console.error("Error:", error);
+      throw error; // その他のエラーを投げる
+    }
+  }
+};
+
+const getImagesInProject = async (id: string) => {
+  try {
+    const url = `${config.backend_base_url}/images/${id}`;
     const response = await axios.get(url);
     return response.data; // レスポンスのデータ部分のみを返す
   } catch (error) {
@@ -229,6 +241,7 @@ export {
   getData,
   getProject,
   getProjectMembership,
+  getImagesInProject,
   postUser,
   postProjectMembership,
   postProject,

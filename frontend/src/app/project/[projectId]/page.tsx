@@ -5,7 +5,7 @@ import config from "@/config/config.json";
 import Header from "@/components/Header";
 import ImageList from "@/components/ImageList";
 import GroupList from "@/components/GroupList";
-import { getProject, projectType } from "@/api/api";
+import { getProject, projectType, getImagesInProject } from "@/api/api";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getLoginedUser } from "@/utils/utils";
@@ -14,8 +14,7 @@ import { AppDispatch } from "@/lib/store";
 import { setLoginedUser } from "@/lib/userReducer";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
 import UploadImageModal from "@/components/UploadImageModal";
-const statusString: { [key in "origin" | "object" | "group"]: string } = {
-  origin: "元画像一覧",
+const statusString: { [key in "object" | "group"]: string } = {
   object: "オブジェクト画像一覧",
   group: "分類結果一覧",
 };
@@ -35,9 +34,9 @@ const ProjectDetail: React.FC = () => {
   const { projectId } = useParams<{ projectId: string }>();
   const [project, setProject] = useState<projectType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [displayStatus, setDisplayStatus] = useState<
-    "origin" | "object" | "group"
-  >("origin");
+  const [displayStatus, setDisplayStatus] = useState<"object" | "group">(
+    "object"
+  );
   const [isOpenPullDown, setIsPullDown] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const loginedUser = getLoginedUser();
@@ -63,13 +62,22 @@ const ProjectDetail: React.FC = () => {
       try {
         const projectRes = await getProject(projectId);
         setProject(projectRes.data);
+        console.log(projectRes.data);
       } catch (error) {
         console.error("Failed to get projects:", error);
         router.push("/project");
       }
     };
+    const fetchImagesInProject = async () => {
+      try {
+        const imageRes = await getImagesInProject(projectId);
+      } catch (error) {
+        console.error("Failed to get images in project :", error);
+      }
+    };
 
     fetchProject();
+    fetchImagesInProject();
 
     //テストデータのパスをセット
     setOriginalImagesPath(config.images_path.original_images);
@@ -93,7 +101,7 @@ const ProjectDetail: React.FC = () => {
     setIsOpenUploadImageModal(true);
   };
 
-  const handleChangeDisplayStatus = (status: "origin" | "object" | "group") => {
+  const handleChangeDisplayStatus = (status: "object" | "group") => {
     setDisplayStatus(status);
     closePulldown();
   };
@@ -134,9 +142,7 @@ const ProjectDetail: React.FC = () => {
                       <div
                         key={key}
                         onClick={() =>
-                          handleChangeDisplayStatus(
-                            key as "origin" | "object" | "group"
-                          )
+                          handleChangeDisplayStatus(key as "object" | "group")
                         }
                       >
                         <label className="menu-content">
@@ -157,7 +163,7 @@ const ProjectDetail: React.FC = () => {
                 )}
               </div>
               <div className="option-buttons-div">
-                {displayStatus === "origin" ? (
+                {displayStatus === "object" ? (
                   <>
                     <input
                       type="button"
@@ -171,12 +177,6 @@ const ProjectDetail: React.FC = () => {
                       value="削除"
                     />
                   </>
-                ) : displayStatus === "object" ? (
-                  <input
-                    type="button"
-                    className="option-buttons delete-buttons"
-                    value="削除"
-                  />
                 ) : displayStatus == "group" ? (
                   <input
                     type="button"
@@ -190,12 +190,12 @@ const ProjectDetail: React.FC = () => {
             </div>
 
             <div className="display-area">
-              {displayStatus === "origin" ? (
-                <ImageList imagesPath={originalImagesPath} />
-              ) : displayStatus === "object" ? (
-                <ImageList imagesPath={objectImagesPath} />
+              {displayStatus === "object" ? (
+                // <ImageList imagesPath={objectImagesPath} />
+                <></>
               ) : displayStatus === "group" ? (
-                <GroupList objectGroups={objectGroups} />
+                // <GroupList objectGroups={objectGroups} />
+                <></>
               ) : (
                 <></>
               )}

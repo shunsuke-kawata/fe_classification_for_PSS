@@ -2,8 +2,9 @@
     "title":"Classification for PSS",
     "description":"Classification for PSS",
     "administrator_code":4645,
-    "frontend_base_url":"http://localhost:5002",
-    "backend_base_url":"http://localhost:8002",
+    "frontend_base_url":"http://localhost:5008",
+    "backend_base_url":"http://localhost:8008",
+    "bucket_base_url":"https://classification-for-pss-bucket-ks.s3.ap-northeast-1.amazonaws.com",
     "images_path":{
         "original_images": [
           "/image_samples/original_images/camera_images_2024-06-23-23-52-19-303-0-1.jpg",
