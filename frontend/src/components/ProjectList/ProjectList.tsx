@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { projectType } from "@/api/api";
 import "@/styles/AllComponentsStyle.css";
 import { useRouter } from "next/navigation";
-import JoinProjectModal from "./JoinProjectModal";
+import JoinProjectModal from "../JoinProjectModal/JoinProjectModal";
 
 type ProjectListProps = {
   projects: projectType[];
@@ -26,7 +26,7 @@ const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
   const prevIsOpen = usePrevious(isOpenJoinProjectModal);
 
   const enterProject = (projectId: number) => {
-    router.push(`/project/${projectId}`);
+    router.push(`/projects/${projectId}`);
   };
 
   const openJoinProjectModal = (project: projectType) => {

@@ -2,9 +2,9 @@
 import "@/app/globals.css";
 import "./page.modules.css";
 import config from "@/config/config.json";
-import Header from "@/components/Header";
-import ImageList from "@/components/ImageList";
-import GroupList from "@/components/GroupList";
+import Header from "@/components/Header/Header";
+import ImageList from "@/components/ImageList/ImageList";
+import GroupList from "@/components/GroupList/GroupList";
 import { getProject, projectType, getImagesInProject } from "@/api/api";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -13,10 +13,15 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/lib/store";
 import { setLoginedUser } from "@/lib/userReducer";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
-import UploadImageModal from "@/components/UploadImageModal";
+import UploadImageModal from "@/components/UploadImageModal/UploadImageModal";
 const statusString: { [key in "object" | "group"]: string } = {
   object: "オブジェクト画像一覧",
   group: "分類結果一覧",
+};
+
+type imageInfo = {
+  id: string;
+  name: string;
 };
 
 const ProjectDetail: React.FC = () => {
@@ -40,6 +45,7 @@ const ProjectDetail: React.FC = () => {
   const [isOpenPullDown, setIsPullDown] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const loginedUser = getLoginedUser();
+  const [imagesInProject, setImagesInProject] = useState<imageInfo[]>([]);
 
   //ユーザ情報の読み込み
   useEffect(() => {
@@ -62,15 +68,19 @@ const ProjectDetail: React.FC = () => {
       try {
         const projectRes = await getProject(projectId);
         setProject(projectRes.data);
-        console.log(projectRes.data);
       } catch (error) {
         console.error("Failed to get projects:", error);
-        router.push("/project");
+        router.push("/projects");
       }
     };
     const fetchImagesInProject = async () => {
       try {
-        const imageRes = await getImagesInProject(projectId);
+        const imageRes = await getImagesInProject(Number(projectId));
+        const images: imageInfo[] = imageRes.data.map((img: any) => ({
+          id: img.id,
+          name: img.name,
+        }));
+        setImagesInProject(images);
       } catch (error) {
         console.error("Failed to get images in project :", error);
       }
@@ -84,14 +94,13 @@ const ProjectDetail: React.FC = () => {
     setObjectImagesPath(Object.values(config.images_path.object_images).flat());
     setObjectGroups(config.images_path.object_images);
     if (!projectId) {
-      router.push("/project");
+      router.push("/projects");
     }
   }, [projectId]);
 
-  useEffect(() => {}, [displayStatus]);
   useEffect(() => {
-    console.log(project);
-  }, [project]);
+    console.log(imagesInProject);
+  }, [imagesInProject]);
 
   const closePulldown = () => {
     setIsPullDown(false);

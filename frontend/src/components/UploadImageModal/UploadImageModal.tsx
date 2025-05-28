@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { newImageType, postImage } from "@/api/api";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, selectUser } from "@/lib/store";
 
 type uploadImageModalProps = {
   projectId: number;
@@ -21,6 +23,7 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
   const [uploadingImages, setUploadingImages] = useState<
     uploadingFile[] | null
   >(null);
+  const loginedUser = useSelector(selectUser);
   const uploadingImageNow = useRef<File | null>(null);
 
   useEffect(() => {
@@ -59,10 +62,17 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
 
     for (let i = 0; i < uploadingImages.length; i++) {
       uploadingImageNow.current = uploadingImages[i].file;
+      if (loginedUser.id === null) {
+        // Handle the error as appropriate for your app
+        alert("ユーザー情報が取得できません。再度ログインしてください。");
+        setIsUploadImageModalOpen(false);
+        return;
+      }
       const tmpNewImage: newImageType = {
         name: uploadingImageNow.current.name,
-        project_id_form: projectId,
+        project_id: projectId,
         image_file: uploadingImageNow.current,
+        uploaded_user_id: loginedUser.id,
       };
       const res = await postImage(tmpNewImage);
       console.log(res);

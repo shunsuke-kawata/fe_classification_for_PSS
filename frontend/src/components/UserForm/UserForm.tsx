@@ -129,7 +129,7 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
       //storeにユーザ情報を入れる
       const tmpUser = getLoginedUser();
       dispatch(setLoginedUser(tmpUser));
-      router.push("/project");
+      router.push("/projects");
     } else {
       setErrorMessage("ログインに失敗しました");
     }

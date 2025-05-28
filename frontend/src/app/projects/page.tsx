@@ -2,12 +2,12 @@
 import { useState, useEffect } from "react";
 import "@/app/globals.css";
 import "./page.modules.css";
-import Header from "@/components/Header";
+import Header from "@/components/Header/Header";
 import config from "@/config/config.json";
 import { getData } from "@/api/api";
-import NewProjectModal from "@/components/NewProjectModal";
+import NewProjectModal from "@/components/NewProjectModal/NewProjectModal";
 import { projectType, projectMembershipType } from "@/api/api";
-import ProjectList from "@/components/ProjectList";
+import ProjectList from "@/components/ProjectList/ProjectList";
 import { getCookie } from "cookies-next";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, AppDispatch } from "@/lib/store";

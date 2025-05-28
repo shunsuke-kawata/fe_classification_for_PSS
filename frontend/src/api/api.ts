@@ -20,10 +20,10 @@ type newProjectMembershipType = {
 
 type newImageType = {
   name: string;
-  project_id_form: number;
+  project_id: number;
+  uploaded_user_id: number;
   image_file: File;
 };
-
 type projectType = {
   id: number;
   name: string;
@@ -89,10 +89,12 @@ const getProject = async (id: string) => {
   }
 };
 
-const getImagesInProject = async (id: string) => {
+const getImagesInProject = async (project_id: number) => {
   try {
-    const url = `${config.backend_base_url}/images/${id}`;
-    const response = await axios.get(url);
+    const url = `${config.backend_base_url}/images`;
+    const response = await axios.get(url, {
+      params: { project_id },
+    });
     return response.data; // レスポンスのデータ部分のみを返す
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -172,13 +174,13 @@ const postProjectMembership = async (
 //新たな画像のアップロード
 const postImage = async (newImage: newImageType) => {
   try {
-    const url = `${config.backend_base_url}/images/${newImage.project_id_form}`;
+    const url = `${config.backend_base_url}/images`;
 
-    // FormData を作成してデータを追加
     const formData = new FormData();
     formData.append("name", newImage.name);
-    formData.append("project_id_form", newImage.project_id_form.toString());
-    formData.append("image_file", newImage.image_file);
+    formData.append("project_id", newImage.project_id.toString());
+    formData.append("uploaded_user_id", newImage.uploaded_user_id.toString());
+    formData.append("file", newImage.image_file);
 
     const response = await axios.post(url, formData, {
       headers: {
@@ -194,7 +196,6 @@ const postImage = async (newImage: newImageType) => {
     return Promise.reject(error);
   }
 };
-
 //restから外れたアクション処理//
 
 //ログイン処理
