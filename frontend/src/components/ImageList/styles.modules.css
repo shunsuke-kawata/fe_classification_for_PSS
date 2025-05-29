@@ -1,0 +1,8 @@
+.image-thumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 10px; /* 画像の間隔調整 */
+
+  max-height: 100%;
+}

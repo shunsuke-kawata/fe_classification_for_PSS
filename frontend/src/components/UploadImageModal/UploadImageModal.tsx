@@ -69,7 +69,6 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
         return;
       }
       const tmpNewImage: newImageType = {
-        name: uploadingImageNow.current.name,
         project_id: projectId,
         image_file: uploadingImageNow.current,
         uploaded_user_id: loginedUser.id,
@@ -78,6 +77,7 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
       console.log(res);
     }
     setIsUploadImageModalOpen(false);
+    window.location.reload();
   };
 
   return (

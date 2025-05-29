@@ -1,21 +1,41 @@
 import React, { useState, useEffect } from "react";
 import config from "@/config/config.json";
 import "@/styles/AllComponentsStyle.css";
+import Image from "../Image/Image";
+import { imageInfo } from "@/app/projects/[projectId]/page";
+import { fullImageInfo } from "../Image/Image";
+import "./styles.modules.css";
 
 type imagesListProps = {
-  imagesPath: string[];
+  fullImageInfolist: imageInfo[];
+  originalImageFolderPath: string;
 };
 
-const ImageList: React.FC<imagesListProps> = ({ imagesPath }) => {
-  const [displayImagesPath, setDisplayImagesPath] = useState<string[]>([]);
-  useEffect(() => {}, [displayImagesPath, imagesPath]);
+const ImageList: React.FC<imagesListProps> = ({
+  fullImageInfolist,
+  originalImageFolderPath,
+}: imagesListProps) => {
+  const sortedImagesByDate: imageInfo[] = [...fullImageInfolist].sort(
+    (a, b) => a.created_at.getTime() - b.created_at.getTime()
+  );
+  console.log(originalImageFolderPath);
   return (
     <>
-      {imagesPath.map((imagePath, index) => (
-        <div key={index} className="display-image-div">
-          <img className="display-img" src={imagePath} alt={imagePath} />
-        </div>
-      ))}
+      <div className="image-thumb-list">
+        {sortedImagesByDate.map((image: imageInfo) => {
+          return (
+            <div key={image.id} className="image-thumb-div">
+              <Image
+                id={image.id}
+                name={image.name}
+                is_created_caption={image.is_created_caption}
+                caption={image.caption}
+                original_images_folder_path={originalImageFolderPath}
+              />
+            </div>
+          );
+        })}
+      </div>
     </>
   );
 };

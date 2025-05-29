@@ -10,7 +10,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
 import { setLoginedUser } from "@/lib/userReducer";
 import { getLoginedUser } from "@/utils/utils";
+
 const Top = () => {
+  console.log(process.env.NEXT_PUBLIC_DEFAULT_IMAGE_PATH);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(true);

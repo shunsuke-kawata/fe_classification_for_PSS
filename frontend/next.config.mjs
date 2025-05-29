@@ -6,6 +6,7 @@ const nextConfig = {
   reactStrictMode: false,
   env: {
     PORT: process.env.PORT,
+    DEFAULT_IMAGE_PATH: process.env.DEFAULT_IMAGE_PATH,
   },
 };
 

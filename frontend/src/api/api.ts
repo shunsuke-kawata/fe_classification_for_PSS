@@ -19,7 +19,6 @@ type newProjectMembershipType = {
 };
 
 type newImageType = {
-  name: string;
   project_id: number;
   uploaded_user_id: number;
   image_file: File;
@@ -29,9 +28,9 @@ type projectType = {
   name: string;
   owner_id: number;
   description: string;
-  root_folder_path: string;
-  images_folder_path: string;
-  object_images_folder_path: string;
+  root_folder_id: string;
+  original_images_folder_path: string;
+  init_clustering_state: number;
   joined: boolean;
 };
 
@@ -95,6 +94,7 @@ const getImagesInProject = async (project_id: number) => {
     const response = await axios.get(url, {
       params: { project_id },
     });
+    console.log(response);
     return response.data; // レスポンスのデータ部分のみを返す
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -177,7 +177,6 @@ const postImage = async (newImage: newImageType) => {
     const url = `${config.backend_base_url}/images`;
 
     const formData = new FormData();
-    formData.append("name", newImage.name);
     formData.append("project_id", newImage.project_id.toString());
     formData.append("uploaded_user_id", newImage.uploaded_user_id.toString());
     formData.append("file", newImage.image_file);

@@ -1,10 +1,8 @@
 "use client";
 import "@/app/globals.css";
 import "./page.modules.css";
-import config from "@/config/config.json";
 import Header from "@/components/Header/Header";
 import ImageList from "@/components/ImageList/ImageList";
-import GroupList from "@/components/GroupList/GroupList";
 import { getProject, projectType, getImagesInProject } from "@/api/api";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
@@ -14,23 +12,21 @@ import { AppDispatch } from "@/lib/store";
 import { setLoginedUser } from "@/lib/userReducer";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
 import UploadImageModal from "@/components/UploadImageModal/UploadImageModal";
+import ClusteringResult from "@/components/ClusteringResult/CluesteringResult";
 const statusString: { [key in "object" | "group"]: string } = {
   object: "オブジェクト画像一覧",
   group: "分類結果一覧",
 };
 
-type imageInfo = {
+export type imageInfo = {
   id: string;
   name: string;
+  is_created_caption: boolean;
+  caption: string;
+  created_at: Date;
 };
 
 const ProjectDetail: React.FC = () => {
-  //中間発表用の値を表示する
-  const [originalImagesPath, setOriginalImagesPath] = useState<string[]>([]);
-  const [objectImagesPath, setObjectImagesPath] = useState<string[]>([]);
-  const [objectGroups, setObjectGroups] = useState<{
-    [key: string]: string[];
-  }>({});
   const [isOpenUploadImageModal, setIsOpenUploadImageModal] =
     useState<boolean>(false);
   //実際の研究ではデータベースからfetch
@@ -67,6 +63,7 @@ const ProjectDetail: React.FC = () => {
     const fetchProject = async () => {
       try {
         const projectRes = await getProject(projectId);
+        console.log(projectRes.data);
         setProject(projectRes.data);
       } catch (error) {
         console.error("Failed to get projects:", error);
@@ -76,10 +73,16 @@ const ProjectDetail: React.FC = () => {
     const fetchImagesInProject = async () => {
       try {
         const imageRes = await getImagesInProject(Number(projectId));
-        const images: imageInfo[] = imageRes.data.map((img: any) => ({
-          id: img.id,
-          name: img.name,
-        }));
+        const images: imageInfo[] = imageRes.data.map((img: any) => {
+          return {
+            id: img.id,
+            name: img.name,
+            is_created_caption: img.is_created_caption,
+            caption: img.caption || "",
+            created_at: new Date(img.created_at), // 必要なら parsedDate.date にしてもOK
+            // 他に microseconds を使いたいなら parsedDate.microseconds を別途保存も可能
+          };
+        });
         setImagesInProject(images);
       } catch (error) {
         console.error("Failed to get images in project :", error);
@@ -89,10 +92,6 @@ const ProjectDetail: React.FC = () => {
     fetchProject();
     fetchImagesInProject();
 
-    //テストデータのパスをセット
-    setOriginalImagesPath(config.images_path.original_images);
-    setObjectImagesPath(Object.values(config.images_path.object_images).flat());
-    setObjectGroups(config.images_path.object_images);
     if (!projectId) {
       router.push("/projects");
     }
@@ -101,6 +100,9 @@ const ProjectDetail: React.FC = () => {
   useEffect(() => {
     console.log(imagesInProject);
   }, [imagesInProject]);
+  useEffect(() => {
+    console.log(project);
+  }, [project]);
 
   const closePulldown = () => {
     setIsPullDown(false);
@@ -200,11 +202,14 @@ const ProjectDetail: React.FC = () => {
 
             <div className="display-area">
               {displayStatus === "object" ? (
-                // <ImageList imagesPath={objectImagesPath} />
-                <></>
+                <ImageList
+                  fullImageInfolist={imagesInProject}
+                  originalImageFolderPath={project.original_images_folder_path}
+                />
               ) : displayStatus === "group" ? (
-                // <GroupList objectGroups={objectGroups} />
-                <></>
+                <ClusteringResult
+                  initClusteringState={project.init_clustering_state}
+                />
               ) : (
                 <></>
               )}
