@@ -1,4 +1,3 @@
-"use client";
 import { newProjectType } from "@/api/api";
 import "@/styles/AllComponentsStyle.css";
 import { useRef, useState } from "react";
@@ -66,15 +65,18 @@ const NewProjectModal: React.FC<newProjectModalProps> = ({
     };
     const projectRes = await postProject(newProject);
     if (projectRes.status === 201) {
-      const projectId = projectRes.data.project_id;
+      const projectId = projectRes.data.data.project_id;
       const ownerId = Number(ownerIdValue);
+      console.log(projectId);
       const newProjectMembership: newProjectMembershipType = {
         project_id: projectId,
         user_id: ownerId,
       };
+      console.log(newProjectMembership);
       const projectMembershipRes = await postProjectMembership(
         newProjectMembership
       );
+      console.log(projectMembershipRes);
       if (projectMembershipRes.status === 201) {
         closeNewProjectModal();
       } else {

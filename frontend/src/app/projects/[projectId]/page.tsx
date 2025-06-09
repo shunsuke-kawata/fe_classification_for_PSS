@@ -1,10 +1,9 @@
 "use client";
 import "@/app/globals.css";
 import "./page.modules.css";
-import config from "@/config/config.json";
-import Header from "@/components/Header";
-import ImageList from "@/components/ImageList";
-import { getProject, projectType } from "@/api/api";
+import Header from "@/components/Header/Header";
+import ImageList from "@/components/ImageList/ImageList";
+import { getProject, projectType, getImagesInProject } from "@/api/api";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getLoginedUser } from "@/utils/utils";
@@ -12,24 +11,39 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/lib/store";
 import { setLoginedUser } from "@/lib/userReducer";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
-const statusString: { [key in "origin" | "object" | "group"]: string } = {
-  origin: "元画像一覧",
+import UploadImageModal from "@/components/UploadImageModal/UploadImageModal";
+import ClusteringResult from "@/components/ClusteringResult/CluesteringResult";
+const statusString: { [key in "object" | "group"]: string } = {
   object: "オブジェクト画像一覧",
   group: "分類結果一覧",
 };
 
+export type imageInfo = {
+  id: string;
+  name: string;
+  is_created_caption: boolean;
+  caption: string;
+  created_at: Date;
+};
+
 const ProjectDetail: React.FC = () => {
+  const [isOpenUploadImageModal, setIsOpenUploadImageModal] =
+    useState<boolean>(false);
+  //実際の研究ではデータベースからfetch
+
   const router = useRouter();
   const { projectId } = useParams<{ projectId: string }>();
   const [project, setProject] = useState<projectType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [displayStatus, setDisplayStatus] = useState<
-    "origin" | "object" | "group"
-  >("group");
+  const [displayStatus, setDisplayStatus] = useState<"object" | "group">(
+    "object"
+  );
   const [isOpenPullDown, setIsPullDown] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const loginedUser = getLoginedUser();
+  const [imagesInProject, setImagesInProject] = useState<imageInfo[]>([]);
 
+  //ユーザ情報の読み込み
   useEffect(() => {
     const initializeUser = async () => {
       const user = getLoginedUser();
@@ -49,26 +63,56 @@ const ProjectDetail: React.FC = () => {
     const fetchProject = async () => {
       try {
         const projectRes = await getProject(projectId);
+        console.log(projectRes.data);
         setProject(projectRes.data);
       } catch (error) {
         console.error("Failed to get projects:", error);
-        router.push("/project");
+        router.push("/projects");
+      }
+    };
+    const fetchImagesInProject = async () => {
+      try {
+        const imageRes = await getImagesInProject(Number(projectId));
+        const images: imageInfo[] = imageRes.data.map((img: any) => {
+          return {
+            id: img.id,
+            name: img.name,
+            is_created_caption: img.is_created_caption,
+            caption: img.caption || "",
+            created_at: new Date(img.created_at), // 必要なら parsedDate.date にしてもOK
+            // 他に microseconds を使いたいなら parsedDate.microseconds を別途保存も可能
+          };
+        });
+        setImagesInProject(images);
+      } catch (error) {
+        console.error("Failed to get images in project :", error);
       }
     };
 
     fetchProject();
+    fetchImagesInProject();
+
     if (!projectId) {
-      router.push("/project");
+      router.push("/projects");
     }
   }, [projectId]);
 
-  useEffect(() => {}, [displayStatus]);
+  useEffect(() => {
+    console.log(imagesInProject);
+  }, [imagesInProject]);
+  useEffect(() => {
+    console.log(project);
+  }, [project]);
 
   const closePulldown = () => {
     setIsPullDown(false);
   };
 
-  const handleChangeDisplayStatus = (status: "origin" | "object" | "group") => {
+  const openUploadImageModal = () => {
+    setIsOpenUploadImageModal(true);
+  };
+
+  const handleChangeDisplayStatus = (status: "object" | "group") => {
     setDisplayStatus(status);
     closePulldown();
   };
@@ -109,9 +153,7 @@ const ProjectDetail: React.FC = () => {
                       <div
                         key={key}
                         onClick={() =>
-                          handleChangeDisplayStatus(
-                            key as "origin" | "object" | "group"
-                          )
+                          handleChangeDisplayStatus(key as "object" | "group")
                         }
                       >
                         <label className="menu-content">
@@ -132,12 +174,13 @@ const ProjectDetail: React.FC = () => {
                 )}
               </div>
               <div className="option-buttons-div">
-                {displayStatus === "origin" ? (
+                {displayStatus === "object" ? (
                   <>
                     <input
                       type="button"
                       className="option-buttons upload-buttons"
                       value="アップロード"
+                      onClick={() => openUploadImageModal()}
                     />
                     <input
                       type="button"
@@ -145,12 +188,6 @@ const ProjectDetail: React.FC = () => {
                       value="削除"
                     />
                   </>
-                ) : displayStatus === "object" ? (
-                  <input
-                    type="button"
-                    className="option-buttons delete-buttons"
-                    value="削除"
-                  />
                 ) : displayStatus == "group" ? (
                   <input
                     type="button"
@@ -162,14 +199,32 @@ const ProjectDetail: React.FC = () => {
                 )}
               </div>
             </div>
+
             <div className="display-area">
-              <ImageList displayStatus={displayStatus} />
+              {displayStatus === "object" ? (
+                <ImageList
+                  fullImageInfolist={imagesInProject}
+                  originalImageFolderPath={project.original_images_folder_path}
+                />
+              ) : displayStatus === "group" ? (
+                <ClusteringResult
+                  initClusteringState={project.init_clustering_state}
+                />
+              ) : (
+                <></>
+              )}
             </div>
           </div>
         </>
       ) : (
         <></>
       )}
+      {isOpenUploadImageModal ? (
+        <UploadImageModal
+          projectId={Number(projectId)}
+          setIsUploadImageModalOpen={setIsOpenUploadImageModal}
+        />
+      ) : null}
     </>
   );
 };

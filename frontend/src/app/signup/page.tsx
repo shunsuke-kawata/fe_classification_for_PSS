@@ -1,7 +1,7 @@
 "use client";
 import "@/app/globals.css";
-import Header from "@/components/Header";
-import UserForm from "@/components/UserForm";
+import Header from "@/components/Header/Header";
+import UserForm from "@/components/UserForm/UserForm";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, selectUser } from "@/lib/store";
 import { useEffect, useState } from "react";

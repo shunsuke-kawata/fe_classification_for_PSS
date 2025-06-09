@@ -1,26 +1,45 @@
-"use client";
-import React, { useState } from "react";
-import { projectMembershipType, projectType } from "@/api/api";
+import React, { useEffect, useRef, useState } from "react";
+import { projectType } from "@/api/api";
 import "@/styles/AllComponentsStyle.css";
 import { useRouter } from "next/navigation";
-import JoinProjectModal from "./JoinProjectModal";
-type projectListProps = {
+import JoinProjectModal from "../JoinProjectModal/JoinProjectModal";
+
+type ProjectListProps = {
   projects: projectType[];
 };
 
-const ProjectList: React.FC<projectListProps> = ({ projects }) => {
+const usePrevious = <T,>(value: T): T | undefined => {
+  const ref = useRef<T>();
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+};
+
+const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
   const router = useRouter();
   const [isOpenJoinProjectModal, setIsOpenJoinProjectModal] =
     useState<boolean>(false);
   const [joinTargetProject, setJoinTargetProject] =
     useState<projectType | null>(null);
+
+  const prevIsOpen = usePrevious(isOpenJoinProjectModal);
+
   const enterProject = (projectId: number) => {
-    router.push(`/project/${projectId}`);
+    router.push(`/projects/${projectId}`);
   };
+
   const openJoinProjectModal = (project: projectType) => {
     setJoinTargetProject(project);
     setIsOpenJoinProjectModal(true);
   };
+
+  useEffect(() => {
+    if (prevIsOpen && !isOpenJoinProjectModal) {
+      window.location.reload();
+    }
+  }, [isOpenJoinProjectModal, prevIsOpen]);
+
   return (
     <>
       <div className="project-list-main">
@@ -50,13 +69,11 @@ const ProjectList: React.FC<projectListProps> = ({ projects }) => {
           </div>
         ))}
       </div>
-      {isOpenJoinProjectModal && joinTargetProject !== null ? (
+      {isOpenJoinProjectModal && joinTargetProject !== null && (
         <JoinProjectModal
           project={joinTargetProject}
           setIsOpenJoinProjectModal={setIsOpenJoinProjectModal}
         />
-      ) : (
-        <></>
       )}
     </>
   );

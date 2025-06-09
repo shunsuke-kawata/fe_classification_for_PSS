@@ -1,8 +1,8 @@
 "use client";
 import "./page.modules.css";
 import "@/app/globals.css";
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
+import Header from "@/components/Header/Header";
+import Sidebar from "@/components/Sidebar/Sidebar";
 import { AppDispatch, selectUser } from "@/lib/store";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -10,7 +10,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
 import { setLoginedUser } from "@/lib/userReducer";
 import { getLoginedUser } from "@/utils/utils";
+
 const Top = () => {
+  console.log(process.env.NEXT_PUBLIC_DEFAULT_IMAGE_PATH);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const [isLoading, setIsLoading] = useState(true);
@@ -23,6 +25,7 @@ const Top = () => {
       dispatch(setSidebarStatus(false));
       setIsLoading(false);
       console.log(user);
+      console.log(process.env.ACCESS_KEY_ID);
     };
 
     initializeUser();

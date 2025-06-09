@@ -1,10 +1,9 @@
-"use client";
 import config from "@/config/config.json";
 import "@/styles/AllComponentsStyle.css";
 import { useDispatch, useSelector } from "react-redux";
 import { selectSidebar, AppDispatch, selectUser } from "@/lib/store";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
-import Sidebar from "./Sidebar";
+import Sidebar from "@/components/Sidebar/Sidebar";
 import { useRouter } from "next/navigation";
 
 const Header: React.FC = () => {

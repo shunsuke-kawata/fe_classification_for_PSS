@@ -1,4 +1,3 @@
-"use client";
 import config from "@/config/config.json";
 import "@/styles/AllComponentsStyle.css";
 import { useState, useRef } from "react";
@@ -49,7 +48,7 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
 
   const onChangeUserAuth = (isAdminUser: boolean) => {
     setIsAdminUser(isAdminUser);
-    setAdministratorCodeValue(""); // Clear administrator code value when toggling
+    setAdministratorCodeValue("");
   };
 
   const onSubmitSignup = async () => {
@@ -130,7 +129,7 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
       //storeにユーザ情報を入れる
       const tmpUser = getLoginedUser();
       dispatch(setLoginedUser(tmpUser));
-      router.push("/project");
+      router.push("/projects");
     } else {
       setErrorMessage("ログインに失敗しました");
     }

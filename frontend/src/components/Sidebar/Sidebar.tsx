@@ -1,4 +1,3 @@
-"use client";
 import "@/styles/AllComponentsStyle.css";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
 import { AppDispatch, selectSidebar } from "@/lib/store";
@@ -38,7 +37,7 @@ const Sidebar: React.FC = () => {
           </div>
           <div
             className="sidebar-menu-value"
-            onClick={() => transitFromSidebar("/project")}
+            onClick={() => transitFromSidebar("/projects")}
           >
             プロジェクト一覧
           </div>
