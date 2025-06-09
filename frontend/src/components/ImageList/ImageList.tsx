@@ -18,7 +18,6 @@ const ImageList: React.FC<imagesListProps> = ({
   const sortedImagesByDate: imageInfo[] = [...fullImageInfolist].sort(
     (a, b) => a.created_at.getTime() - b.created_at.getTime()
   );
-  console.log(originalImageFolderPath);
   return (
     <>
       <div className="image-thumb-list">

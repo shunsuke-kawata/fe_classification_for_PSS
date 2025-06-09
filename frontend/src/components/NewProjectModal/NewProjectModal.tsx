@@ -67,16 +67,13 @@ const NewProjectModal: React.FC<newProjectModalProps> = ({
     if (projectRes.status === 201) {
       const projectId = projectRes.data.data.project_id;
       const ownerId = Number(ownerIdValue);
-      console.log(projectId);
       const newProjectMembership: newProjectMembershipType = {
         project_id: projectId,
         user_id: ownerId,
       };
-      console.log(newProjectMembership);
       const projectMembershipRes = await postProjectMembership(
         newProjectMembership
       );
-      console.log(projectMembershipRes);
       if (projectMembershipRes.status === 201) {
         closeNewProjectModal();
       } else {
@@ -85,7 +82,7 @@ const NewProjectModal: React.FC<newProjectModalProps> = ({
         );
       }
     } else {
-      setErrorMessage("ユーザの新規登録に失敗しました");
+      setErrorMessage("プロジェクトの新規作成に失敗しました");
     }
   };
   return (

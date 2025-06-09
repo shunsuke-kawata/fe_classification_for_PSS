@@ -29,7 +29,6 @@ export type imageInfo = {
 const ProjectDetail: React.FC = () => {
   const [isOpenUploadImageModal, setIsOpenUploadImageModal] =
     useState<boolean>(false);
-  //実際の研究ではデータベースからfetch
 
   const router = useRouter();
   const { projectId } = useParams<{ projectId: string }>();
@@ -60,10 +59,9 @@ const ProjectDetail: React.FC = () => {
 
   //プロジェクト情報の取得
   useEffect(() => {
-    const fetchProject = async () => {
+    const fetchProject = async (user_id: number) => {
       try {
-        const projectRes = await getProject(projectId);
-        console.log(projectRes.data);
+        const projectRes = await getProject(projectId, user_id);
         setProject(projectRes.data);
       } catch (error) {
         console.error("Failed to get projects:", error);
@@ -89,7 +87,9 @@ const ProjectDetail: React.FC = () => {
       }
     };
 
-    fetchProject();
+    if (!loginedUser.id) return;
+
+    fetchProject(loginedUser.id);
     fetchImagesInProject();
 
     if (!projectId) {
@@ -97,9 +97,6 @@ const ProjectDetail: React.FC = () => {
     }
   }, [projectId]);
 
-  useEffect(() => {
-    console.log(imagesInProject);
-  }, [imagesInProject]);
   useEffect(() => {
     console.log(project);
   }, [project]);

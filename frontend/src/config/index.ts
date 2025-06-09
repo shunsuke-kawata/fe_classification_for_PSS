@@ -25,4 +25,5 @@ export const clusteringStatus = {
   NotExecuted: 0,
   Executing: 1,
   Finished: 2,
+  Failed: 3,
 };
