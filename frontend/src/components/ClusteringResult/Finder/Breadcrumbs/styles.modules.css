@@ -1,0 +1,21 @@
+.breadcrumbs {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center; /* ← これで親 flex の子は縦中央に */
+  background-color: aliceblue;
+  padding: 8px 16px;
+}
+
+.breadcrumb-item {
+  margin: 0 10px;
+  font-size: 20px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.separator {
+  display: inline-block;
+  font-size: 20px;
+  vertical-align: middle; /* ここで縦中央に揃える */
+  margin: 0 4px;
+}

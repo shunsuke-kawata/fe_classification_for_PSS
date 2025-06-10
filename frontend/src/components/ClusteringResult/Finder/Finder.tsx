@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Breadclumbs from "./Breadcrumbs/Breadcrumbs";
+import "./styles.modules.css";
+import ListView from "./ListView/ListView";
+import ImageFileView from "./ImageFileView/ImageFileView";
 
 interface finderProps {
   result: {
@@ -7,7 +10,7 @@ interface finderProps {
   };
 }
 
-type leafData = { [imageId: string]: string };
+export type leafData = { [imageId: string]: string };
 interface treeNode {
   is_leaf: boolean;
   data: treeData;
@@ -90,16 +93,28 @@ const Finder: React.FC<finderProps> = ({ result }: finderProps) => {
   const getNodesInCurrentFolder = (folderId: string) => {
     const folders = getFoldersInFolder(folderId);
     const files = getFilesInFolder(folderId);
-    const path = folderId === "top" ? [] : findPathToNode(result, folderId);
-    console.log("Folders:", folders); //現在のフォルダ内のフォルダ一覧
-    console.log("Files:", files); //現在のフォルダ内のファイル一覧
-    console.log("Path:", path); //現在のフォルダの親フォルダリスト
+    const path =
+      folderId === "top" ? [] : findPathToNode(result, folderId) ?? [];
+    setCurrentFolderState({
+      ...currentFolderState,
+      parentFolders: path,
+      folders: folders ?? [],
+      files: files ?? {},
+    });
   };
 
+  useEffect(() => {
+    getNodesInCurrentFolder(selectedFolder);
+  }, []);
   return (
     <>
-      <div className="finder-div-main"></div>
-      <Breadclumbs folderList={currentFolderState.parentFolders} />
+      <div className="finder-div-main">
+        <Breadclumbs parentFolders={currentFolderState.parentFolders} />
+        <div className="finder-view-main">
+          <ListView folders={currentFolderState.folders} />
+          <ImageFileView files={currentFolderState.files} />
+        </div>
+      </div>
     </>
   );
 };

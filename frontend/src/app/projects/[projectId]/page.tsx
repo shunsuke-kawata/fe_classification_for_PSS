@@ -197,21 +197,21 @@ const ProjectDetail: React.FC = () => {
               </div>
             </div>
 
-            <div className="display-area">
-              {displayStatus === "object" ? (
+            {displayStatus === "object" ? (
+              <div className="display-area">
                 <ImageList
                   fullImageInfolist={imagesInProject}
                   originalImageFolderPath={project.original_images_folder_path}
                 />
-              ) : displayStatus === "group" ? (
-                <ClusteringResult
-                  mongoResultId={project.mongo_result_id}
-                  initClusteringState={project.init_clustering_state}
-                />
-              ) : (
-                <></>
-              )}
-            </div>
+              </div>
+            ) : displayStatus === "group" ? (
+              <ClusteringResult
+                mongoResultId={project.mongo_result_id}
+                initClusteringState={project.init_clustering_state}
+              />
+            ) : (
+              <></>
+            )}
           </div>
         </>
       ) : (
