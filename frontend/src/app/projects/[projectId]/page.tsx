@@ -128,7 +128,7 @@ const ProjectDetail: React.FC = () => {
       {project ? (
         <>
           <div className="project-detail-main">
-            <div className="project-detail-title">{project.name}</div>
+            <div className="project-title">{project.name}</div>
             <div className="menu-outer-flex">
               <div className="select-display-status">
                 <label className="select-status-label">
@@ -205,6 +205,7 @@ const ProjectDetail: React.FC = () => {
                 />
               ) : displayStatus === "group" ? (
                 <ClusteringResult
+                  mongoResultId={project.mongo_result_id}
                   initClusteringState={project.init_clustering_state}
                 />
               ) : (

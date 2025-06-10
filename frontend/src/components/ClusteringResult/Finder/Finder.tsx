@@ -1,0 +1,107 @@
+import { useState } from "react";
+import Breadclumbs from "./Breadcrumbs/Breadcrumbs";
+
+interface finderProps {
+  result: {
+    [topLevelNodeId: string]: treeNode;
+  };
+}
+
+type leafData = { [imageId: string]: string };
+interface treeNode {
+  is_leaf: boolean;
+  data: treeData;
+}
+
+type treeData = leafData | { [nodeId: string]: treeNode };
+
+const Finder: React.FC<finderProps> = ({ result }: finderProps) => {
+  const [selectedFolder, setSelectedFolder] = useState<string>("top");
+  const [currentFolderState, setCurrentFolderState] = useState<{
+    parentFolders: string[];
+    files: leafData;
+    folders: string[];
+  }>({
+    parentFolders: [],
+    files: {},
+    folders: [],
+  });
+
+  function findNodeById(
+    obj: { [key: string]: treeNode },
+    targetId: string
+  ): treeNode | undefined {
+    for (const key in obj) {
+      const node = obj[key];
+      if (key === targetId) return node;
+      if (!node.is_leaf) {
+        const childData = node.data as { [key: string]: treeNode };
+        const result = findNodeById(childData, targetId);
+        if (result) return result;
+      }
+    }
+    return undefined;
+  }
+
+  const isLeaf = (folderId: string): boolean => {
+    if (folderId === "top") return false;
+    const node = findNodeById(result, folderId);
+    return node?.is_leaf ?? false;
+  };
+
+  const getFoldersInFolder = (folderId: string): string[] => {
+    if (folderId === "top") {
+      return Object.keys(result);
+    }
+    const node = findNodeById(result, folderId);
+    if (!node || node.is_leaf) return [];
+    const childData = node.data as { [key: string]: treeNode };
+    return Object.entries(childData)
+      .filter(([_, value]) => !value.is_leaf)
+      .map(([key]) => key);
+  };
+
+  const getFilesInFolder = (folderId: string): { [id: string]: string } => {
+    const node = findNodeById(result, folderId);
+    if (!node || !node.is_leaf) return {};
+    return node.data as leafData;
+  };
+
+  // 親フォルダのパス（top→親→…→target の順）
+  function findPathToNode(
+    obj: { [key: string]: treeNode },
+    targetId: string,
+    path: string[] = []
+  ): string[] | undefined {
+    for (const key in obj) {
+      const node = obj[key];
+      if (key === targetId) {
+        return path;
+      }
+      if (!node.is_leaf) {
+        const childData = node.data as { [key: string]: treeNode };
+        const result = findPathToNode(childData, targetId, [...path, key]);
+        if (result) return result;
+      }
+    }
+    return undefined;
+  }
+
+  const getNodesInCurrentFolder = (folderId: string) => {
+    const folders = getFoldersInFolder(folderId);
+    const files = getFilesInFolder(folderId);
+    const path = folderId === "top" ? [] : findPathToNode(result, folderId);
+    console.log("Folders:", folders); //現在のフォルダ内のフォルダ一覧
+    console.log("Files:", files); //現在のフォルダ内のファイル一覧
+    console.log("Path:", path); //現在のフォルダの親フォルダリスト
+  };
+
+  return (
+    <>
+      <div className="finder-div-main"></div>
+      <Breadclumbs folderList={currentFolderState.parentFolders} />
+    </>
+  );
+};
+
+export default Finder;

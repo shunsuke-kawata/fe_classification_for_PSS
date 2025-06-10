@@ -243,7 +243,7 @@ const getinitClusteringResult = async (mongo_result_id: string) => {
   try {
     const url = `${config.backend_base_url}/action/clustering/result/${mongo_result_id}`;
     const response = await axios.get(url);
-    return response;
+    return response.data.data;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
       return error.response;
