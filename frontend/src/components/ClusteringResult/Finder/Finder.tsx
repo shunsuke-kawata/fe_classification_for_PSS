@@ -5,6 +5,7 @@ import ListView from "./ListView/ListView";
 import ImageFileView from "./ImageFileView/ImageFileView";
 
 interface finderProps {
+  originalImageFolderPath: string;
   result: {
     [topLevelNodeId: string]: treeNode;
   };
@@ -18,7 +19,10 @@ interface treeNode {
 
 type treeData = leafData | { [nodeId: string]: treeNode };
 
-const Finder: React.FC<finderProps> = ({ result }: finderProps) => {
+const Finder: React.FC<finderProps> = ({
+  result,
+  originalImageFolderPath,
+}: finderProps) => {
   const [selectedFolder, setSelectedFolder] = useState<string>("top");
   const [currentFolderState, setCurrentFolderState] = useState<{
     parentFolders: string[];
@@ -131,7 +135,10 @@ const Finder: React.FC<finderProps> = ({ result }: finderProps) => {
             }
             setSelectedFolder={setSelectedFolder}
           />
-          <ImageFileView files={currentFolderState.files} />
+          <ImageFileView
+            files={currentFolderState.files}
+            originalImageFolderPath={originalImageFolderPath}
+          />
         </div>
       </div>
     </>

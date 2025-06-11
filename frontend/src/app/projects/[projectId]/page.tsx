@@ -3,7 +3,12 @@ import "@/app/globals.css";
 import "./page.modules.css";
 import Header from "@/components/Header/Header";
 import ImageList from "@/components/ImageList/ImageList";
-import { getProject, projectType, getImagesInProject } from "@/api/api";
+import {
+  getProject,
+  projectType,
+  getImagesInProject,
+  executeInitClustering,
+} from "@/api/api";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getLoginedUser } from "@/utils/utils";
@@ -13,6 +18,7 @@ import { setLoginedUser } from "@/lib/userReducer";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
 import UploadImageModal from "@/components/UploadImageModal/UploadImageModal";
 import ClusteringResult from "@/components/ClusteringResult/CluesteringResult";
+import { clusteringStatus } from "@/config";
 const statusString: { [key in "object" | "group"]: string } = {
   object: "オブジェクト画像一覧",
   group: "分類結果一覧",
@@ -185,11 +191,33 @@ const ProjectDetail: React.FC = () => {
                       value="削除"
                     />
                   </>
-                ) : displayStatus == "group" ? (
+                ) : displayStatus === "group" ? (
                   <input
                     type="button"
-                    className="option-buttons edit-buttons"
-                    value="編集"
+                    className={
+                      project.init_clustering_state ===
+                        clusteringStatus.Executing ||
+                      project.init_clustering_state ===
+                        clusteringStatus.Finished
+                        ? "option-buttons locked-clustering-buttons"
+                        : "option-buttons clustering-buttons"
+                    }
+                    value="初期クラスタリング"
+                    disabled={
+                      project.init_clustering_state ===
+                        clusteringStatus.Executing ||
+                      project.init_clustering_state ===
+                        clusteringStatus.Finished
+                    }
+                    onClick={
+                      typeof loginedUser.id === "number"
+                        ? () =>
+                            executeInitClustering(
+                              project.id,
+                              loginedUser.id as number
+                            )
+                        : () => {}
+                    }
                   />
                 ) : (
                   ""
@@ -208,6 +236,7 @@ const ProjectDetail: React.FC = () => {
               <ClusteringResult
                 mongoResultId={project.mongo_result_id}
                 initClusteringState={project.init_clustering_state}
+                originalImageFolderPath={project.original_images_folder_path}
               />
             ) : (
               <></>

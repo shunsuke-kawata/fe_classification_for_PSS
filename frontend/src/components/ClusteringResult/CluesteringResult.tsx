@@ -6,6 +6,7 @@ import "./styles.modules.css";
 type clusteringResultProps = {
   mongoResultId: string;
   initClusteringState: number;
+  originalImageFolderPath: string;
 };
 
 type leafData = { [imageId: string]: string };
@@ -27,6 +28,7 @@ interface clusteringResultType {
 const ClusteringResult: React.FC<clusteringResultProps> = ({
   mongoResultId,
   initClusteringState,
+  originalImageFolderPath,
 }: clusteringResultProps) => {
   const [clusteringResult, setClusteringResult] =
     useState<clusteringResultType | null>(null);
@@ -56,7 +58,10 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
     <>
       <div className="result-div-main">
         {clusteringResult?.result && (
-          <Finder result={clusteringResult.result} />
+          <Finder
+            result={clusteringResult.result}
+            originalImageFolderPath={originalImageFolderPath}
+          />
         )}
       </div>
     </>
