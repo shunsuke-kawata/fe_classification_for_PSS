@@ -31,6 +31,7 @@ type projectType = {
   root_folder_id: string;
   original_images_folder_path: string;
   init_clustering_state: number;
+  mongo_result_id: string;
   joined: boolean;
 };
 
@@ -72,9 +73,9 @@ const getData = async (url: string, params: any) => {
     }
   }
 };
-const getProject = async (id: string) => {
+const getProject = async (id: string, user_id: number) => {
   try {
-    const url = `${config.backend_base_url}/projects/${id}`;
+    const url = `${config.backend_base_url}/projects/${id}?user_id=${user_id}`;
     const response = await axios.get(url);
     return response.data; // レスポンスのデータ部分のみを返す
   } catch (error) {
@@ -94,7 +95,6 @@ const getImagesInProject = async (project_id: number) => {
     const response = await axios.get(url, {
       params: { project_id },
     });
-    console.log(response);
     return response.data; // レスポンスのデータ部分のみを返す
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
@@ -226,6 +226,32 @@ const executeJoinProject = async (
     return Promise.reject(error);
   }
 };
+
+const executeInitClustering = async (project_id: number, user_id: number) => {
+  try {
+    const url = `${config.backend_base_url}/action/clustering/init/${project_id}?user_id=${user_id}`;
+    const response = await axios.get(url);
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+  }
+};
+
+const getinitClusteringResult = async (mongo_result_id: string) => {
+  try {
+    const url = `${config.backend_base_url}/action/clustering/result/${mongo_result_id}`;
+    const response = await axios.get(url);
+    return response.data.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
 export type {
   signupUserType,
   newProjectType,
@@ -248,4 +274,6 @@ export {
   postImage,
   executeLogin,
   executeJoinProject,
+  executeInitClustering,
+  getinitClusteringResult,
 };

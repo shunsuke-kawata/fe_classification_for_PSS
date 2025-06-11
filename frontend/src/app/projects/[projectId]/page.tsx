@@ -3,7 +3,12 @@ import "@/app/globals.css";
 import "./page.modules.css";
 import Header from "@/components/Header/Header";
 import ImageList from "@/components/ImageList/ImageList";
-import { getProject, projectType, getImagesInProject } from "@/api/api";
+import {
+  getProject,
+  projectType,
+  getImagesInProject,
+  executeInitClustering,
+} from "@/api/api";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getLoginedUser } from "@/utils/utils";
@@ -13,6 +18,7 @@ import { setLoginedUser } from "@/lib/userReducer";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
 import UploadImageModal from "@/components/UploadImageModal/UploadImageModal";
 import ClusteringResult from "@/components/ClusteringResult/CluesteringResult";
+import { clusteringStatus } from "@/config";
 const statusString: { [key in "object" | "group"]: string } = {
   object: "オブジェクト画像一覧",
   group: "分類結果一覧",
@@ -29,7 +35,6 @@ export type imageInfo = {
 const ProjectDetail: React.FC = () => {
   const [isOpenUploadImageModal, setIsOpenUploadImageModal] =
     useState<boolean>(false);
-  //実際の研究ではデータベースからfetch
 
   const router = useRouter();
   const { projectId } = useParams<{ projectId: string }>();
@@ -60,10 +65,9 @@ const ProjectDetail: React.FC = () => {
 
   //プロジェクト情報の取得
   useEffect(() => {
-    const fetchProject = async () => {
+    const fetchProject = async (user_id: number) => {
       try {
-        const projectRes = await getProject(projectId);
-        console.log(projectRes.data);
+        const projectRes = await getProject(projectId, user_id);
         setProject(projectRes.data);
       } catch (error) {
         console.error("Failed to get projects:", error);
@@ -89,7 +93,9 @@ const ProjectDetail: React.FC = () => {
       }
     };
 
-    fetchProject();
+    if (!loginedUser.id) return;
+
+    fetchProject(loginedUser.id);
     fetchImagesInProject();
 
     if (!projectId) {
@@ -97,9 +103,6 @@ const ProjectDetail: React.FC = () => {
     }
   }, [projectId]);
 
-  useEffect(() => {
-    console.log(imagesInProject);
-  }, [imagesInProject]);
   useEffect(() => {
     console.log(project);
   }, [project]);
@@ -131,7 +134,7 @@ const ProjectDetail: React.FC = () => {
       {project ? (
         <>
           <div className="project-detail-main">
-            <div className="project-detail-title">{project.name}</div>
+            <div className="project-title">{project.name}</div>
             <div className="menu-outer-flex">
               <div className="select-display-status">
                 <label className="select-status-label">
@@ -188,11 +191,33 @@ const ProjectDetail: React.FC = () => {
                       value="削除"
                     />
                   </>
-                ) : displayStatus == "group" ? (
+                ) : displayStatus === "group" ? (
                   <input
                     type="button"
-                    className="option-buttons edit-buttons"
-                    value="編集"
+                    className={
+                      project.init_clustering_state ===
+                        clusteringStatus.Executing ||
+                      project.init_clustering_state ===
+                        clusteringStatus.Finished
+                        ? "option-buttons locked-clustering-buttons"
+                        : "option-buttons clustering-buttons"
+                    }
+                    value="初期クラスタリング"
+                    disabled={
+                      project.init_clustering_state ===
+                        clusteringStatus.Executing ||
+                      project.init_clustering_state ===
+                        clusteringStatus.Finished
+                    }
+                    onClick={
+                      typeof loginedUser.id === "number"
+                        ? () =>
+                            executeInitClustering(
+                              project.id,
+                              loginedUser.id as number
+                            )
+                        : () => {}
+                    }
                   />
                 ) : (
                   ""
@@ -200,20 +225,22 @@ const ProjectDetail: React.FC = () => {
               </div>
             </div>
 
-            <div className="display-area">
-              {displayStatus === "object" ? (
+            {displayStatus === "object" ? (
+              <div className="display-area">
                 <ImageList
                   fullImageInfolist={imagesInProject}
                   originalImageFolderPath={project.original_images_folder_path}
                 />
-              ) : displayStatus === "group" ? (
-                <ClusteringResult
-                  initClusteringState={project.init_clustering_state}
-                />
-              ) : (
-                <></>
-              )}
-            </div>
+              </div>
+            ) : displayStatus === "group" ? (
+              <ClusteringResult
+                mongoResultId={project.mongo_result_id}
+                initClusteringState={project.init_clustering_state}
+                originalImageFolderPath={project.original_images_folder_path}
+              />
+            ) : (
+              <></>
+            )}
           </div>
         </>
       ) : (

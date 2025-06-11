@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import config from "@/config/config.json";
 import "@/styles/AllComponentsStyle.css";
-import Image from "../Image/Image";
+import Image from "./Image/Image";
 import { imageInfo } from "@/app/projects/[projectId]/page";
-import { fullImageInfo } from "../Image/Image";
+import { fullImageInfo } from "./Image/Image";
 import "./styles.modules.css";
 
 type imagesListProps = {
@@ -18,7 +18,6 @@ const ImageList: React.FC<imagesListProps> = ({
   const sortedImagesByDate: imageInfo[] = [...fullImageInfolist].sort(
     (a, b) => a.created_at.getTime() - b.created_at.getTime()
   );
-  console.log(originalImageFolderPath);
   return (
     <>
       <div className="image-thumb-list">

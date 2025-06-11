@@ -1,0 +1,37 @@
+.list-view-main{
+    width:40%;
+    height:100%;
+    border-right:0.5px #a9a9a9 solid;
+    overflow-y: scroll;
+}
+
+.list-view-item{
+    height: 30px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left:10px;
+}
+.arrow{
+}
+.list-view-item-even{
+
+}
+
+.list-view-item-odd{
+    background-color: #f4f4f4;
+}
+
+.folder-icon{
+
+}
+
+.img-icon{
+    display:block;
+    margin-left: 5px;
+    width: 20px;
+}
+
+.folder-name-span{
+    margin-left: 10px;
+}

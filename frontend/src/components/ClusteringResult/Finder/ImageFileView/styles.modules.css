@@ -1,0 +1,17 @@
+.image-file-view-main{
+    width:60%;
+    height:100%;
+    overflow-y: scroll;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 6px 10px;
+
+  max-height: 100%;
+
+}
+
+.image-file-item{
+    width: 150px;
+    height: 150px;
+}
