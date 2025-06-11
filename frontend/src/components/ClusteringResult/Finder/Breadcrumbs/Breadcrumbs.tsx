@@ -1,33 +1,37 @@
 import "./styles.modules.css";
 interface breadcrumbsProps {
   parentFolders: string[];
+  setSelectedFolder: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const Breadcrumbs: React.FC<breadcrumbsProps> = ({
   parentFolders,
+  setSelectedFolder,
 }: breadcrumbsProps) => {
   console.log(parentFolders);
-
-  const dummy: string[] = ["1", "2", "3"];
-
   // parentFoldersまたはdummyを使用してパンクズリストを生成
-  const items = parentFolders.length > 0 ? parentFolders : dummy;
+  const items = parentFolders;
 
   return (
     <div className="breadcrumbs">
-      <span className="separator">{">"}</span>
+      <span
+        className="breadcrumb-item"
+        onClick={() => setSelectedFolder("top")}
+      >
+        {"top"}
+      </span>
+      <span className="separator">{"＞"}</span>
       {items.map((item, index) => (
         <span key={index}>
           <span
             className="breadcrumb-item"
-            onClick={() => {
-              // TODO: ここに各itemに対応した関数を実装
-              console.log(`Clicked on: ${item} at index: ${index}`);
-            }}
+            onClick={() => setSelectedFolder(item)}
           >
             {item}
           </span>
-          {index < items.length - 1 && <span className="separator">{">"}</span>}
+          {index < items.length - 1 && (
+            <span className="separator">{"＞"}</span>
+          )}
         </span>
       ))}
     </div>

@@ -54,13 +54,17 @@ const Finder: React.FC<finderProps> = ({ result }: finderProps) => {
 
   const getFoldersInFolder = (folderId: string): string[] => {
     if (folderId === "top") {
-      return Object.keys(result);
+      return Object.entries(result)
+        .filter(([_, node]) => typeof node.data !== "undefined")
+        .map(([key]) => key);
     }
     const node = findNodeById(result, folderId);
-    if (!node || node.is_leaf) return [];
+    if (!node) return [];
+
+    // node.data が leafData でない（＝ treeNode の map）ならフォルダ
     const childData = node.data as { [key: string]: treeNode };
     return Object.entries(childData)
-      .filter(([_, value]) => !value.is_leaf)
+      .filter(([_, value]) => typeof value.data !== "undefined")
       .map(([key]) => key);
   };
 
@@ -79,7 +83,7 @@ const Finder: React.FC<finderProps> = ({ result }: finderProps) => {
     for (const key in obj) {
       const node = obj[key];
       if (key === targetId) {
-        return path;
+        return [...path, key]; // 修正ポイント
       }
       if (!node.is_leaf) {
         const childData = node.data as { [key: string]: treeNode };
@@ -95,6 +99,8 @@ const Finder: React.FC<finderProps> = ({ result }: finderProps) => {
     const files = getFilesInFolder(folderId);
     const path =
       folderId === "top" ? [] : findPathToNode(result, folderId) ?? [];
+
+    //現在のフォルダ情報を更新
     setCurrentFolderState({
       ...currentFolderState,
       parentFolders: path,
@@ -105,13 +111,26 @@ const Finder: React.FC<finderProps> = ({ result }: finderProps) => {
 
   useEffect(() => {
     getNodesInCurrentFolder(selectedFolder);
-  }, []);
+    console.log(isLeaf(selectedFolder));
+  }, [selectedFolder]);
+
   return (
     <>
       <div className="finder-div-main">
-        <Breadclumbs parentFolders={currentFolderState.parentFolders} />
+        <Breadclumbs
+          parentFolders={currentFolderState.parentFolders}
+          setSelectedFolder={setSelectedFolder}
+        />
         <div className="finder-view-main">
-          <ListView folders={currentFolderState.folders} />
+          <ListView
+            isLeaf={isLeaf(selectedFolder)}
+            folders={
+              isLeaf(selectedFolder)
+                ? Object.values(currentFolderState.files)
+                : currentFolderState.folders
+            }
+            setSelectedFolder={setSelectedFolder}
+          />
           <ImageFileView files={currentFolderState.files} />
         </div>
       </div>

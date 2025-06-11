@@ -2,19 +2,25 @@
   display: flex;
   justify-content: flex-start;
   align-items: center; /* ← これで親 flex の子は縦中央に */
-  background-color: aliceblue;
-  padding: 8px 16px;
+  padding: 6px 12px;
+  background-color: #ebe9e6;
+  border:0.5px #a9a9a9 solid;
+  width:98.5%;
 }
 
 .breadcrumb-item {
-  margin: 0 10px;
+  margin: 0 5px;
+  color:#4d4d4d;
   font-size: 20px;
+  font-weight:600;
   display: inline-block;
   vertical-align: middle;
 }
 
 .separator {
   display: inline-block;
+  font-size: 20px;
+  color:#4d4d4d;
   font-size: 20px;
   vertical-align: middle; /* ここで縦中央に揃える */
   margin: 0 4px;
