@@ -1,16 +1,20 @@
 import "./styles.modules.css";
-interface breadcrumbsProps {
+
+interface BreadcrumbsProps {
   parentFolders: string[];
   setSelectedFolder: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Breadcrumbs: React.FC<breadcrumbsProps> = ({
+const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   parentFolders,
   setSelectedFolder,
-}: breadcrumbsProps) => {
-  console.log(parentFolders);
-  // parentFoldersまたはdummyを使用してパンクズリストを生成
+}) => {
   const items = parentFolders;
+
+  const truncateFolderName = (name: string) => {
+    if (name.length <= 6) return name;
+    return name.slice(0, 3) + "•••" + name.slice(-3);
+  };
 
   return (
     <div className="breadcrumbs">
@@ -18,22 +22,26 @@ const Breadcrumbs: React.FC<breadcrumbsProps> = ({
         className="breadcrumb-item"
         onClick={() => setSelectedFolder("top")}
       >
-        {"top"}
+        top
       </span>
-      <span className="separator">{"＞"}</span>
-      {items.map((item, index) => (
-        <span key={index}>
-          <span
-            className="breadcrumb-item"
-            onClick={() => setSelectedFolder(item)}
-          >
-            {item}
+      <span className="separator">＞</span>
+      {items.map((item, index) => {
+        const isLast = index === items.length - 1;
+        const shouldTruncate = items.length >= 3 && !isLast;
+        const displayName = shouldTruncate ? truncateFolderName(item) : item;
+
+        return (
+          <span key={index}>
+            <span
+              className="breadcrumb-item"
+              onClick={() => setSelectedFolder(item)}
+            >
+              {displayName}
+            </span>
+            {!isLast && <span className="separator">＞</span>}
           </span>
-          {index < items.length - 1 && (
-            <span className="separator">{"＞"}</span>
-          )}
-        </span>
-      ))}
+        );
+      })}
     </div>
   );
 };
