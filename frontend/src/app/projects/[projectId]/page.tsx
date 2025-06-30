@@ -18,10 +18,14 @@ import { setLoginedUser } from "@/lib/userReducer";
 import { setSidebarStatus } from "@/lib/sidebarReducer";
 import UploadImageModal from "@/components/UploadImageModal/UploadImageModal";
 import ClusteringResult from "@/components/ClusteringResult/CluesteringResult";
+import ReclassificationInterface from "@/components/ReclassificationInterface/ReclassificationInterface";
 import { clusteringStatus } from "@/config";
-const statusString: { [key in "object" | "group"]: string } = {
+const statusString: {
+  [key in "object" | "group" | "reclassification"]: string;
+} = {
   object: "オブジェクト画像一覧",
   group: "分類結果一覧",
+  reclassification: "再分類",
 };
 
 export type imageInfo = {
@@ -238,6 +242,8 @@ const ProjectDetail: React.FC = () => {
                 initClusteringState={project.init_clustering_state}
                 originalImageFolderPath={project.original_images_folder_path}
               />
+            ) : displayStatus === "reclassification" ? (
+              <ReclassificationInterface />
             ) : (
               <></>
             )}
