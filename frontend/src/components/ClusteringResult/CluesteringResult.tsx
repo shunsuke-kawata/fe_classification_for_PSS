@@ -3,6 +3,7 @@ import { getClusteringResult } from "@/api/api";
 import { useEffect, useState } from "react";
 import Finder from "./Finder/Finder";
 import "./styles.modules.css";
+import { treeNode } from "@/utils/result";
 
 type clusteringResultProps = {
   mongoResultId: string;
@@ -10,14 +11,6 @@ type clusteringResultProps = {
   originalImageFolderPath: string;
 };
 
-export type leafData = { [imageId: string]: string };
-export interface treeNode {
-  is_leaf: boolean;
-  data: treeData;
-}
-
-export type treeData = leafData | { [nodeId: string]: treeNode };
-// 最上位のレスポンス全体
 interface clusteringResultType {
   _id: string;
   mongo_result_id: string;

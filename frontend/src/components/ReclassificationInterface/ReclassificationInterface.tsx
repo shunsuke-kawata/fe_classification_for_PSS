@@ -3,27 +3,14 @@ import "./styles.modules.css";
 import { clusteringStatus } from "@/config";
 import { getClusteringResult } from "@/api/api";
 import DndFinder from "./DndFinder/DndFinder";
+import { treeNode } from "@/utils/result";
 
 type reclassificationInterfaceProps = {
   mongoResultId: string;
   initClusteringState: number;
   originalImageFolderPath: string;
 };
-export type leafData = { [imageId: string]: string };
-export interface treeNode {
-  is_leaf: boolean;
-  data: treeData;
-}
 
-export type treeData = leafData | { [nodeId: string]: treeNode };
-// 最上位のレスポンス全体
-interface clusteringResultType {
-  _id: string;
-  mongo_result_id: string;
-  result: {
-    [topLevelNodeId: string]: treeNode;
-  };
-}
 // 最上位のレスポンス全体
 interface clusteringResultType {
   _id: string;

@@ -1,7 +1,7 @@
-import { leafData } from "../../CluesteringResult";
 import "./styles.modules.css";
 import config from "@/config/config.json";
 import FileThumbnail from "@/components/FileThumbnail/FileThumbnail";
+import { leafData } from "@/utils/result";
 interface imageFileViewProps {
   files: leafData;
   originalImageFolderPath: string;

@@ -10,7 +10,7 @@ import {
   executeInitClustering,
 } from "@/api/api";
 import { useEffect, useState, useRef } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { getLoginedUser } from "@/utils/utils";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/lib/store";
@@ -20,6 +20,7 @@ import UploadImageModal from "@/components/UploadImageModal/UploadImageModal";
 import ClusteringResult from "@/components/ClusteringResult/CluesteringResult";
 import ReclassificationInterface from "@/components/ReclassificationInterface/ReclassificationInterface";
 import { clusteringStatus } from "@/config";
+
 const statusString: {
   [key in "object" | "group" | "reclassification"]: string;
 } = {
@@ -41,16 +42,41 @@ const ProjectDetail: React.FC = () => {
     useState<boolean>(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { projectId } = useParams<{ projectId: string }>();
   const [project, setProject] = useState<projectType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [displayStatus, setDisplayStatus] = useState<"object" | "group">(
-    "object"
-  );
+
+  // クエリパラメータから初期値を取得
+  const getInitialDisplayStatus = ():
+    | "object"
+    | "group"
+    | "reclassification" => {
+    const displayParam = searchParams.get("display");
+    if (displayParam === "group" || displayParam === "reclassification") {
+      return displayParam;
+    }
+    return "object"; // デフォルト値
+  };
+
+  const [displayStatus, setDisplayStatus] = useState<
+    "object" | "group" | "reclassification"
+  >(getInitialDisplayStatus());
   const [isOpenPullDown, setIsPullDown] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const loginedUser = getLoginedUser();
   const [imagesInProject, setImagesInProject] = useState<imageInfo[]>([]);
+
+  // クエリパラメータを更新する関数
+  const updateQueryParam = (
+    status: "object" | "group" | "reclassification"
+  ) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("display", status);
+    router.replace(`${window.location.pathname}?${params.toString()}`, {
+      scroll: false,
+    });
+  };
 
   //ユーザ情報の読み込み
   useEffect(() => {
@@ -66,6 +92,12 @@ const ProjectDetail: React.FC = () => {
 
     initializeUser();
   }, [dispatch]);
+
+  // クエリパラメータの変更を監視
+  useEffect(() => {
+    const newDisplayStatus = getInitialDisplayStatus();
+    setDisplayStatus(newDisplayStatus);
+  }, [searchParams]);
 
   //プロジェクト情報の取得
   useEffect(() => {
@@ -119,8 +151,11 @@ const ProjectDetail: React.FC = () => {
     setIsOpenUploadImageModal(true);
   };
 
-  const handleChangeDisplayStatus = (status: "object" | "group") => {
+  const handleChangeDisplayStatus = (
+    status: "object" | "group" | "reclassification"
+  ) => {
     setDisplayStatus(status);
+    updateQueryParam(status);
     closePulldown();
   };
 
@@ -160,7 +195,9 @@ const ProjectDetail: React.FC = () => {
                       <div
                         key={key}
                         onClick={() =>
-                          handleChangeDisplayStatus(key as "object" | "group")
+                          handleChangeDisplayStatus(
+                            key as "object" | "group" | "reclassification"
+                          )
                         }
                       >
                         <label className="menu-content">
