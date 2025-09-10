@@ -1,21 +1,21 @@
-import { useEffect, useState } from "react";
-import Breadclumbs from "./Breadcrumbs/Breadcrumbs";
-import "./styles.modules.css";
-import ListView from "./ListView/ListView";
-import ImageFileView from "./ImageFileView/ImageFileView";
-import { treeData, leafData, treeNode } from "../CluesteringResult";
+import { original } from "@reduxjs/toolkit";
+import { leafData, treeNode } from "../ReclassificationInterface";
+import { SetStateAction, useEffect, useState } from "react";
 
-interface finderProps {
+import DndBreadclumbs from "./DndBreadclumbs/DndBreadclumbs";
+import "./styles.modules.css";
+
+type dndFinderProps = {
   originalImageFolderPath: string;
   result: {
     [topLevelNodeId: string]: treeNode;
   };
-}
+};
 
-const Finder: React.FC<finderProps> = ({
+const DndFinder: React.FC<dndFinderProps> = ({
   result,
   originalImageFolderPath,
-}: finderProps) => {
+}: dndFinderProps) => {
   const [selectedFolder, setSelectedFolder] = useState<string>("top");
   const [currentFolderState, setCurrentFolderState] = useState<{
     parentFolders: string[];
@@ -110,32 +110,16 @@ const Finder: React.FC<finderProps> = ({
     getNodesInCurrentFolder(selectedFolder);
     console.log(isLeaf(selectedFolder));
   }, [selectedFolder]);
-
   return (
     <>
-      <div className="finder-div-main">
-        <Breadclumbs
+      <div className="dnd-finder-div-main">
+        <DndBreadclumbs
           parentFolders={currentFolderState.parentFolders}
           setSelectedFolder={setSelectedFolder}
         />
-        <div className="finder-view-main">
-          <ListView
-            isLeaf={isLeaf(selectedFolder)}
-            folders={
-              isLeaf(selectedFolder)
-                ? Object.values(currentFolderState.files)
-                : currentFolderState.folders
-            }
-            setSelectedFolder={setSelectedFolder}
-          />
-          <ImageFileView
-            files={currentFolderState.files}
-            originalImageFolderPath={originalImageFolderPath}
-          />
-        </div>
       </div>
     </>
   );
 };
 
-export default Finder;
+export default DndFinder;

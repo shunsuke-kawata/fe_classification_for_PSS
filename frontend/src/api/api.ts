@@ -239,7 +239,7 @@ const executeInitClustering = async (project_id: number, user_id: number) => {
   }
 };
 
-const getinitClusteringResult = async (mongo_result_id: string) => {
+const getClusteringResult = async (mongo_result_id: string) => {
   try {
     const url = `${config.backend_base_url}/action/clustering/result/${mongo_result_id}`;
     const response = await axios.get(url);
@@ -275,5 +275,5 @@ export {
   executeLogin,
   executeJoinProject,
   executeInitClustering,
-  getinitClusteringResult,
+  getClusteringResult,
 };

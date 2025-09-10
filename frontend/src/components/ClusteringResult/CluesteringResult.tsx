@@ -1,21 +1,22 @@
 import { clusteringStatus } from "@/config";
-import { getinitClusteringResult } from "@/api/api";
+import { getClusteringResult } from "@/api/api";
 import { useEffect, useState } from "react";
 import Finder from "./Finder/Finder";
 import "./styles.modules.css";
+
 type clusteringResultProps = {
   mongoResultId: string;
   initClusteringState: number;
   originalImageFolderPath: string;
 };
 
-type leafData = { [imageId: string]: string };
-interface treeNode {
+export type leafData = { [imageId: string]: string };
+export interface treeNode {
   is_leaf: boolean;
   data: treeData;
 }
 
-type treeData = leafData | { [nodeId: string]: treeNode };
+export type treeData = leafData | { [nodeId: string]: treeNode };
 // 最上位のレスポンス全体
 interface clusteringResultType {
   _id: string;
@@ -36,7 +37,7 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
     if (initClusteringState !== clusteringStatus.Finished) return;
     const fetchClusteringResult = async (mongo_result_id: string) => {
       try {
-        const resultRes = await getinitClusteringResult(mongo_result_id);
+        const resultRes = await getClusteringResult(mongo_result_id);
         return resultRes;
       } catch (error) {
         console.log(error);

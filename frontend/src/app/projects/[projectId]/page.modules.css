@@ -110,7 +110,7 @@
   margin-left: auto;
   margin-right: auto;
   width: 95%;
-  height: 90%;
+  height: 88%;
   flex-wrap: wrap; 
   justify-content: left;
   overflow-y: scroll;
@@ -140,4 +140,8 @@ background-color: #3453b3;
 
 .locked-clustering-buttons{
   background-color: #a9a9a9;
+}
+
+.images-count{
+  margin: 10px 0 0px 5px;
 }

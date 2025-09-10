@@ -1,4 +1,4 @@
-import { leafData } from "../Finder";
+import { leafData } from "../../CluesteringResult";
 import "./styles.modules.css";
 import config from "@/config/config.json";
 import FileThumbnail from "./FileThumbnail/FileThumbnail";
@@ -11,7 +11,6 @@ const ImageFileView: React.FC<imageFileViewProps> = ({
   files,
   originalImageFolderPath,
 }: imageFileViewProps) => {
-  console.log(originalImageFolderPath);
   const baseOriginalImageFolderPath = `${config.backend_base_url}/images/${originalImageFolderPath}`;
   return (
     <div className="image-file-view-main">

@@ -63,9 +63,6 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
     for (let i = 0; i < uploadingImages.length; i++) {
       uploadingImageNow.current = uploadingImages[i].file;
       if (loginedUser.id === null) {
-        // Handle the error as appropriate for your app
-        alert("ユーザー情報が取得できません。再度ログインしてください。");
-        setIsUploadImageModalOpen(false);
         return;
       }
       const tmpNewImage: newImageType = {

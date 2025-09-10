@@ -215,11 +215,13 @@ const ProjectDetail: React.FC = () => {
                     }
                     onClick={
                       typeof loginedUser.id === "number"
-                        ? () =>
+                        ? () => {
                             executeInitClustering(
                               project.id,
                               loginedUser.id as number
-                            )
+                            );
+                            window.location.reload();
+                          }
                         : () => {}
                     }
                   />
@@ -230,12 +232,19 @@ const ProjectDetail: React.FC = () => {
             </div>
 
             {displayStatus === "object" ? (
-              <div className="display-area">
-                <ImageList
-                  fullImageInfolist={imagesInProject}
-                  originalImageFolderPath={project.original_images_folder_path}
-                />
-              </div>
+              <>
+                {/* <div className="images-count">
+                  画像枚数合計：{imagesInProject.length}
+                </div> */}
+                <div className="display-area">
+                  <ImageList
+                    fullImageInfolist={imagesInProject}
+                    originalImageFolderPath={
+                      project.original_images_folder_path
+                    }
+                  />
+                </div>
+              </>
             ) : displayStatus === "group" ? (
               <ClusteringResult
                 mongoResultId={project.mongo_result_id}
@@ -243,7 +252,11 @@ const ProjectDetail: React.FC = () => {
                 originalImageFolderPath={project.original_images_folder_path}
               />
             ) : displayStatus === "reclassification" ? (
-              <ReclassificationInterface />
+              <ReclassificationInterface
+                mongoResultId={project.mongo_result_id}
+                initClusteringState={project.init_clustering_state}
+                originalImageFolderPath={project.original_images_folder_path}
+              />
             ) : (
               <></>
             )}
