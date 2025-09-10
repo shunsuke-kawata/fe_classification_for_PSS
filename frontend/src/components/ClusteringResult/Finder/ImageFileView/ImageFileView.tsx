@@ -1,7 +1,7 @@
 import { leafData } from "../../CluesteringResult";
 import "./styles.modules.css";
 import config from "@/config/config.json";
-import FileThumbnail from "./FileThumbnail/FileThumbnail";
+import FileThumbnail from "@/components/FileThumbnail/FileThumbnail";
 interface imageFileViewProps {
   files: leafData;
   originalImageFolderPath: string;
@@ -14,11 +14,9 @@ const ImageFileView: React.FC<imageFileViewProps> = ({
   const baseOriginalImageFolderPath = `${config.backend_base_url}/images/${originalImageFolderPath}`;
   return (
     <div className="image-file-view-main">
-      {Object.entries(files).map(([key, value]) => (
+      {Object.entries(files).map(([key, file]) => (
         <div key={key} className="image-file-item">
-          <FileThumbnail
-            originalImageFilePath={`${baseOriginalImageFolderPath}/${value}`}
-          />
+          <FileThumbnail imagePath={`${baseOriginalImageFolderPath}/${file}`} />
         </div>
       ))}
     </div>

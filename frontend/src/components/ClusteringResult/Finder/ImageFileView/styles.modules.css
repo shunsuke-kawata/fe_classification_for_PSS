@@ -4,12 +4,16 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  gap: 6px 10px;
-
+  align-content: flex-start; /* 追加: 縦方向の配置を上揃えに */
+  gap: 20px 10px;
 
 }
 
 .image-file-item{
-    width: 150px;
-    height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+
 }

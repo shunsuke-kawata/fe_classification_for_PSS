@@ -125,6 +125,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
               ? Object.values(currentFolderState.files)
               : currentFolderState.folders
           }
+          originalImageFolderPath={originalImageFolderPath}
           setSelectedFolder={setSelectedFolder}
         />
       </div>
