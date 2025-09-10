@@ -16,11 +16,27 @@
   vertical-align: middle;
 }
 
-.separator {
-  display: inline-block;
-  font-size: 20px;
-  color:#4d4d4d;
-  font-size: 20px;
-  vertical-align: middle; /* ここで縦中央に揃える */
-  margin: 0 4px;
+
+.parent-folder-button {
+  width: 30px;
+  height: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; 
+  font-size: 24px;
+  background-color: #FFFFFF;
+  border: #4d4d4d solid 0.1px;
+  margin-right: 10px;
+  border-radius: 3px;
+}
+
+
+.parent-folder-button span {
+  position: relative;
+  top: -12px; 
+  color: #4d4d4d;
+}
+
+.parent-folder-button span.parent-folder-button-span-disabled{
+  color:#ebe9e6;
 }

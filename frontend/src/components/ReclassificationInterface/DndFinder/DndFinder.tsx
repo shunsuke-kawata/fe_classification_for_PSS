@@ -3,6 +3,7 @@ import { leafData, treeNode } from "../ReclassificationInterface";
 import { SetStateAction, useEffect, useState } from "react";
 
 import DndBreadclumbs from "./DndBreadclumbs/DndBreadclumbs";
+import DndListView from "./DndListView/DndListView";
 import "./styles.modules.css";
 
 type dndFinderProps = {
@@ -115,6 +116,15 @@ const DndFinder: React.FC<dndFinderProps> = ({
       <div className="dnd-finder-div-main">
         <DndBreadclumbs
           parentFolders={currentFolderState.parentFolders}
+          setSelectedFolder={setSelectedFolder}
+        />
+        <DndListView
+          isLeaf={isLeaf(selectedFolder)}
+          folders={
+            isLeaf(selectedFolder)
+              ? Object.values(currentFolderState.files)
+              : currentFolderState.folders
+          }
           setSelectedFolder={setSelectedFolder}
         />
       </div>

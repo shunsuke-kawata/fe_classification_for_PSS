@@ -1,14 +1,15 @@
 import "./styles.modules.css";
 
-interface BreadcrumbsProps {
+interface dndBreadcrumbsProps {
   parentFolders: string[];
   setSelectedFolder: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
+const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
   parentFolders,
   setSelectedFolder,
 }) => {
+  console.log(parentFolders);
   const items = parentFolders;
 
   const truncateFolderName = (name: string) => {
@@ -16,34 +17,32 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     return name.slice(0, 3) + "•••" + name.slice(-3);
   };
 
+  const toParentFolder = () => {
+    if (items.length === 0) {
+      return;
+    } else if (items.length === 1) {
+      setSelectedFolder("top");
+    } else {
+      setSelectedFolder(items[items.length - 2]);
+    }
+  };
+
   return (
     <div className="breadcrumbs">
-      <span
-        className="breadcrumb-item"
-        onClick={() => setSelectedFolder("top")}
-      >
-        top
+      <div className="parent-folder-button" onClick={() => toParentFolder()}>
+        <span
+          className={
+            items.length === 0 ? "parent-folder-button-span-disabled" : ""
+          }
+        >
+          ..
+        </span>
+      </div>
+      <span className="breadcrumb-item">
+        {items.length === 0 ? "top" : items[items.length - 1]}
       </span>
-      <span className="separator">＞</span>
-      {items.map((item, index) => {
-        const isLast = index === items.length - 1;
-        const shouldTruncate = items.length >= 3 && !isLast;
-        const displayName = shouldTruncate ? truncateFolderName(item) : item;
-
-        return (
-          <span key={index}>
-            <span
-              className="breadcrumb-item"
-              onClick={() => setSelectedFolder(item)}
-            >
-              {displayName}
-            </span>
-            {!isLast && <span className="separator">＞</span>}
-          </span>
-        );
-      })}
     </div>
   );
 };
 
-export default Breadcrumbs;
+export default DndBreadcrumbs;
