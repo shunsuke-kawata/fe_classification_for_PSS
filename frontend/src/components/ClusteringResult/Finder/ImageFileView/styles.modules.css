@@ -1,12 +1,15 @@
 .image-file-view-main{
-  width:60%;
-  overflow-y: scroll;
+  width: 60%;
+  overflow-y: auto;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  align-content: flex-start; /* 追加: 縦方向の配置を上揃えに */
+  align-content: flex-start;
   gap: 20px 10px;
-
+  flex: 1; /* 残りのスペースを占有 */
+  background-color: #ffffff;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .image-file-item{
@@ -15,5 +18,12 @@
   justify-content: center;
   width: 100px;
   height: 100px;
+  position: relative;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
 
+.image-file-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

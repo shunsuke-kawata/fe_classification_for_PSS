@@ -1,8 +1,10 @@
 .list-view-main{
-    width:40%;
-    height:100%;
-    border-right:0.5px #a9a9a9 solid;
-    overflow-y: scroll;
+    width: 40%;
+    height: 100%;
+    border-right: 0.5px #e1e5e9 solid;
+    overflow-y: auto;
+    flex: 1; /* 残りのスペースを占有 */
+    background-color: #ffffff;
 }
 
 .list-view-item{
@@ -19,7 +21,7 @@
 }
 
 .list-view-item-odd{
-    background-color: #f4f4f4;
+    background-color: #f8f9fa;
 }
 
 .folder-icon{

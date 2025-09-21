@@ -4,7 +4,8 @@
     height: 95%;
     display: flex;
     justify-content: center;
-    align-items:flex-start;
+    align-items: flex-start;
     gap: 20px;
-    /* box-sizing: border-box; */
+    overflow: hidden; /* 親要素のスクロールを無効化 */
 }
+

@@ -50,16 +50,20 @@ const ReclassificationInterface: React.FC<reclassificationInterfaceProps> = ({
   useEffect(() => {
     console.log(clusteringResult);
   }, [clusteringResult]);
+
   return (
     <div className="dnd-interface-div-main">
-      <></>
       {clusteringResult?.result && (
         <>
+          {/* 移動前を表示するFinderUI */}
           <DndFinder
+            finderType="before"
             result={clusteringResult.result}
             originalImageFolderPath={originalImageFolderPath}
           />
+          {/* 移動後を表示するFinderUI */}
           <DndFinder
+            finderType="after"
             result={clusteringResult.result}
             originalImageFolderPath={originalImageFolderPath}
           />
