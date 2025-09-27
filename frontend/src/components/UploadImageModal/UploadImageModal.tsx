@@ -36,7 +36,6 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
     if (!e.target.files) return;
     let tmpInputImages = e.target.files;
     setInputImages(tmpInputImages);
-    console.log(Array.from(tmpInputImages));
   };
 
   const handleCancel = () => {
@@ -71,7 +70,6 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
         uploaded_user_id: loginedUser.id,
       };
       const res = await postImage(tmpNewImage);
-      console.log(res);
     }
     setIsUploadImageModalOpen(false);
     window.location.reload();

@@ -35,28 +35,11 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
       setError(null);
 
       try {
-        console.log("=== ClusteringResult: データ取得開始 ===");
-        console.log("mongo_result_id:", mongo_result_id);
-
         const resultRes = await getClusteringResult(mongo_result_id);
 
-        console.log("=== ClusteringResult: データ取得完了 ===");
-        console.log("取得したデータ:", resultRes);
-
-        console.log("=== データ検証 ===");
-        console.log("resultRes:", resultRes);
-        console.log("resultRes type:", typeof resultRes);
-        console.log("resultRes is null:", resultRes === null);
-        console.log("resultRes is undefined:", resultRes === undefined);
-
         if (resultRes && typeof resultRes === "object") {
-          console.log("resultRes keys:", Object.keys(resultRes));
-          console.log("resultRes.result:", resultRes.result);
-          console.log("resultRes.result type:", typeof resultRes.result);
-
           if (resultRes.result) {
             setClusteringResult(resultRes);
-            console.log("✅ データ設定完了");
           } else {
             console.error("❌ resultRes.result が存在しません");
             setError("データの取得に失敗しました: result field not found");
@@ -78,10 +61,7 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
   }, [mongoResultId, initClusteringState]);
 
   useEffect(() => {
-    console.log("=== ClusteringResult: 状態更新 ===");
-    console.log("clusteringResult:", clusteringResult);
-    console.log("isLoading:", isLoading);
-    console.log("error:", error);
+    // 状態更新の監視（デバッグ用のログを削除）
   }, [clusteringResult, isLoading, error]);
 
   if (isLoading) {

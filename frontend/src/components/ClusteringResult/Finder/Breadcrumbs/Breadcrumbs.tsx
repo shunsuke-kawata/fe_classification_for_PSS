@@ -34,8 +34,6 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     const isMediumScreen = windowWidth <= 1024; // 中程度の画面（タブレット）
     const isLargeScreen = windowWidth > 1024; // 大きい画面（デスクトップ）
 
-    console.log(`Window width: ${windowWidth}, Items length: ${items.length}`);
-
     // 非常に大きい画面でも3階層以上で省略
     if (windowWidth > 1440) {
       // 3階層以上で省略

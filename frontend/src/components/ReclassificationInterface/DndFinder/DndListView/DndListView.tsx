@@ -6,13 +6,14 @@ import {
   isLeaf as isLeafFunction,
   treeNode,
   getFilesInFolder,
+  leafData,
 } from "@/utils/result";
 import { useEffect } from "react";
 
 interface dndListViewProps {
   finderType: finderType;
   isLeaf: boolean;
-  folders: string[];
+  folders: string[] | leafData;
   originalImageFolderPath: string;
   setSelectedFolder: React.Dispatch<React.SetStateAction<string>>;
   movedImages?: string[];
@@ -41,8 +42,26 @@ const DndListView: React.FC<dndListViewProps> = ({
   getFolderPreviewImagePath,
   result,
 }: dndListViewProps) => {
-  const baseOriginalImageFolderPath = `${config.backend_base_url}/images/${originalImageFolderPath}`;
+  // 配列形式のpropsを出力
+  console.log("=== DndListView 配列形式props ===");
+  console.log("folders:", folders);
+  console.log("movedImages:", movedImages);
+  console.log("selectedImages:", selectedImages);
 
+  // foldersを統一的に扱うためのヘルパー関数
+  const getFolderItems = (): Array<{ key: string; value: string }> => {
+    if (Array.isArray(folders)) {
+      // 配列の場合：フォルダ名のみ（keyとvalueが同じ）
+      return folders.map((folder) => ({ key: folder, value: folder }));
+    } else {
+      // オブジェクトの場合：キーと値を分ける（ファイル名とパス）
+      return Object.entries(folders).map(([key, value]) => ({ key, value }));
+    }
+  };
+
+  const folderItems = getFolderItems();
+
+  const baseOriginalImageFolderPath = `${config.backend_base_url}/images/${originalImageFolderPath}`;
   const handleDragStart = (
     e: React.DragEvent<HTMLDivElement>,
     imagePath: string
@@ -56,10 +75,8 @@ const DndListView: React.FC<dndListViewProps> = ({
         selectedImages: isMultiSelectMode ? selectedImages : [],
       });
       e.dataTransfer.setData("text/plain", data);
-      console.log("ドラッグ開始:", data);
     } else {
       e.preventDefault();
-      console.log("ドラッグ無効: 右のFinderがフォルダ表示のため");
     }
   };
 
@@ -82,7 +99,6 @@ const DndListView: React.FC<dndListViewProps> = ({
         selectedFolders: isMultiSelectMode ? selectedImages : [],
       });
       e.dataTransfer.setData("text/plain", data);
-      console.log("フォルダドラッグ開始:", data);
     } else {
       // 右側のFinderでもフォルダのドラッグを許可
       const data = JSON.stringify({
@@ -93,7 +109,6 @@ const DndListView: React.FC<dndListViewProps> = ({
         selectedFolders: isMultiSelectMode ? selectedImages : [],
       });
       e.dataTransfer.setData("text/plain", data);
-      console.log("フォルダドラッグ開始:", data);
     }
   };
 
@@ -105,7 +120,7 @@ const DndListView: React.FC<dndListViewProps> = ({
 
   //forldersファイルnameのstringが渡されてしまっているので変更する
   useEffect(() => {
-    console.log("current--------------", folders);
+    // フォルダ情報の監視（デバッグ用のログを削除）
   }, [folders]);
 
   return (
@@ -115,44 +130,43 @@ const DndListView: React.FC<dndListViewProps> = ({
           {/* 移動前のFinderUI Draggable */}
           {isLeaf ? (
             <div className="dnd-image-file-view-main">
-              {folders
-                .filter((foldername) => !movedImages.includes(foldername))
-                .map((foldername, idx) => (
+              {folderItems
+                .filter((item) => !movedImages.includes(item.key))
+                .map((item, idx) => (
                   <div
                     key={idx}
                     className={`dnd-image-file-item ${
-                      selectedImages.includes(foldername) ? "selected" : ""
+                      selectedImages.includes(item.key) ? "selected" : ""
                     } ${isMultiSelectMode ? "selectable" : ""}`}
                     draggable={!isMultiSelectMode}
-                    onDragStart={(e) => handleDragStart(e, foldername)}
-                    onClick={() => handleImageClick(foldername)}
+                    onDragStart={(e) => handleDragStart(e, item.key)}
+                    onClick={() => handleImageClick(item.key)}
                   >
                     <FileThumbnail
-                      imagePath={`${baseOriginalImageFolderPath}/${foldername}`}
+                      imagePath={`${baseOriginalImageFolderPath}/${item.value}`}
                       width={80}
                       height={80}
                       padding={1}
                     />
-                    {isMultiSelectMode &&
-                      selectedImages.includes(foldername) && (
-                        <div className="selection-indicator">✓</div>
-                      )}
+                    {isMultiSelectMode && selectedImages.includes(item.key) && (
+                      <div className="selection-indicator">✓</div>
+                    )}
                   </div>
                 ))}
             </div>
           ) : viewMode === "list" ? (
             <div className="list-view-main">
-              {folders.map((foldername, idx) => {
+              {folderItems.map((item, idx) => {
                 // 各フォルダがisLeafかどうかをチェック
                 const isFolderLeaf =
                   result && isLeafFunction
-                    ? isLeafFunction(result, foldername)
+                    ? isLeafFunction(result, item.key)
                     : false;
 
                 // isLeafフォルダの場合、画像枚数を取得
                 const imageCount =
                   isFolderLeaf && result
-                    ? Object.keys(getFilesInFolder(result, foldername)).length
+                    ? Object.keys(getFilesInFolder(result, item.key)).length
                     : 0;
 
                 return (
@@ -163,16 +177,16 @@ const DndListView: React.FC<dndListViewProps> = ({
                         ? "list-view-item-even"
                         : "list-view-item-odd"
                     } ${isMultiSelectMode ? "selectable" : ""} ${
-                      selectedImages.includes(foldername) ? "selected" : ""
+                      selectedImages.includes(item.key) ? "selected" : ""
                     }`}
                     draggable={!isLeaf}
-                    onDragStart={(e) => handleFolderDragStart(e, foldername)}
+                    onDragStart={(e) => handleFolderDragStart(e, item.key)}
                     onClick={
                       isLeaf
                         ? () => {}
                         : isMultiSelectMode
-                        ? () => handleFolderClick(foldername)
-                        : () => setSelectedFolder(foldername)
+                        ? () => handleFolderClick(item.key)
+                        : () => setSelectedFolder(item.key)
                     }
                   >
                     <span className="arrow">{"＞"}</span>
@@ -183,8 +197,8 @@ const DndListView: React.FC<dndListViewProps> = ({
                     />
                     <span className="folder-name-span">
                       {isFolderLeaf && imageCount > 0
-                        ? `${foldername} (${imageCount})`
-                        : foldername}
+                        ? `${item.key} (${imageCount})`
+                        : item.key}
                     </span>
                   </div>
                 );
@@ -192,14 +206,14 @@ const DndListView: React.FC<dndListViewProps> = ({
             </div>
           ) : (
             <div className="dnd-image-file-view-main">
-              {folders.map((foldername, idx) => {
+              {folderItems.map((item, idx) => {
                 // 各フォルダがisLeafかどうかを個別にチェック
                 const isFolderLeaf =
                   result && isLeafFunction
-                    ? isLeafFunction(result, foldername)
+                    ? isLeafFunction(result, item.key)
                     : false;
                 const previewImagePath = isFolderLeaf
-                  ? getFolderPreviewImagePath?.(foldername)
+                  ? getFolderPreviewImagePath?.(item.key)
                   : null;
 
                 return (
@@ -207,15 +221,15 @@ const DndListView: React.FC<dndListViewProps> = ({
                     key={idx}
                     className={`dnd-folder-icon-item ${
                       isMultiSelectMode ? "selectable" : ""
-                    } ${selectedImages.includes(foldername) ? "selected" : ""}`}
+                    } ${selectedImages.includes(item.key) ? "selected" : ""}`}
                     draggable={!isLeaf}
-                    onDragStart={(e) => handleFolderDragStart(e, foldername)}
+                    onDragStart={(e) => handleFolderDragStart(e, item.key)}
                     onClick={
                       isLeaf
                         ? () => {}
                         : isMultiSelectMode
-                        ? () => handleFolderClick(foldername)
-                        : () => setSelectedFolder(foldername)
+                        ? () => handleFolderClick(item.key)
+                        : () => setSelectedFolder(item.key)
                     }
                   >
                     <div className="folder-icon-container">
@@ -242,11 +256,11 @@ const DndListView: React.FC<dndListViewProps> = ({
                           />
                         </div>
                       )}
-                      {selectedImages.includes(foldername) && (
+                      {selectedImages.includes(item.key) && (
                         <div className="selection-indicator">✓</div>
                       )}
                     </div>
-                    <span className="folder-name-label">{foldername}</span>
+                    <span className="folder-name-label">{item.key}</span>
                   </div>
                 );
               })}
@@ -270,10 +284,10 @@ const DndListView: React.FC<dndListViewProps> = ({
                 </div>
               ))}
               {/* 元のフォルダの画像も表示 */}
-              {folders.map((foldername, idx) => (
+              {folderItems.map((item, idx) => (
                 <div key={idx} className="dnd-image-file-item">
                   <FileThumbnail
-                    imagePath={`${baseOriginalImageFolderPath}/${foldername}`}
+                    imagePath={`${baseOriginalImageFolderPath}/${item.value}`}
                     width={80}
                     height={80}
                     padding={1}
@@ -283,17 +297,17 @@ const DndListView: React.FC<dndListViewProps> = ({
             </div>
           ) : viewMode === "list" ? (
             <div className="list-view-main">
-              {folders.map((foldername, idx) => {
+              {folderItems.map((item, idx) => {
                 // 各フォルダがisLeafかどうかをチェック
                 const isFolderLeaf =
                   result && isLeafFunction
-                    ? isLeafFunction(result, foldername)
+                    ? isLeafFunction(result, item.key)
                     : false;
 
                 // isLeafフォルダの場合、画像枚数を取得
                 const imageCount =
                   isFolderLeaf && result
-                    ? Object.keys(getFilesInFolder(result, foldername)).length
+                    ? Object.keys(getFilesInFolder(result, item.key)).length
                     : 0;
 
                 return (
@@ -304,16 +318,16 @@ const DndListView: React.FC<dndListViewProps> = ({
                         ? "list-view-item-even"
                         : "list-view-item-odd"
                     } ${isMultiSelectMode ? "selectable" : ""} ${
-                      selectedImages.includes(foldername) ? "selected" : ""
+                      selectedImages.includes(item.key) ? "selected" : ""
                     }`}
                     draggable={!isLeaf}
-                    onDragStart={(e) => handleFolderDragStart(e, foldername)}
+                    onDragStart={(e) => handleFolderDragStart(e, item.key)}
                     onClick={
                       isLeaf
                         ? () => {}
                         : isMultiSelectMode
-                        ? () => handleFolderClick(foldername)
-                        : () => setSelectedFolder(foldername)
+                        ? () => handleFolderClick(item.key)
+                        : () => setSelectedFolder(item.key)
                     }
                   >
                     <span className="arrow">{"＞"}</span>
@@ -324,8 +338,8 @@ const DndListView: React.FC<dndListViewProps> = ({
                     />
                     <span className="folder-name-span">
                       {isFolderLeaf && imageCount > 0
-                        ? `${foldername} (${imageCount})`
-                        : foldername}
+                        ? `${item.key} (${imageCount})`
+                        : item.key}
                     </span>
                   </div>
                 );
@@ -333,14 +347,14 @@ const DndListView: React.FC<dndListViewProps> = ({
             </div>
           ) : (
             <div className="dnd-image-file-view-main">
-              {folders.map((foldername, idx) => {
+              {folderItems.map((item, idx) => {
                 // 各フォルダがisLeafかどうかを個別にチェック
                 const isFolderLeaf =
                   result && isLeafFunction
-                    ? isLeafFunction(result, foldername)
+                    ? isLeafFunction(result, item.key)
                     : false;
                 const previewImagePath = isFolderLeaf
-                  ? getFolderPreviewImagePath?.(foldername)
+                  ? getFolderPreviewImagePath?.(item.key)
                   : null;
 
                 return (
@@ -348,15 +362,15 @@ const DndListView: React.FC<dndListViewProps> = ({
                     key={idx}
                     className={`dnd-folder-icon-item ${
                       isMultiSelectMode ? "selectable" : ""
-                    } ${selectedImages.includes(foldername) ? "selected" : ""}`}
+                    } ${selectedImages.includes(item.key) ? "selected" : ""}`}
                     draggable={!isLeaf}
-                    onDragStart={(e) => handleFolderDragStart(e, foldername)}
+                    onDragStart={(e) => handleFolderDragStart(e, item.key)}
                     onClick={
                       isLeaf
                         ? () => {}
                         : isMultiSelectMode
-                        ? () => handleFolderClick(foldername)
-                        : () => setSelectedFolder(foldername)
+                        ? () => handleFolderClick(item.key)
+                        : () => setSelectedFolder(item.key)
                     }
                   >
                     <div className="folder-icon-container">
@@ -383,11 +397,11 @@ const DndListView: React.FC<dndListViewProps> = ({
                           />
                         </div>
                       )}
-                      {selectedImages.includes(foldername) && (
+                      {selectedImages.includes(item.key) && (
                         <div className="selection-indicator">✓</div>
                       )}
                     </div>
-                    <span className="folder-name-label">{foldername}</span>
+                    <span className="folder-name-label">{item.key}</span>
                   </div>
                 );
               })}

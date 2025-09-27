@@ -242,29 +242,7 @@ const executeInitClustering = async (project_id: number, user_id: number) => {
 const getClusteringResult = async (mongo_result_id: string) => {
   try {
     const url = `${config.backend_base_url}/action/clustering/result/${mongo_result_id}`;
-    console.log("=== getClusteringResult API Request ===");
-    console.log("URL:", url);
-    console.log("mongo_result_id:", mongo_result_id);
-
     const response = await axios.get(url);
-    console.log("=== getClusteringResult API Response ===");
-    console.log("Full response:", response);
-    console.log("Response data:", response.data);
-    console.log("Response data type:", typeof response.data);
-    console.log("Response status:", response.status);
-
-    if (response.data && typeof response.data === "object") {
-      console.log("Response data keys:", Object.keys(response.data));
-      if (response.data.result) {
-        console.log("result field exists:", response.data.result);
-        console.log("result type:", typeof response.data.result);
-        if (typeof response.data.result === "object") {
-          console.log("result keys:", Object.keys(response.data.result));
-        }
-      } else {
-        console.log("❌ result field not found in response.data");
-      }
-    }
 
     // バックエンドから直接dataが返されるので、response.dataを返す
     return response.data;
@@ -300,10 +278,6 @@ const moveClusteringItems = async (
       params.append("sources", source);
     });
 
-    console.log("=== API呼び出し詳細 ===");
-    console.log("URL:", url);
-    console.log("params:", params.toString());
-
     const response = await axios.put(url, null, {
       params: params,
     });
@@ -311,9 +285,6 @@ const moveClusteringItems = async (
   } catch (error) {
     console.error("=== API呼び出しエラー ===");
     console.error("error:", error);
-    console.error("error.response:", error?.response);
-    console.error("error.response?.data:", error?.response?.data);
-    console.error("error.response?.status:", error?.response?.status);
 
     if (axios.isAxiosError(error) && error.response) {
       return error.response;

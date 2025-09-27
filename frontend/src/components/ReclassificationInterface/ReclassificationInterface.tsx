@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import "./styles.modules.css";
 import { clusteringStatus } from "@/config";
 import { getClusteringResult } from "@/api/api";
@@ -9,6 +10,11 @@ type reclassificationInterfaceProps = {
   mongoResultId: string;
   initClusteringState: number;
   originalImageFolderPath: string;
+  onFolderMoveComplete?: (
+    targetFolder: string,
+    destinationFolder: string
+  ) => void;
+  onFolderChange?: (beforeFolderId: string, afterFolderId: string) => void;
 };
 
 // 最上位のレスポンス全体
@@ -24,68 +30,105 @@ const ReclassificationInterface: React.FC<reclassificationInterfaceProps> = ({
   mongoResultId,
   initClusteringState,
   originalImageFolderPath,
+  onFolderMoveComplete,
+  onFolderChange,
 }) => {
   const [clusteringResult, setClusteringResult] =
     useState<clusteringResultType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
+  const [currentBeforeFolderId, setCurrentBeforeFolderId] =
+    useState<string>("");
+  const [currentAfterFolderId, setCurrentAfterFolderId] = useState<string>("");
+  const searchParams = useSearchParams();
+
+  // フォルダ移動パラメータを取得
+  const targetFolder = searchParams.get("t_folder");
+  const destinationFolder = searchParams.get("d_folder");
+
+  // データをリフレッシュする関数
+  const refreshClusteringResult = async () => {
+    if (initClusteringState !== clusteringStatus.Finished) return;
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const resultRes = await getClusteringResult(mongoResultId);
+
+      if (resultRes && typeof resultRes === "object") {
+        if (resultRes.result) {
+          setClusteringResult(resultRes);
+        } else {
+          setError("データの取得に失敗しました: result field not found");
+        }
+      } else {
+        setError("データの取得に失敗しました: invalid data format");
+      }
+    } catch (error) {
+      setError("データの取得中にエラーが発生しました");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // フォルダ移動完了時の処理
+  const handleFolderMoveComplete = async (
+    targetFolderId: string,
+    destinationFolderId: string
+  ) => {
+    // データをリフレッシュ
+    await refreshClusteringResult();
+
+    // 親コンポーネントにリダイレクトを通知
+    if (onFolderMoveComplete) {
+      onFolderMoveComplete(targetFolderId, destinationFolderId);
+    }
+  };
+
+  // フォルダ変更時の処理（before/afterのフォルダ選択が変更された時）
+  const handleBeforeFolderChange = useCallback((folderId: string) => {
+    setCurrentBeforeFolderId(folderId);
+    if (onFolderChange) {
+      onFolderChange(folderId, currentAfterFolderId);
+    }
+  }, [onFolderChange, currentAfterFolderId]);
+
+  const handleAfterFolderChange = useCallback((folderId: string) => {
+    setCurrentAfterFolderId(folderId);
+    if (onFolderChange) {
+      onFolderChange(currentBeforeFolderId, folderId);
+    }
+  }, [onFolderChange, currentBeforeFolderId]);
 
   useEffect(() => {
     if (initClusteringState !== clusteringStatus.Finished) return;
 
     const fetchClusteringResult = async (mongo_result_id: string) => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        console.log("=== ReclassificationInterface: データ取得開始 ===");
-        console.log("mongo_result_id:", mongo_result_id);
-        console.log("originalImageFolderPath:", originalImageFolderPath);
-
-        const resultRes = await getClusteringResult(mongo_result_id);
-
-        console.log("=== ReclassificationInterface: データ取得完了 ===");
-        console.log("取得したデータ:", resultRes);
-
-        console.log("=== データ検証 ===");
-        console.log("resultRes:", resultRes);
-        console.log("resultRes type:", typeof resultRes);
-        console.log("resultRes is null:", resultRes === null);
-        console.log("resultRes is undefined:", resultRes === undefined);
-
-        if (resultRes && typeof resultRes === "object") {
-          console.log("resultRes keys:", Object.keys(resultRes));
-          console.log("resultRes.result:", resultRes.result);
-          console.log("resultRes.result type:", typeof resultRes.result);
-
-          if (resultRes.result) {
-            setClusteringResult(resultRes);
-            console.log("✅ データ設定完了");
-          } else {
-            console.error("❌ resultRes.result が存在しません");
-            setError("データの取得に失敗しました: result field not found");
-          }
-        } else {
-          console.error("❌ データが不正です:", resultRes);
-          setError("データの取得に失敗しました: invalid data format");
-        }
-      } catch (error) {
-        console.error("=== ReclassificationInterface: データ取得エラー ===");
-        console.error("Error:", error);
-        setError("データの取得中にエラーが発生しました");
-      } finally {
-        setIsLoading(false);
-      }
+      await refreshClusteringResult();
     };
 
     fetchClusteringResult(mongoResultId);
-  }, [mongoResultId, initClusteringState, originalImageFolderPath]);
+  }, [
+    mongoResultId,
+    initClusteringState,
+    originalImageFolderPath,
+    refreshTrigger,
+  ]);
+
+  // クエリパラメータからフォルダIDを初期設定
+  useEffect(() => {
+    if (targetFolder) {
+      setCurrentBeforeFolderId(targetFolder);
+    }
+    if (destinationFolder) {
+      setCurrentAfterFolderId(destinationFolder);
+    }
+  }, [targetFolder, destinationFolder]);
 
   useEffect(() => {
-    console.log("=== ReclassificationInterface: 状態更新 ===");
-    console.log("clusteringResult:", clusteringResult);
-    console.log("isLoading:", isLoading);
-    console.log("error:", error);
+    // 状態更新の監視（デバッグ用のログを削除）
   }, [clusteringResult, isLoading, error]);
 
   if (isLoading) {
@@ -136,6 +179,10 @@ const ReclassificationInterface: React.FC<reclassificationInterfaceProps> = ({
             result={clusteringResult.result}
             originalImageFolderPath={originalImageFolderPath}
             mongo_result_id={mongoResultId}
+            onFolderMoveComplete={handleFolderMoveComplete}
+            onFolderChange={handleBeforeFolderChange}
+            targetFolder={targetFolder}
+            destinationFolder={destinationFolder}
           />
           {/* 移動後を表示するFinderUI */}
           <DndFinder
@@ -143,6 +190,10 @@ const ReclassificationInterface: React.FC<reclassificationInterfaceProps> = ({
             result={clusteringResult.result}
             originalImageFolderPath={originalImageFolderPath}
             mongo_result_id={mongoResultId}
+            onFolderMoveComplete={handleFolderMoveComplete}
+            onFolderChange={handleAfterFolderChange}
+            targetFolder={targetFolder}
+            destinationFolder={destinationFolder}
           />
         </>
       ) : (

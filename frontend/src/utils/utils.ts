@@ -22,5 +22,4 @@ export const logout = () => {
   deleteCookie("name");
   deleteCookie("email");
   deleteCookie("authority");
-  console.log("logout");
 };

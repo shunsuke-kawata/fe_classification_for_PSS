@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 import DndBreadclumbs from "./DndBreadclumbs/DndBreadclumbs";
 import DndListView from "./DndListView/DndListView";
@@ -24,6 +24,13 @@ type dndFinderProps = {
     [topLevelNodeId: string]: treeNode;
   };
   mongo_result_id: string;
+  onFolderMoveComplete?: (
+    targetFolderId: string,
+    destinationFolderId: string
+  ) => Promise<void>;
+  onFolderChange?: (folderId: string) => void;
+  targetFolder?: string | null;
+  destinationFolder?: string | null;
 };
 
 const DndFinder: React.FC<dndFinderProps> = ({
@@ -31,10 +38,26 @@ const DndFinder: React.FC<dndFinderProps> = ({
   result,
   originalImageFolderPath,
   mongo_result_id,
+  onFolderMoveComplete,
+  onFolderChange,
+  targetFolder,
+  destinationFolder,
 }: dndFinderProps) => {
   const topLevelId = getTopLevelFolderId(result);
+  
+  // 初期選択フォルダを決定（クエリパラメータがある場合はそれを使用）
+  const getInitialFolder = (): string => {
+    if (finderType === "before" && targetFolder) {
+      return targetFolder;
+    }
+    if (finderType === "after" && destinationFolder) {
+      return destinationFolder;
+    }
+    return topLevelId || "";
+  };
+  
   const [selectedFolder, setSelectedFolder] = useState<string>(
-    topLevelId || ""
+    getInitialFolder()
   );
   const [currentFolderState, setCurrentFolderState] = useState<{
     parentFolders: string[];
@@ -66,31 +89,20 @@ const DndFinder: React.FC<dndFinderProps> = ({
 
   const getFolderPreviewImage = (folderName: string): string | null => {
     // フォルダ内の画像を取得（0番目の画像）
-    console.log(`フォルダ ${folderName} の画像を取得中...`);
-    console.log(`現在のresult構造:`, result);
-
     const folderFiles = getFilesInFolder(result, folderName);
-    console.log(`フォルダ ${folderName} のファイル一覧:`, folderFiles);
 
     if (folderFiles && Object.keys(folderFiles).length > 0) {
       const firstImage = Object.values(folderFiles)[0];
-      console.log(`選択された最初の画像:`, firstImage);
       return firstImage;
     }
 
     // フォルダが見つからない場合、フォルダ名をそのまま使用
-    console.log(
-      `フォルダ ${folderName} に画像が見つからないため、フォルダ名をそのまま使用`
-    );
     return folderName;
   };
 
   const getFolderPreviewImagePath = (folderName: string): string | null => {
     // フォルダ内の画像を取得してフルパスを生成
     const previewImage = getFolderPreviewImage(folderName);
-    console.log(`フォルダ ${folderName} のプレビュー画像:`, previewImage);
-    console.log(`originalImageFolderPath:`, originalImageFolderPath);
-    console.log(`config.backend_base_url:`, config.backend_base_url);
 
     if (previewImage) {
       // 提供された例の形式: http://localhost:8008/images/jUL6JBa4RROGhBWv-_Ixpw/object_camera0_20241212_225845_x545_y552_1.png
@@ -99,7 +111,6 @@ const DndFinder: React.FC<dndFinderProps> = ({
         ? previewImage
         : `${previewImage}.png`;
       const fullPath = `${config.backend_base_url}/images/${originalImageFolderPath}/${imageFileName}`;
-      console.log(`生成された画像パス:`, fullPath);
       return fullPath;
     }
     return null;
@@ -112,7 +123,6 @@ const DndFinder: React.FC<dndFinderProps> = ({
   ): boolean => {
     // 判定基準1: 移動先のフォルダが移動したいフォルダ一覧に含まれていないか
     if (foldersToMove.includes(targetFolder)) {
-      console.log("警告: 移動先が移動したいフォルダ一覧に含まれています");
       return true;
     }
 
@@ -121,9 +131,6 @@ const DndFinder: React.FC<dndFinderProps> = ({
     if (targetPath) {
       for (const folderToMove of foldersToMove) {
         if (targetPath.includes(folderToMove)) {
-          console.log(
-            `警告: 移動先の親フォルダに移動したいフォルダ "${folderToMove}" が含まれています`
-          );
           return true;
         }
       }
@@ -134,11 +141,31 @@ const DndFinder: React.FC<dndFinderProps> = ({
 
   useEffect(() => {
     getNodesInCurrentFolder(selectedFolder);
-    console.log(isLeaf(result, selectedFolder));
     // フォルダが変わったら選択状態をリセット
     setSelectedImages([]);
     setIsMultiSelectMode(false);
+
+    // フォルダ変更を親コンポーネントに通知
+    if (onFolderChange && selectedFolder) {
+      onFolderChange(selectedFolder);
+    }
   }, [selectedFolder]);
+
+  // クエリパラメータが変更された時に選択フォルダを更新
+  useEffect(() => {
+    let newFolder = "";
+    if (finderType === "before" && targetFolder) {
+      newFolder = targetFolder;
+    } else if (finderType === "after" && destinationFolder) {
+      newFolder = destinationFolder;
+    } else {
+      newFolder = topLevelId || "";
+    }
+    
+    if (newFolder && newFolder !== selectedFolder) {
+      setSelectedFolder(newFolder);
+    }
+  }, [targetFolder, destinationFolder, finderType, topLevelId]);
 
   const handleMultiSelectToggle = () => {
     setIsMultiSelectMode(!isMultiSelectMode);
@@ -170,17 +197,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
         ? imagesToMove
         : [imagesToMove];
 
-      console.log("=== 画像移動API呼び出し開始 ===");
-      console.log("mongo_result_id:", mongo_result_id);
-      console.log("source_type: images");
-      console.log("sources:", sources);
-      console.log("destination_folder:", targetFolder);
-      console.log("destination_folder type:", typeof targetFolder);
-      console.log("destination_folder length:", targetFolder?.length);
-
       // 利用可能なフォルダ一覧を表示
-      const availableFolders = getFoldersInFolder(result, topLevelId);
-      console.log("利用可能なフォルダ一覧:", availableFolders);
+      const availableFolders = topLevelId
+        ? getFoldersInFolder(result, topLevelId)
+        : [];
 
       const response = await moveClusteringItems(
         mongo_result_id,
@@ -188,11 +208,6 @@ const DndFinder: React.FC<dndFinderProps> = ({
         sources,
         targetFolder
       );
-
-      console.log("=== APIレスポンス ===");
-      console.log("response:", response);
-      console.log("response.status:", response?.status);
-      console.log("response.data:", response?.data);
 
       // レスポンスの構造を確認
       if (
@@ -203,12 +218,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
         setSelectedImages([]);
         setIsMultiSelectMode(false);
 
-        console.log(
-          `✅ まとめて移動成功: ${imagesToMove.length}個の画像を移動しました`
-        );
-        console.log(`移動元フォルダ: ${sourceFolder}`);
-        console.log(`移動先フォルダ: ${targetFolder}`);
-        console.log(`移動された画像: ${imagesToMove.join(", ")}`);
+        // フォルダ移動完了のコールバックを呼び出し
+        if (onFolderMoveComplete) {
+          await onFolderMoveComplete(sourceFolder, targetFolder);
+        }
 
         alert(
           `✅ まとめて移動成功!\n${imagesToMove.length}個の画像を移動しました`
@@ -230,14 +243,17 @@ const DndFinder: React.FC<dndFinderProps> = ({
     } catch (error) {
       console.error("=== 移動処理でエラーが発生 ===");
       console.error("error:", error);
-      console.error("error.message:", error?.message);
-      console.error("error.response:", error?.response);
-      console.error("error.response?.data:", error?.response?.data);
-      console.error("error.response?.status:", error?.response?.status);
+      console.error("error.message:", (error as any)?.message);
+      console.error("error.response:", (error as any)?.response);
+      console.error("error.response?.data:", (error as any)?.response?.data);
+      console.error(
+        "error.response?.status:",
+        (error as any)?.response?.status
+      );
 
       const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
+        (error as any)?.response?.data?.message ||
+        (error as any)?.message ||
         "不明なエラーが発生しました";
 
       alert(`❌ 移動に失敗しました\n${errorMessage}`);
@@ -255,17 +271,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
         ? foldersToMove
         : [foldersToMove];
 
-      console.log("=== フォルダ移動API呼び出し開始 ===");
-      console.log("mongo_result_id:", mongo_result_id);
-      console.log("source_type: folders");
-      console.log("sources:", sources);
-      console.log("destination_folder:", targetFolder);
-      console.log("destination_folder type:", typeof targetFolder);
-      console.log("destination_folder length:", targetFolder?.length);
-
       // 利用可能なフォルダ一覧を表示
-      const availableFolders = getFoldersInFolder(result, topLevelId);
-      console.log("利用可能なフォルダ一覧:", availableFolders);
+      const availableFolders = topLevelId
+        ? getFoldersInFolder(result, topLevelId)
+        : [];
 
       const response = await moveClusteringItems(
         mongo_result_id,
@@ -273,11 +282,6 @@ const DndFinder: React.FC<dndFinderProps> = ({
         sources,
         targetFolder
       );
-
-      console.log("=== APIレスポンス ===");
-      console.log("response:", response);
-      console.log("response.status:", response?.status);
-      console.log("response.data:", response?.data);
 
       // レスポンスの構造を確認
       if (
@@ -287,8 +291,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
         setSelectedImages([]);
         setIsMultiSelectMode(false);
 
-        console.log("移動先のフォルダ:", targetFolder);
-        console.log("移動したフォルダ一覧:", foldersToMove);
+        // 移動完了をコールバックで通知
+        if (onFolderMoveComplete) {
+          onFolderMoveComplete(foldersToMove[0], targetFolder);
+        }
 
         alert(
           `✅ フォルダ移動完了!\n移動したフォルダ: ${foldersToMove.length}個\n移動先: ${targetFolder}`
@@ -310,14 +316,17 @@ const DndFinder: React.FC<dndFinderProps> = ({
     } catch (error) {
       console.error("=== フォルダ移動処理でエラーが発生 ===");
       console.error("error:", error);
-      console.error("error.message:", error?.message);
-      console.error("error.response:", error?.response);
-      console.error("error.response?.data:", error?.response?.data);
-      console.error("error.response?.status:", error?.response?.status);
+      console.error("error.message:", (error as any)?.message);
+      console.error("error.response:", (error as any)?.response);
+      console.error("error.response?.data:", (error as any)?.response?.data);
+      console.error(
+        "error.response?.status:",
+        (error as any)?.response?.status
+      );
 
       const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
+        (error as any)?.response?.data?.message ||
+        (error as any)?.message ||
         "不明なエラーが発生しました";
 
       alert(`❌ フォルダ移動に失敗しました\n${errorMessage}`);
@@ -328,10 +337,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
     e.preventDefault();
 
     // デバッグ用: すべてのドロップを許可
-    console.log("ドロップイベント発生:", finderType, selectedFolder);
-
     const data = e.dataTransfer.getData("text/plain");
-    console.log("受け取ったデータ:", data);
 
     if (!data) {
       console.error("ドロップされたデータが空です");
@@ -340,16 +346,13 @@ const DndFinder: React.FC<dndFinderProps> = ({
 
     try {
       const dragData = JSON.parse(data);
-      console.log("ドラッグデータ:", dragData);
 
       // フォルダ移動の処理
       if (dragData.type === "folder") {
         // フォルダ移動: 移動先のフォルダがisLeafでない場合のみ移動を許可
-        console.log("フォルダ移動処理開始");
         if (!isLeaf(result, selectedFolder)) {
           // 同じフォルダへのドロップをチェック
           if (dragData.sourceFolder === selectedFolder) {
-            console.log("同じフォルダへのドロップは無効です");
             alert("同じフォルダへの移動はできません");
             return;
           }
@@ -358,20 +361,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
           if (dragData.selectedFolders && dragData.selectedFolders.length > 0) {
             // 移動が無効かどうかをチェック
             if (isInvalidMove(dragData.selectedFolders, selectedFolder)) {
-              console.log("警告: 無効な移動です");
               alert("❌ 移動できません\n無効な移動先です");
               return;
             }
 
-            console.log(
-              "📋 ドラッグされたフォルダ一覧:",
-              dragData.selectedFolders
-            );
-            console.log(
-              `📁 移動元フォルダ: ${dragData.sourceFolder || "不明"}`
-            );
-            console.log(`📁 移動先フォルダ: ${selectedFolder}`);
-            console.log(`🔄 移動方向: ${dragData.sourceType} → ${finderType}`);
             handleMoveSelectedFolders(
               dragData.selectedFolders,
               dragData.sourceFolder || "不明",
@@ -381,13 +374,9 @@ const DndFinder: React.FC<dndFinderProps> = ({
             // 単一フォルダの移動
             // 移動が無効かどうかをチェック
             if (isInvalidMove([dragData.folderId], selectedFolder)) {
-              console.log("警告: 無効な移動です");
               alert("❌ 移動できません\n無効な移動先です");
               return;
             }
-
-            console.log("移動先のフォルダ:", selectedFolder);
-            console.log("移動したフォルダ一覧:", [dragData.folderId]);
 
             // 単一フォルダの移動もAPIを呼び出す
             handleMoveSelectedFolders(
@@ -397,7 +386,6 @@ const DndFinder: React.FC<dndFinderProps> = ({
             );
           }
         } else {
-          console.log("ドロップ無効: 移動先がisLeafフォルダのため");
           alert(
             "ドロップできません\n移動先はisLeafでないフォルダを選択してください"
           );
@@ -407,9 +395,6 @@ const DndFinder: React.FC<dndFinderProps> = ({
 
       // 画像移動の処理（既存のコード）
       const imageData = dragData;
-      console.log(
-        `Image moved: ${imageData.path} from ${imageData.sourceType} to ${finderType}`
-      );
 
       // 移動先のFinderに画像を追加（isLeafフォルダにのみ移動可能）
       if (
@@ -419,7 +404,6 @@ const DndFinder: React.FC<dndFinderProps> = ({
       ) {
         // 同じフォルダへのドロップをチェック
         if (imageData.sourceFolder === selectedFolder) {
-          console.log("同じフォルダへのドロップは無効です");
           alert("同じフォルダへの移動はできません");
           return;
         }
@@ -445,7 +429,6 @@ const DndFinder: React.FC<dndFinderProps> = ({
         !isLeaf(result, selectedFolder)
       ) {
         // 画像をisLeafでないフォルダにドロップしようとした場合
-        console.log("ドロップ無効: 画像はisLeafフォルダにのみ移動可能");
         alert("ドロップできません\n画像はisLeafフォルダにのみ移動できます");
       }
     } catch (error) {
@@ -457,10 +440,6 @@ const DndFinder: React.FC<dndFinderProps> = ({
     // ドラッグオーバー効果を常に有効にする（ドロップ処理で制限をかける）
     e.preventDefault();
   };
-
-  useEffect(() => {
-    console.log("current--------------", currentFolderState);
-  }, [currentFolderState]);
 
   return (
     <>
@@ -559,14 +538,14 @@ const DndFinder: React.FC<dndFinderProps> = ({
         <DndBreadclumbs
           parentFolders={currentFolderState.parentFolders}
           setSelectedFolder={setSelectedFolder}
-          topLevelId={topLevelId}
+          topLevelId={topLevelId || undefined}
         />
         <DndListView
           finderType={finderType}
           isLeaf={isLeaf(result, selectedFolder)}
           folders={
             isLeaf(result, selectedFolder)
-              ? Object.values(currentFolderState.files)
+              ? currentFolderState.files
               : currentFolderState.folders
           }
           originalImageFolderPath={originalImageFolderPath}

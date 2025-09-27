@@ -11,7 +11,6 @@ const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
   setSelectedFolder,
   topLevelId,
 }) => {
-  console.log(parentFolders);
   const items = parentFolders;
 
   const toParentFolder = () => {

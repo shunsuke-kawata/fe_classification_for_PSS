@@ -46,12 +46,6 @@ const Finder: React.FC<finderProps> = ({
     const folders = getFoldersInFolder(result, folderId);
     const files = getFilesInFolder(result, folderId);
     const path = findPathToNode(result, folderId) ?? [];
-    console.log("=== getNodesInCurrentFolder Debug ===");
-    console.log("folderId:", folderId);
-    console.log("topLevelId:", topLevelId);
-    console.log("path:", path);
-    console.log("folders:", folders);
-    console.log("files:", files);
 
     //現在のフォルダ情報を更新
     setCurrentFolderState({
@@ -63,13 +57,11 @@ const Finder: React.FC<finderProps> = ({
   };
 
   useEffect(() => {
-    console.log(selectedFolder);
     getNodesInCurrentFolder(selectedFolder);
-    console.log(isLeaf(result, selectedFolder));
   }, [selectedFolder]);
 
   useEffect(() => {
-    console.log(currentFolderState);
+    // 状態更新の監視（デバッグ用のログを削除）
   }, [currentFolderState]);
 
   return (

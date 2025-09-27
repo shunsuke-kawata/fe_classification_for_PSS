@@ -69,20 +69,54 @@ const ProjectDetail: React.FC = () => {
 
   // クエリパラメータを更新する関数
   const updateQueryParam = (
-    status: "object" | "group" | "reclassification"
+    status: "object" | "group" | "reclassification",
+    targetFolder?: string,
+    destinationFolder?: string
   ) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("display", status);
+
+    // フォルダ移動のパラメータを追加
+    if (targetFolder) {
+      params.set("t_folder", targetFolder);
+    } else {
+      params.delete("t_folder");
+    }
+
+    if (destinationFolder) {
+      params.set("d_folder", destinationFolder);
+    } else {
+      params.delete("d_folder");
+    }
+
     router.replace(`${window.location.pathname}?${params.toString()}`, {
       scroll: false,
     });
+  };
+
+  // フォルダ移動後のリダイレクト用関数
+  const handleFolderMoveRedirect = (
+    targetFolder: string,
+    destinationFolder: string
+  ) => {
+    // 再分類画面にリダイレクトし、移動に関連するパラメータを追加
+    updateQueryParam("reclassification", targetFolder, destinationFolder);
+  };
+
+  // フォルダ変更時の関数（再分類画面で常にt_folder, d_folderを更新）
+  const handleFolderChange = (
+    beforeFolderId: string,
+    afterFolderId: string
+  ) => {
+    if (displayStatus === "reclassification") {
+      updateQueryParam("reclassification", beforeFolderId, afterFolderId);
+    }
   };
 
   //ユーザ情報の読み込み
   useEffect(() => {
     const initializeUser = async () => {
       const user = getLoginedUser();
-      console.log(user);
 
       dispatch(setLoginedUser(user));
       dispatch(setSidebarStatus(false));
@@ -140,7 +174,7 @@ const ProjectDetail: React.FC = () => {
   }, [projectId]);
 
   useEffect(() => {
-    console.log(project);
+    // プロジェクト情報の監視（デバッグログ削除）
   }, [project]);
 
   const closePulldown = () => {
@@ -306,6 +340,8 @@ const ProjectDetail: React.FC = () => {
                 mongoResultId={project.mongo_result_id}
                 initClusteringState={project.init_clustering_state}
                 originalImageFolderPath={project.original_images_folder_path}
+                onFolderMoveComplete={handleFolderMoveRedirect}
+                onFolderChange={handleFolderChange}
               />
             ) : (
               <></>

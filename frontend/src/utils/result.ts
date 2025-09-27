@@ -36,7 +36,6 @@ export const getTopLevelFolderId = (result: {
 }): string | null => {
   // 全体フォルダは parent_id が null のフォルダ
   for (const [key, node] of Object.entries(result)) {
-    console.log(node);
     if (node.parent_id === null && !node.is_leaf) {
       return key;
     }
@@ -104,51 +103,31 @@ export const findPathToNode = (
   path: string[] = []
 ): string[] | undefined => {
   const topLevelId = getTopLevelFolderId(obj);
-  console.log("=== findPathToNode Debug ===");
-  console.log("targetId:", targetId);
-  console.log("topLevelId:", topLevelId);
-  console.log("current path:", path);
-  console.log("obj keys:", Object.keys(obj));
 
   for (const key in obj) {
     const node = obj[key];
-    console.log(`Checking key: ${key}, is_leaf: ${node.is_leaf}`);
 
     if (key === targetId) {
-      console.log(`Found targetId: ${key}`);
       // 全体フォルダIDの場合はtopLevelIdのみの配列を返す
       if (key === topLevelId) {
-        console.log("Target is topLevelId, returning [topLevelId]");
         return [topLevelId];
       }
-      console.log("Returning path:", [...path, key]);
       return [...path, key];
     }
     if (!node.is_leaf) {
       const childData = node.data as { [key: string]: treeNode };
       // 全体フォルダIDの場合は、その子要素から検索を開始
       const searchPath = key === topLevelId ? [] : [...path, key];
-      console.log(
-        `Searching in child data for key: ${key}, searchPath:`,
-        searchPath
-      );
       const result = findPathToNode(childData, targetId, searchPath);
       if (result !== undefined) {
-        console.log(`Found result in child:`, result);
         // 全体フォルダIDの子要素が見つかった場合の処理
         if (key === topLevelId) {
           // 全体フォルダIDの子要素が見つかった場合、常にtopLevelIdを最初に追加
-          console.log(
-            "TopLevel child found, returning:",
-            topLevelId ? [topLevelId, ...result] : result
-          );
           return topLevelId ? [topLevelId, ...result] : result;
         }
-        console.log("Non-topLevel child found, returning:", result);
         return result;
       }
     }
   }
-  console.log("No result found, returning undefined");
   return undefined;
 };
