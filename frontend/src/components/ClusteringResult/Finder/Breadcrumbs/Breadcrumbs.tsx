@@ -25,19 +25,54 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 省略が必要かどうかを判定
+  // 省略が必要かどうかを判定（ウィンドウサイズと階層数に応じて）
   const shouldTruncate = () => {
-    // 階層が3以下の場合は省略しない
-    if (items.length <= 3) {
-      return false;
+    // 画面サイズを細かく分類
+    const isVerySmallScreen = windowWidth <= 480; // 非常に小さい画面（スマホ縦）
+    const isSmallScreen = windowWidth <= 768; // 小さい画面（スマホ横・小タブレット）
+    const isMediumSmallScreen = windowWidth <= 1024 * (2 / 3); // ウィンドウの2/3程度（約683px）
+    const isMediumScreen = windowWidth <= 1024; // 中程度の画面（タブレット）
+    const isLargeScreen = windowWidth > 1024; // 大きい画面（デスクトップ）
+
+    console.log(`Window width: ${windowWidth}, Items length: ${items.length}`);
+
+    // 非常に大きい画面でも3階層以上で省略
+    if (windowWidth > 1440) {
+      // 3階層以上で省略
+      return items.length > 2;
     }
 
-    // ウィンドウ幅が大きい場合は省略しない（デスクトップ）
-    if (windowWidth >= 1024) {
-      return false;
+    // 大きい画面（デスクトップ）
+    if (isLargeScreen) {
+      // 3階層以上で省略（より積極的に省略）
+      return items.length > 2;
     }
 
-    return true;
+    // 中程度の画面（タブレット）
+    if (isMediumScreen && !isMediumSmallScreen) {
+      // 3階層以上で省略
+      return items.length > 2;
+    }
+
+    // ウィンドウの2/3程度以下（PCでブラウザサイズを小さくした場合を想定）
+    if (isMediumSmallScreen && !isSmallScreen) {
+      // 2階層以上で省略
+      return items.length > 1;
+    }
+
+    // 小さい画面（スマホ横・小タブレット）
+    if (isSmallScreen && !isVerySmallScreen) {
+      // 2階層以上で省略
+      return items.length > 1;
+    }
+
+    // 非常に小さい画面（スマホ縦）
+    if (isVerySmallScreen) {
+      // 1階層以上で省略（最も制限的）
+      return items.length > 0;
+    }
+
+    return false;
   };
 
   // 文字列を省略する関数（前3文字 + ... + 後3文字）
