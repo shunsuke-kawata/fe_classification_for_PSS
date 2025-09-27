@@ -1,16 +1,51 @@
 .project-main-div{
-    position:relative;
-    width:900px;
+    position: relative;
+    width: 90%;
+    max-width: 900px;
+    min-width: 320px;
     height: 800px;
     margin: 10px auto;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .add-project-button{
-    position:absolute;
-    top:-50px;
-    right:-30px;
-    width:120px;
+    position: absolute;
+    top: -50px;
+    right: 0;
+    width: 120px;
     height: 40px;
     font-size: 18px;
-    border-radius:5px;
+    border-radius: 5px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .project-main-div {
+        width: 95%;
+        height: 700px;
+        padding: 0 10px;
+    }
+    
+    .add-project-button {
+        position: relative;
+        top: 0;
+        right: 0;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .project-main-div {
+        width: 98%;
+        height: 600px;
+        padding: 0 5px;
+    }
+    
+    .add-project-button {
+        font-size: 16px;
+        height: 35px;
+    }
 }

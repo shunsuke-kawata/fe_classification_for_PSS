@@ -7,6 +7,7 @@ import {
   findPathToNode,
   getFilesInFolder,
   getFoldersInFolder,
+  getTopLevelFolderId,
   isLeaf,
   leafData,
   treeNode,
@@ -23,13 +24,20 @@ const Finder: React.FC<finderProps> = ({
   result,
   originalImageFolderPath,
 }: finderProps) => {
-  const [selectedFolder, setSelectedFolder] = useState<string>("top");
+  const topLevelId = getTopLevelFolderId(result);
+
+  // topLevelIdがnullの場合は何も表示しない
+  if (!topLevelId) {
+    return <></>;
+  }
+
+  const [selectedFolder, setSelectedFolder] = useState<string>(topLevelId);
   const [currentFolderState, setCurrentFolderState] = useState<{
     parentFolders: string[];
     files: leafData;
     folders: string[];
   }>({
-    parentFolders: [],
+    parentFolders: [topLevelId],
     files: {},
     folders: [],
   });
@@ -37,8 +45,13 @@ const Finder: React.FC<finderProps> = ({
   const getNodesInCurrentFolder = (folderId: string) => {
     const folders = getFoldersInFolder(result, folderId);
     const files = getFilesInFolder(result, folderId);
-    const path =
-      folderId === "top" ? [] : findPathToNode(result, folderId) ?? [];
+    const path = findPathToNode(result, folderId) ?? [];
+    console.log("=== getNodesInCurrentFolder Debug ===");
+    console.log("folderId:", folderId);
+    console.log("topLevelId:", topLevelId);
+    console.log("path:", path);
+    console.log("folders:", folders);
+    console.log("files:", files);
 
     //現在のフォルダ情報を更新
     setCurrentFolderState({
@@ -50,9 +63,14 @@ const Finder: React.FC<finderProps> = ({
   };
 
   useEffect(() => {
+    console.log(selectedFolder);
     getNodesInCurrentFolder(selectedFolder);
     console.log(isLeaf(result, selectedFolder));
   }, [selectedFolder]);
+
+  useEffect(() => {
+    console.log(currentFolderState);
+  }, [currentFolderState]);
 
   return (
     <>

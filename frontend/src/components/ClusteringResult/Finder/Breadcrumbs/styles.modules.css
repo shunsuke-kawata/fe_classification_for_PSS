@@ -1,26 +1,99 @@
 .breadcrumbs {
   display: flex;
   justify-content: flex-start;
-  align-items: center; /* ← これで親 flex の子は縦中央に */
-  padding: 6px 12px;
+  align-items: center;
+  padding: 10px 12px;
   background-color: #ebe9e6;
-  border:0.5px #a9a9a9 solid;
+  border: 0.5px #a9a9a9 solid;
+  height: 52px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  overflow-x: auto; /* 横スクロールを許可 */
+  white-space: nowrap; /* 改行を防ぐ */
+}
+
+.breadcrumb-wrapper {
+  flex-shrink: 0; /* 各アイテムの縮小を防ぐ */
+  display: inline-flex;
+  align-items: center;
 }
 
 .breadcrumb-item {
   margin: 0 5px;
-  color:#4d4d4d;
+  color: #4d4d4d;
   font-size: 20px;
-  font-weight:600;
+  font-weight: 600;
   display: inline-block;
   vertical-align: middle;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  /* CSS側の省略機能を削除し、JavaScript側で制御 */
+}
+
+.breadcrumb-item:hover {
+  color: #2c2c2c;
+  text-decoration: underline;
 }
 
 .separator {
   display: inline-block;
   font-size: 20px;
-  color:#4d4d4d;
-  font-size: 20px;
-  vertical-align: middle; /* ここで縦中央に揃える */
+  color: #4d4d4d;
+  vertical-align: middle;
   margin: 0 4px;
+  flex-shrink: 0; /* セパレータの縮小を防ぐ */
+}
+
+/* タブレット用のスタイル */
+@media (max-width: 1024px) {
+  .breadcrumbs {
+    padding: 8px 10px;
+    height: 48px;
+  }
+  
+  .breadcrumb-item {
+    font-size: 18px;
+    margin: 0 4px;
+  }
+  
+  .separator {
+    font-size: 18px;
+    margin: 0 3px;
+  }
+}
+
+/* モバイル用のスタイル */
+@media (max-width: 768px) {
+  .breadcrumbs {
+    padding: 6px 8px;
+    height: 44px;
+  }
+  
+  .breadcrumb-item {
+    font-size: 16px;
+    margin: 0 3px;
+  }
+  
+  .separator {
+    font-size: 16px;
+    margin: 0 2px;
+  }
+}
+
+/* 非常に小さい画面用 */
+@media (max-width: 480px) {
+  .breadcrumbs {
+    padding: 4px 6px;
+    height: 40px;
+  }
+  
+  .breadcrumb-item {
+    font-size: 14px;
+    margin: 0 2px;
+  }
+  
+  .separator {
+    font-size: 14px;
+    margin: 0 1px;
+  }
 }

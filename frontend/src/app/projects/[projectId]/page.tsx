@@ -172,7 +172,13 @@ const ProjectDetail: React.FC = () => {
       <Header />
       {project ? (
         <>
-          <div className="project-detail-main">
+          <div
+            className={`project-detail-main ${
+              displayStatus === "group" || displayStatus === "reclassification"
+                ? "no-scroll"
+                : ""
+            }`}
+          >
             <div className="project-title">{project.name}</div>
             <div className="menu-outer-flex">
               <div className="select-display-status">
@@ -273,7 +279,14 @@ const ProjectDetail: React.FC = () => {
                 {/* <div className="images-count">
                   画像枚数合計：{imagesInProject.length}
                 </div> */}
-                <div className="display-area">
+                <div
+                  className={`display-area ${
+                    displayStatus === "group" ||
+                    displayStatus === "reclassification"
+                      ? "no-scroll"
+                      : ""
+                  }`}
+                >
                   <ImageList
                     fullImageInfolist={imagesInProject}
                     originalImageFolderPath={

@@ -1,10 +1,11 @@
 .list-view-main{
     width: 100%;
-    height: calc(100% - 50px); /* ブレッドクラム分を引く */
+    height: calc(100%); /* ヘッダー(36px) + ブレッドクラム(48px)分を引く */
     border: 0.5px #e1e5e9 solid;
     overflow-y: auto;
     flex: 1; /* 残りのスペースを占有 */
     background-color: #ffffff;
+    box-sizing: border-box;
 }
 
 .list-view-item{
@@ -49,7 +50,7 @@
 .dnd-image-file-view-main {
   border: 0.5px #e1e5e9 solid;
   width: 100%;
-  height: calc(100% - 50px); /* ブレッドクラム分を引く */
+  height: calc(100% - 84px); /* ヘッダー(36px) + ブレッドクラム(48px)分を引く */
   overflow-y: auto;
   display: flex;
   flex-wrap: wrap;
@@ -176,9 +177,101 @@
   font-weight: 500;
 }
 
-.dnd-listview-div-main {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  flex: 1;
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .dnd-image-file-view-main {
+    gap: 15px 8px;
+    padding: 8px;
+  }
+  
+  .dnd-image-file-item {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .dnd-folder-icon-item {
+    width: 80px;
+    height: 100px;
+  }
+  
+  .folder-icon-container {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .folder-icon-large {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .folder-name-label {
+    font-size: 11px;
+    max-width: 80px;
+  }
+  
+  .list-view-item {
+    height: 25px;
+    padding-left: 8px;
+  }
+  
+  .img-icon {
+    width: 16px;
+  }
+  
+  .folder-name-span {
+    margin-left: 8px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dnd-image-file-view-main {
+    gap: 10px 5px;
+    padding: 5px;
+  }
+  
+  .dnd-image-file-item {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .dnd-folder-icon-item {
+    width: 70px;
+    height: 90px;
+  }
+  
+  .folder-icon-container {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .folder-icon-large {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .folder-name-label {
+    font-size: 10px;
+    max-width: 70px;
+  }
+  
+  .list-view-item {
+    height: 22px;
+    padding-left: 6px;
+  }
+  
+  .img-icon {
+    width: 14px;
+  }
+  
+  .folder-name-span {
+    margin-left: 6px;
+    font-size: 12px;
+  }
+  
+  .selection-indicator {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+  }
 }

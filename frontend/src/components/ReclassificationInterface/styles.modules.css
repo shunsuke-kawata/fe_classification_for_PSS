@@ -1,11 +1,44 @@
 .dnd-interface-div-main {
     width: 100%;
     margin-top: 20px;
-    height: 95%;
+    height: calc(100vh - 220px); /* ビューポート高さからヘッダーやマージン分を引く（少し余裕を持たせる） */
     display: flex;
     justify-content: center;
     align-items: flex-start;
     gap: 20px;
-    overflow: hidden; /* 親要素のスクロールを無効化 */
+    padding: 0 20px;
+    box-sizing: border-box;
+    max-width: 1800px; /* 大画面での最大幅を設定 */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1200px) {
+    .dnd-interface-div-main {
+        gap: 15px;
+        padding: 0 15px;
+        height: calc(100vh - 200px); /* ビューポート高さからヘッダーやマージン分を引く */
+    }
+}
+
+@media (max-width: 768px) {
+    .dnd-interface-div-main {
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 10px;
+        height: calc(100vh - 180px); /* ビューポート高さからヘッダーやマージン分を引く */
+        align-items: center; /* 中央揃え */
+    }
+}
+
+@media (max-width: 480px) {
+    .dnd-interface-div-main {
+        gap: 10px;
+        padding: 0 5px;
+        margin-top: 10px;
+        height: calc(100vh - 160px); /* ビューポート高さからヘッダーやマージン分を引く */
+        align-items: center; /* 中央揃え */
+    }
 }
 

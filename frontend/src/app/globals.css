@@ -1,8 +1,9 @@
 body{
     background-color: #7cc7e8;
     font-family: 'Hiragino Kaku Gothic ProN', 'ヒラギノ角ゴ ProN W3', 'Hiragino Sans', 'ヒラギノ角ゴシック', 'Hiragino Kaku Gothic Pro', 'ヒラギノ角ゴ Pro W3', 'ヒラギノ角ゴシック W3', 'Hiragino Maru Gothic Pro', 'ヒラギノ丸ゴ Pro W4', 'Hiragino Mincho Pro', 'ヒラギノ明朝 Pro W3', 'Hiragino Mincho ProN', 'ヒラギノ明朝 ProN W3', 'Hiragino Sans GB', 'Hiragino Kaku Gothic StdN', 'ヒラギノ角ゴ StdN W8', 'Hiragino Kaku Gothic Std', 'ヒラギノ角ゴ Std W8', sans-serif;
-    min-width: 1000px;
-    overflow: hidden;
+    min-width: 320px; /* モバイル対応 */
+    overflow-x: hidden; /* 横スクロールを防ぐ */
+    overflow-y: auto; /* 縦スクロールは許可 */
 }
 
 .common-buttons{

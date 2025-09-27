@@ -3,25 +3,24 @@ import "./styles.modules.css";
 interface dndBreadcrumbsProps {
   parentFolders: string[];
   setSelectedFolder: React.Dispatch<React.SetStateAction<string>>;
+  topLevelId?: string;
 }
 
 const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
   parentFolders,
   setSelectedFolder,
+  topLevelId,
 }) => {
   console.log(parentFolders);
   const items = parentFolders;
-
-  const truncateFolderName = (name: string) => {
-    if (name.length <= 6) return name;
-    return name.slice(0, 3) + "•••" + name.slice(-3);
-  };
 
   const toParentFolder = () => {
     if (items.length === 0) {
       return;
     } else if (items.length === 1) {
-      setSelectedFolder("top");
+      if (topLevelId) {
+        setSelectedFolder(topLevelId);
+      }
     } else {
       setSelectedFolder(items[items.length - 2]);
     }
@@ -39,7 +38,7 @@ const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
         </span>
       </div>
       <span className="breadcrumb-item">
-        {items.length === 0 ? "top" : items[items.length - 1]}
+        {items.length === 0 ? topLevelId || "Root" : items[items.length - 1]}
       </span>
     </div>
   );

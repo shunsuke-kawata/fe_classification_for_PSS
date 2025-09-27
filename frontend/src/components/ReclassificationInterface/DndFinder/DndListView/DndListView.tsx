@@ -7,6 +7,7 @@ import {
   treeNode,
   getFilesInFolder,
 } from "@/utils/result";
+import { useEffect } from "react";
 
 interface dndListViewProps {
   finderType: finderType;
@@ -34,7 +35,7 @@ const DndListView: React.FC<dndListViewProps> = ({
   isMultiSelectMode = false,
   selectedImages = [],
   onImageSelect,
-  currentFolder = "top",
+  currentFolder,
   viewMode = "list",
   getFolderPreviewImage,
   getFolderPreviewImagePath,
@@ -101,6 +102,11 @@ const DndListView: React.FC<dndListViewProps> = ({
       onImageSelect(folderId);
     }
   };
+
+  //forldersファイルnameのstringが渡されてしまっているので変更する
+  useEffect(() => {
+    console.log("current--------------", folders);
+  }, [folders]);
 
   return (
     <>

@@ -7,11 +7,13 @@ import {
   findPathToNode,
   getFilesInFolder,
   getFoldersInFolder,
+  getTopLevelFolderId,
   isLeaf,
   leafData,
   treeNode,
 } from "@/utils/result";
 import config from "@/config/config.json";
+import { moveClusteringItems } from "@/api/api";
 
 export type finderType = "before" | "after";
 
@@ -21,14 +23,19 @@ type dndFinderProps = {
   result: {
     [topLevelNodeId: string]: treeNode;
   };
+  mongo_result_id: string;
 };
 
 const DndFinder: React.FC<dndFinderProps> = ({
   finderType,
   result,
   originalImageFolderPath,
+  mongo_result_id,
 }: dndFinderProps) => {
-  const [selectedFolder, setSelectedFolder] = useState<string>("top");
+  const topLevelId = getTopLevelFolderId(result);
+  const [selectedFolder, setSelectedFolder] = useState<string>(
+    topLevelId || ""
+  );
   const [currentFolderState, setCurrentFolderState] = useState<{
     parentFolders: string[];
     files: leafData;
@@ -41,13 +48,12 @@ const DndFinder: React.FC<dndFinderProps> = ({
   const [movedImages, setMovedImages] = useState<string[]>([]);
   const [isMultiSelectMode, setIsMultiSelectMode] = useState<boolean>(false);
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<"list" | "icon">("list");
+  const [viewMode, setViewMode] = useState<"list" | "icon">("icon");
 
   const getNodesInCurrentFolder = (folderId: string) => {
     const folders = getFoldersInFolder(result, folderId);
     const files = getFilesInFolder(result, folderId);
-    const path =
-      folderId === "top" ? [] : findPathToNode(result, folderId) ?? [];
+    const path = findPathToNode(result, folderId) ?? [];
 
     //現在のフォルダ情報を更新
     setCurrentFolderState({
@@ -153,39 +159,169 @@ const DndFinder: React.FC<dndFinderProps> = ({
     });
   };
 
-  const handleMoveSelectedImages = (
+  const handleMoveSelectedImages = async (
     imagesToMove: string[],
     sourceFolder: string,
     targetFolder: string
   ) => {
-    setMovedImages((prev) => [...prev, ...imagesToMove]);
-    setSelectedImages([]);
-    setIsMultiSelectMode(false);
+    try {
+      // 単独ファイルの移動時も配列として処理
+      const sources = Array.isArray(imagesToMove)
+        ? imagesToMove
+        : [imagesToMove];
 
-    console.log(
-      `✅ まとめて移動成功: ${imagesToMove.length}個の画像を移動しました`
-    );
-    console.log(`移動元フォルダ: ${sourceFolder}`);
-    console.log(`移動先フォルダ: ${targetFolder}`);
-    console.log(`移動された画像: ${imagesToMove.join(", ")}`);
+      console.log("=== 画像移動API呼び出し開始 ===");
+      console.log("mongo_result_id:", mongo_result_id);
+      console.log("source_type: images");
+      console.log("sources:", sources);
+      console.log("destination_folder:", targetFolder);
+      console.log("destination_folder type:", typeof targetFolder);
+      console.log("destination_folder length:", targetFolder?.length);
 
-    alert(`✅ まとめて移動成功!\n${imagesToMove.length}個の画像を移動しました`);
+      // 利用可能なフォルダ一覧を表示
+      const availableFolders = getFoldersInFolder(result, topLevelId);
+      console.log("利用可能なフォルダ一覧:", availableFolders);
+
+      const response = await moveClusteringItems(
+        mongo_result_id,
+        "images",
+        sources,
+        targetFolder
+      );
+
+      console.log("=== APIレスポンス ===");
+      console.log("response:", response);
+      console.log("response.status:", response?.status);
+      console.log("response.data:", response?.data);
+
+      // レスポンスの構造を確認
+      if (
+        response &&
+        (response.status === 200 || response.statusCode === 200)
+      ) {
+        setMovedImages((prev) => [...prev, ...imagesToMove]);
+        setSelectedImages([]);
+        setIsMultiSelectMode(false);
+
+        console.log(
+          `✅ まとめて移動成功: ${imagesToMove.length}個の画像を移動しました`
+        );
+        console.log(`移動元フォルダ: ${sourceFolder}`);
+        console.log(`移動先フォルダ: ${targetFolder}`);
+        console.log(`移動された画像: ${imagesToMove.join(", ")}`);
+
+        alert(
+          `✅ まとめて移動成功!\n${imagesToMove.length}個の画像を移動しました`
+        );
+      } else {
+        console.error("移動に失敗しました - 詳細:");
+        console.error("response:", response);
+        console.error("response.status:", response?.status);
+        console.error("response.statusCode:", response?.statusCode);
+        console.error("response.data:", response?.data);
+
+        const errorMessage =
+          response?.data?.message ||
+          response?.message ||
+          `HTTP ${response?.status || response?.statusCode || "Unknown"}`;
+
+        alert(`❌ 移動に失敗しました\n${errorMessage}`);
+      }
+    } catch (error) {
+      console.error("=== 移動処理でエラーが発生 ===");
+      console.error("error:", error);
+      console.error("error.message:", error?.message);
+      console.error("error.response:", error?.response);
+      console.error("error.response?.data:", error?.response?.data);
+      console.error("error.response?.status:", error?.response?.status);
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "不明なエラーが発生しました";
+
+      alert(`❌ 移動に失敗しました\n${errorMessage}`);
+    }
   };
 
-  const handleMoveSelectedFolders = (
+  const handleMoveSelectedFolders = async (
     foldersToMove: string[],
     sourceFolder: string,
     targetFolder: string
   ) => {
-    setSelectedImages([]);
-    setIsMultiSelectMode(false);
+    try {
+      // 単独フォルダの移動時も配列として処理
+      const sources = Array.isArray(foldersToMove)
+        ? foldersToMove
+        : [foldersToMove];
 
-    console.log("移動先のフォルダ:", targetFolder);
-    console.log("移動したフォルダ一覧:", foldersToMove);
+      console.log("=== フォルダ移動API呼び出し開始 ===");
+      console.log("mongo_result_id:", mongo_result_id);
+      console.log("source_type: folders");
+      console.log("sources:", sources);
+      console.log("destination_folder:", targetFolder);
+      console.log("destination_folder type:", typeof targetFolder);
+      console.log("destination_folder length:", targetFolder?.length);
 
-    alert(
-      `✅ フォルダ移動完了!\n移動したフォルダ: ${foldersToMove.length}個\n移動先: ${targetFolder}`
-    );
+      // 利用可能なフォルダ一覧を表示
+      const availableFolders = getFoldersInFolder(result, topLevelId);
+      console.log("利用可能なフォルダ一覧:", availableFolders);
+
+      const response = await moveClusteringItems(
+        mongo_result_id,
+        "folders",
+        sources,
+        targetFolder
+      );
+
+      console.log("=== APIレスポンス ===");
+      console.log("response:", response);
+      console.log("response.status:", response?.status);
+      console.log("response.data:", response?.data);
+
+      // レスポンスの構造を確認
+      if (
+        response &&
+        (response.status === 200 || response.statusCode === 200)
+      ) {
+        setSelectedImages([]);
+        setIsMultiSelectMode(false);
+
+        console.log("移動先のフォルダ:", targetFolder);
+        console.log("移動したフォルダ一覧:", foldersToMove);
+
+        alert(
+          `✅ フォルダ移動完了!\n移動したフォルダ: ${foldersToMove.length}個\n移動先: ${targetFolder}`
+        );
+      } else {
+        console.error("フォルダ移動に失敗しました - 詳細:");
+        console.error("response:", response);
+        console.error("response.status:", response?.status);
+        console.error("response.statusCode:", response?.statusCode);
+        console.error("response.data:", response?.data);
+
+        const errorMessage =
+          response?.data?.message ||
+          response?.message ||
+          `HTTP ${response?.status || response?.statusCode || "Unknown"}`;
+
+        alert(`❌ フォルダ移動に失敗しました\n${errorMessage}`);
+      }
+    } catch (error) {
+      console.error("=== フォルダ移動処理でエラーが発生 ===");
+      console.error("error:", error);
+      console.error("error.message:", error?.message);
+      console.error("error.response:", error?.response);
+      console.error("error.response?.data:", error?.response?.data);
+      console.error("error.response?.status:", error?.response?.status);
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "不明なエラーが発生しました";
+
+      alert(`❌ フォルダ移動に失敗しました\n${errorMessage}`);
+    }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -253,8 +389,11 @@ const DndFinder: React.FC<dndFinderProps> = ({
             console.log("移動先のフォルダ:", selectedFolder);
             console.log("移動したフォルダ一覧:", [dragData.folderId]);
 
-            alert(
-              `✅ フォルダ移動完了!\n移動したフォルダ: ${dragData.folderId}\n移動先: ${selectedFolder}`
+            // 単一フォルダの移動もAPIを呼び出す
+            handleMoveSelectedFolders(
+              [dragData.folderId],
+              dragData.sourceFolder || "不明",
+              selectedFolder
             );
           }
         } else {
@@ -293,15 +432,11 @@ const DndFinder: React.FC<dndFinderProps> = ({
             selectedFolder
           );
         } else {
-          // 単一画像の移動
-          setMovedImages((prev) => [...prev, imageData.path]);
-          console.log(
-            `✅ ドラッグ&ドロップ成功: ${imageData.path} を移動しました`
-          );
-          console.log(`📁 移動元フォルダ: ${imageData.sourceFolder || "不明"}`);
-          console.log(`📁 移動先フォルダ: ${selectedFolder}`);
-          alert(
-            `✅ ドラッグ&ドロップ成功!\n画像 "${imageData.path}" を移動しました`
+          // 単一画像の移動もAPIを呼び出す
+          handleMoveSelectedImages(
+            [imageData.path],
+            imageData.sourceFolder || "不明",
+            selectedFolder
           );
         }
       } else if (
@@ -322,6 +457,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
     // ドラッグオーバー効果を常に有効にする（ドロップ処理で制限をかける）
     e.preventDefault();
   };
+
+  useEffect(() => {
+    console.log("current--------------", currentFolderState);
+  }, [currentFolderState]);
 
   return (
     <>
@@ -420,6 +559,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
         <DndBreadclumbs
           parentFolders={currentFolderState.parentFolders}
           setSelectedFolder={setSelectedFolder}
+          topLevelId={topLevelId}
         />
         <DndListView
           finderType={finderType}
