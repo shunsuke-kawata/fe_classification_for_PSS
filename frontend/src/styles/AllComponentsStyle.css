@@ -1,9 +1,27 @@
+/* アプリ全体のスクロール禁止 */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* アプリ全体のスクロールを禁止 */
+}
+
+/* アプリのルートコンテナ */
+#__next {
+    height: 100vh;
+    overflow: hidden;
+}
+
 .header-main{
     background-color: #4169e1;
     width: 100%;
     height: 80px;
     display: flex;
     box-sizing: border-box;
+    position: fixed; /* ヘッダーを固定 */
+    top: 0;
+    left: 0;
+    z-index: 1000; /* 他の要素より上に表示 */
 }
 
 /* レスポンシブ対応 */

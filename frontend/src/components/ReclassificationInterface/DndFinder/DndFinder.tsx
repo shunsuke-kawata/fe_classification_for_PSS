@@ -155,16 +155,23 @@ const DndFinder: React.FC<dndFinderProps> = ({
 
   // 初回アクセス時にt_folderパラメータを設定
   useEffect(() => {
-    // 初回アクセス時（t_folderパラメータが未設定）の場合
-    const shouldSetInitialFolder = 
-      (finderType === "before" && (!targetFolder || targetFolder.length === 0)) ||
-      (finderType === "after" && (!destinationFolder || destinationFolder.length === 0));
-    
-    if (shouldSetInitialFolder && onFolderChange && topLevelId) {
-      // topLevelIdをt_folderパラメータに設定
-      onFolderChange(topLevelId);
+    // onFolderChangeとtopLevelIdが利用可能な場合のみ実行
+    if (onFolderChange && topLevelId) {
+      // 初回アクセス時（各パラメータが未設定）の場合
+      const shouldSetInitialFolder =
+        (finderType === "before" &&
+          (!targetFolder || targetFolder.length === 0)) ||
+        (finderType === "after" &&
+          (!destinationFolder || destinationFolder.length === 0));
+
+      if (shouldSetInitialFolder) {
+        // 遅延実行でコールバックを呼び出し、両方のフィンダーが初期化されるのを待つ
+        setTimeout(() => {
+          onFolderChange(topLevelId);
+        }, 0);
+      }
     }
-  }, []); // 初回のみ実行
+  }, [onFolderChange, topLevelId, finderType, targetFolder, destinationFolder]); // 依存配列に必要な値を追加
 
   // クエリパラメータが変更された時に選択フォルダを更新
   useEffect(() => {
@@ -659,6 +666,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
           parentFolders={currentFolderState.parentFolders}
           setSelectedFolder={setSelectedFolder}
           topLevelId={topLevelId || undefined}
+          result={result}
         />
         <DndListView
           finderType={finderType}

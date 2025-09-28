@@ -7,6 +7,7 @@ import {
   treeNode,
   getFilesInFolder,
   leafData,
+  getImageCountInFolder,
 } from "@/utils/result";
 import { useEffect } from "react";
 

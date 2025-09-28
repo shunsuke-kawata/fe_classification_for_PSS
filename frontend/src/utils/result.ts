@@ -131,3 +131,17 @@ export const findPathToNode = (
   }
   return undefined;
 };
+
+// フォルダ内の画像枚数を取得する関数
+export const getImageCountInFolder = (
+  result: {
+    [topLevelNodeId: string]: treeNode;
+  },
+  folderId: string
+): number => {
+  const node = findNodeById(result, folderId);
+  if (!node || !node.is_leaf) return 0;
+
+  const files = node.data as leafData;
+  return Object.keys(files).length;
+};

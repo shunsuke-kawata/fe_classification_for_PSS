@@ -39,3 +39,9 @@
         border-bottom: 0.5px #e1e5e9 solid;
     }
 }
+
+.image-count {
+  color: #666;
+  font-size: 12px;
+  margin-left: 4px;
+}

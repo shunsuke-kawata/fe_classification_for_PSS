@@ -1,5 +1,7 @@
 .buttons-main{
-    margin: 15% auto;
+    margin-top: calc(80px + 15vh); /* ヘッダー高さ + 余白 */
+    margin-left: auto;
+    margin-right: auto;
     width: 90%;
     max-width: 600px;
     min-width: 320px;
@@ -18,7 +20,7 @@
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
     .buttons-main {
-        margin: 10% auto;
+        margin-top: calc(60px + 10vh); /* モバイル用ヘッダー高さ + 余白 */
         width: 95%;
         padding: 0 10px;
     }
@@ -31,7 +33,7 @@
 
 @media (max-width: 480px) {
     .buttons-main {
-        margin: 5% auto;
+        margin-top: calc(50px + 5vh); /* 小画面用ヘッダー高さ + 余白 */
     }
     
     .top-buttons {

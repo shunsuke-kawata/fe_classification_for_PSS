@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import "./styles.modules.css";
+import { treeNode, getImageCountInFolder, isLeaf } from "@/utils/result";
 
 interface BreadcrumbsProps {
   parentFolders: string[];
   setSelectedFolder: React.Dispatch<React.SetStateAction<string>>;
   topLevelId?: string;
+  result: {
+    [topLevelNodeId: string]: treeNode;
+  };
 }
 
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   parentFolders,
   setSelectedFolder,
   topLevelId,
+  result,
 }) => {
   const items = parentFolders;
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -97,6 +102,8 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
         const displayName = truncateString(item);
+        const itemIsLeaf = isLeaf(result, item);
+        const imageCount = itemIsLeaf ? getImageCountInFolder(result, item) : 0;
 
         return (
           <span key={index} className="breadcrumb-wrapper">
@@ -106,6 +113,9 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
               title={item} // ホバー時に完全な名前を表示
             >
               {displayName}
+              {itemIsLeaf && imageCount > 0 && (
+                <span className="image-count">({imageCount})</span>
+              )}
             </span>
             {!isLast && <span className="separator">＞</span>}
           </span>

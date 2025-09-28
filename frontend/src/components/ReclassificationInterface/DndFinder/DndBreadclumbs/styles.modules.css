@@ -40,3 +40,9 @@
 .parent-folder-button span.parent-folder-button-span-disabled{
   color:#ebe9e6;
 }
+
+.image-count {
+  color: #666;
+  font-size: 12px;
+  margin-left: 4px;
+}

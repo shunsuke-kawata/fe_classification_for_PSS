@@ -4,7 +4,7 @@ import "./styles.modules.css";
 import { clusteringStatus } from "@/config";
 import { getClusteringResult } from "@/api/api";
 import DndFinder from "./DndFinder/DndFinder";
-import { treeNode } from "@/utils/result";
+import { treeNode, getTopLevelFolderId } from "@/utils/result";
 
 type reclassificationInterfaceProps = {
   mongoResultId: string;
@@ -132,6 +132,29 @@ const ReclassificationInterface: React.FC<reclassificationInterfaceProps> = ({
       setCurrentAfterFolderId(destinationFolder);
     }
   }, [targetFolder, destinationFolder]);
+
+  // クラスタリング結果が読み込まれた際の初期化処理
+  useEffect(() => {
+    if (clusteringResult && clusteringResult.result) {
+      const topLevelId = getTopLevelFolderId(clusteringResult.result);
+
+      // 初回アクセス時（パラメータが未設定）の場合、topLevelIdで初期化
+      if (topLevelId) {
+        if (!targetFolder && !currentBeforeFolderId) {
+          setCurrentBeforeFolderId(topLevelId);
+        }
+        if (!destinationFolder && !currentAfterFolderId) {
+          setCurrentAfterFolderId(topLevelId);
+        }
+      }
+    }
+  }, [
+    clusteringResult,
+    targetFolder,
+    destinationFolder,
+    currentBeforeFolderId,
+    currentAfterFolderId,
+  ]);
 
   useEffect(() => {
     // 状態更新の監視（デバッグ用のログを削除）

@@ -124,6 +124,7 @@ const Finder: React.FC<finderProps> = ({
         <Breadclumbs
           parentFolders={currentFolderState.parentFolders}
           setSelectedFolder={handleBreadcrumbFolderChange}
+          result={result}
         />
         <div className="finder-view-main">
           <ListView
@@ -134,6 +135,7 @@ const Finder: React.FC<finderProps> = ({
                 : currentFolderState.folders
             }
             setSelectedFolder={handleBreadcrumbFolderChange}
+            result={result}
           />
           <ImageFileView
             files={currentFolderState.files}

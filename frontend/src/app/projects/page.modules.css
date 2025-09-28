@@ -3,8 +3,9 @@
     width: 90%;
     max-width: 900px;
     min-width: 320px;
-    height: 800px;
+    height: calc(100vh - 80px - 20px); /* ヘッダー高さとマージン考慮 */
     margin: 10px auto;
+    margin-top: calc(80px + 10px); /* ヘッダー高さ + マージン */
     padding: 0 20px;
     box-sizing: border-box;
 }
@@ -23,7 +24,8 @@
 @media (max-width: 768px) {
     .project-main-div {
         width: 95%;
-        height: 700px;
+        height: calc(100vh - 60px - 20px); /* モバイル用ヘッダー高さ */
+        margin-top: calc(60px + 10px);
         padding: 0 10px;
     }
     
@@ -40,7 +42,8 @@
 @media (max-width: 480px) {
     .project-main-div {
         width: 98%;
-        height: 600px;
+        height: calc(100vh - 50px - 20px); /* 小画面用ヘッダー高さ */
+        margin-top: calc(50px + 10px);
         padding: 0 5px;
     }
     

@@ -1,17 +1,32 @@
 import "./styles.modules.css";
+import { treeNode, getImageCountInFolder, isLeaf } from "@/utils/result";
 
 interface dndBreadcrumbsProps {
   parentFolders: string[];
   setSelectedFolder: React.Dispatch<React.SetStateAction<string>>;
   topLevelId?: string;
+  result: {
+    [topLevelNodeId: string]: treeNode;
+  };
 }
 
 const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
   parentFolders,
   setSelectedFolder,
   topLevelId,
+  result,
 }) => {
   const items = parentFolders;
+
+  // 現在のフォルダの画像枚数を取得
+  const currentFolder =
+    items.length === 0 ? topLevelId || "Root" : items[items.length - 1];
+  const currentFolderIsLeaf = currentFolder
+    ? isLeaf(result, currentFolder)
+    : false;
+  const imageCount = currentFolderIsLeaf
+    ? getImageCountInFolder(result, currentFolder)
+    : 0;
 
   const toParentFolder = () => {
     if (items.length === 0) {
@@ -37,7 +52,10 @@ const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
         </span>
       </div>
       <span className="breadcrumb-item">
-        {items.length === 0 ? topLevelId || "Root" : items[items.length - 1]}
+        {currentFolder}
+        {currentFolderIsLeaf && imageCount > 0 && (
+          <span className="image-count">({imageCount})</span>
+        )}
       </span>
     </div>
   );
