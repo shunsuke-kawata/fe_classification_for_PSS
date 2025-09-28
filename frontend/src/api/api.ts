@@ -293,6 +293,36 @@ const moveClusteringItems = async (
   }
 };
 
+const deleteEmptyFolders = async (
+  mongo_result_id: string,
+  folder_ids: string[]
+) => {
+  try {
+    const url = `${config.backend_base_url}/action/clustering/folders/${mongo_result_id}`;
+
+    // パラメータを手動で構築して配列の形式を制御
+    const params = new URLSearchParams();
+
+    // 配列の各要素を個別に追加
+    folder_ids.forEach((folder_id) => {
+      params.append("folder_ids", folder_id);
+    });
+
+    const response = await axios.delete(url, {
+      params: params,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("=== フォルダ削除API呼び出しエラー ===");
+    console.error("error:", error);
+
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
 export type {
   signupUserType,
   newProjectType,
@@ -318,4 +348,5 @@ export {
   executeInitClustering,
   getClusteringResult,
   moveClusteringItems,
+  deleteEmptyFolders,
 };

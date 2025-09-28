@@ -71,7 +71,8 @@ const ProjectDetail: React.FC = () => {
   const updateQueryParam = (
     status: "object" | "group" | "reclassification",
     targetFolder?: string,
-    destinationFolder?: string
+    destinationFolder?: string,
+    currentFolder?: string
   ) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("display", status);
@@ -87,6 +88,13 @@ const ProjectDetail: React.FC = () => {
       params.set("d_folder", destinationFolder);
     } else {
       params.delete("d_folder");
+    }
+
+    // カレントフォルダのパラメータを追加
+    if (currentFolder) {
+      params.set("c_folder", currentFolder);
+    } else {
+      params.delete("c_folder");
     }
 
     router.replace(`${window.location.pathname}?${params.toString()}`, {
@@ -110,6 +118,13 @@ const ProjectDetail: React.FC = () => {
   ) => {
     if (displayStatus === "reclassification") {
       updateQueryParam("reclassification", beforeFolderId, afterFolderId);
+    }
+  };
+
+  // 分類結果一覧モードでのカレントフォルダ変更
+  const handleCurrentFolderChange = (currentFolderId: string) => {
+    if (displayStatus === "group") {
+      updateQueryParam("group", undefined, undefined, currentFolderId);
     }
   };
 
@@ -334,6 +349,8 @@ const ProjectDetail: React.FC = () => {
                 mongoResultId={project.mongo_result_id}
                 initClusteringState={project.init_clustering_state}
                 originalImageFolderPath={project.original_images_folder_path}
+                currentFolder={searchParams.get("c_folder")}
+                onCurrentFolderChange={handleCurrentFolderChange}
               />
             ) : displayStatus === "reclassification" ? (
               <ReclassificationInterface

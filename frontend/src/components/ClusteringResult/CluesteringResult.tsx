@@ -9,6 +9,8 @@ type clusteringResultProps = {
   mongoResultId: string;
   initClusteringState: number;
   originalImageFolderPath: string;
+  currentFolder?: string | null;
+  onCurrentFolderChange?: (currentFolderId: string) => void;
 };
 
 interface clusteringResultType {
@@ -21,6 +23,8 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
   mongoResultId,
   initClusteringState,
   originalImageFolderPath,
+  currentFolder,
+  onCurrentFolderChange,
 }: clusteringResultProps) => {
   const [clusteringResult, setClusteringResult] =
     useState<clusteringResultType | null>(null);
@@ -109,6 +113,8 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
           <Finder
             result={clusteringResult.result}
             originalImageFolderPath={originalImageFolderPath}
+            currentFolder={currentFolder}
+            onCurrentFolderChange={onCurrentFolderChange}
           />
         ) : (
           <div

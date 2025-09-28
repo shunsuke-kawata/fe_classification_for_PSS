@@ -18,11 +18,15 @@ interface finderProps {
   result: {
     [topLevelNodeId: string]: treeNode;
   };
+  currentFolder?: string | null;
+  onCurrentFolderChange?: (currentFolderId: string) => void;
 }
 
 const Finder: React.FC<finderProps> = ({
   result,
   originalImageFolderPath,
+  currentFolder,
+  onCurrentFolderChange,
 }: finderProps) => {
   const topLevelId = getTopLevelFolderId(result);
 
@@ -31,7 +35,37 @@ const Finder: React.FC<finderProps> = ({
     return <></>;
   }
 
-  const [selectedFolder, setSelectedFolder] = useState<string>(topLevelId);
+  // 初期フォルダを決定（currentFolderパラメータがある場合はそれを使用）
+  const getInitialFolder = (): string => {
+    if (currentFolder && currentFolder.length > 0) {
+      return currentFolder;
+    }
+    return topLevelId;
+  };
+
+  const [selectedFolder, setSelectedFolder] = useState<string>(
+    getInitialFolder()
+  );
+
+  // カスタムなフォルダ変更関数（パラメータ更新を確実に実行）
+  const handleFolderChange = (folderId: string) => {
+    setSelectedFolder(folderId);
+
+    // フォルダ変更をコールバックで通知
+    if (onCurrentFolderChange) {
+      onCurrentFolderChange(folderId);
+    }
+  };
+
+  // Breadcrumbs用のラッパー関数（React.Dispatch型に対応）
+  const handleBreadcrumbFolderChange = (
+    value: React.SetStateAction<string>
+  ) => {
+    const newFolderId =
+      typeof value === "function" ? value(selectedFolder) : value;
+    handleFolderChange(newFolderId);
+  };
+
   const [currentFolderState, setCurrentFolderState] = useState<{
     parentFolders: string[];
     files: leafData;
@@ -60,6 +94,26 @@ const Finder: React.FC<finderProps> = ({
     getNodesInCurrentFolder(selectedFolder);
   }, [selectedFolder]);
 
+  // 初回アクセス時にrootディレクトリをc_folderパラメータに設定
+  useEffect(() => {
+    // currentFolderが未設定かつonCurrentFolderChangeが利用可能な場合
+    if (
+      (!currentFolder || currentFolder.length === 0) &&
+      onCurrentFolderChange
+    ) {
+      // topLevelIdをc_folderパラメータに設定
+      onCurrentFolderChange(topLevelId);
+    }
+  }, []); // 初回のみ実行
+
+  // currentFolderパラメータが変更された時に選択フォルダを更新
+  useEffect(() => {
+    const newFolder = getInitialFolder();
+    if (newFolder !== selectedFolder) {
+      handleFolderChange(newFolder);
+    }
+  }, [currentFolder]);
+
   useEffect(() => {
     // 状態更新の監視（デバッグ用のログを削除）
   }, [currentFolderState]);
@@ -69,7 +123,7 @@ const Finder: React.FC<finderProps> = ({
       <div className="finder-div-main">
         <Breadclumbs
           parentFolders={currentFolderState.parentFolders}
-          setSelectedFolder={setSelectedFolder}
+          setSelectedFolder={handleBreadcrumbFolderChange}
         />
         <div className="finder-view-main">
           <ListView
@@ -79,7 +133,7 @@ const Finder: React.FC<finderProps> = ({
                 ? Object.values(currentFolderState.files)
                 : currentFolderState.folders
             }
-            setSelectedFolder={setSelectedFolder}
+            setSelectedFolder={handleBreadcrumbFolderChange}
           />
           <ImageFileView
             files={currentFolderState.files}

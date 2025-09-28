@@ -73,6 +73,25 @@
     margin-left: 10px;
 }
 
+.merge-folders-btn {
+    padding: 8px 16px;
+    border: 1px solid #28a745;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #28a745;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-left: 10px;
+}
+
+.merge-folders-btn:hover {
+    background-color: #f8fff9;
+    border-color: #20873a;
+    color: #20873a;
+}
+
 .view-mode-toggle {
     display: flex;
     gap: 2px;

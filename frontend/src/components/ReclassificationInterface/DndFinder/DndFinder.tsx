@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 
 import DndBreadclumbs from "./DndBreadclumbs/DndBreadclumbs";
 import DndListView from "./DndListView/DndListView";
@@ -13,7 +14,7 @@ import {
   treeNode,
 } from "@/utils/result";
 import config from "@/config/config.json";
-import { moveClusteringItems } from "@/api/api";
+import { moveClusteringItems, deleteEmptyFolders } from "@/api/api";
 
 export type finderType = "before" | "after";
 
@@ -43,8 +44,9 @@ const DndFinder: React.FC<dndFinderProps> = ({
   targetFolder,
   destinationFolder,
 }: dndFinderProps) => {
+  const router = useRouter();
   const topLevelId = getTopLevelFolderId(result);
-  
+
   // 初期選択フォルダを決定（クエリパラメータがある場合はそれを使用）
   const getInitialFolder = (): string => {
     if (finderType === "before" && targetFolder) {
@@ -55,7 +57,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
     }
     return topLevelId || "";
   };
-  
+
   const [selectedFolder, setSelectedFolder] = useState<string>(
     getInitialFolder()
   );
@@ -151,6 +153,19 @@ const DndFinder: React.FC<dndFinderProps> = ({
     }
   }, [selectedFolder]);
 
+  // 初回アクセス時にt_folderパラメータを設定
+  useEffect(() => {
+    // 初回アクセス時（t_folderパラメータが未設定）の場合
+    const shouldSetInitialFolder = 
+      (finderType === "before" && (!targetFolder || targetFolder.length === 0)) ||
+      (finderType === "after" && (!destinationFolder || destinationFolder.length === 0));
+    
+    if (shouldSetInitialFolder && onFolderChange && topLevelId) {
+      // topLevelIdをt_folderパラメータに設定
+      onFolderChange(topLevelId);
+    }
+  }, []); // 初回のみ実行
+
   // クエリパラメータが変更された時に選択フォルダを更新
   useEffect(() => {
     let newFolder = "";
@@ -161,7 +176,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
     } else {
       newFolder = topLevelId || "";
     }
-    
+
     if (newFolder && newFolder !== selectedFolder) {
       setSelectedFolder(newFolder);
     }
@@ -184,6 +199,103 @@ const DndFinder: React.FC<dndFinderProps> = ({
         return [...prev, imagePath];
       }
     });
+  };
+
+  // フォルダ統合の判定・実行関数
+  const canMergeFolders = (): boolean => {
+    // フォルダが2つ以上選択されている
+    if (selectedImages.length < 2) return false;
+
+    // 現在のフォルダが非リーフ（フォルダ表示モード）
+    if (isLeaf(result, selectedFolder)) return false;
+
+    // 選択されたすべてのフォルダがisLeafである
+    return selectedImages.every((folderId) => isLeaf(result, folderId));
+  };
+
+  const handleMergeFolders = async () => {
+    if (!canMergeFolders()) {
+      return;
+    }
+
+    const targetFolderId = selectedImages[0]; // 1番目のフォルダを統合先とする
+    const sourceFolderIds = selectedImages.slice(1); // 2番目以降のフォルダ
+
+    // 2番目以降のフォルダ内のすべての画像を取得
+    const allImageIds: string[] = [];
+    sourceFolderIds.forEach((folderId) => {
+      const files = getFilesInFolder(result, folderId);
+      if (files) {
+        allImageIds.push(...Object.keys(files));
+      }
+    });
+
+    if (allImageIds.length === 0) {
+      return;
+    }
+
+    try {
+      const response = await moveClusteringItems(
+        mongo_result_id,
+        "images", // ファイル移動として処理
+        allImageIds,
+        targetFolderId
+      );
+
+      console.log("API Response:", response);
+      if (response && response.message === "success") {
+        // 画像移動が成功した場合、空になったフォルダを削除
+        try {
+          const deleteResponse = await deleteEmptyFolders(
+            mongo_result_id,
+            sourceFolderIds
+          );
+          if (
+            deleteResponse &&
+            (deleteResponse.status === 200 || deleteResponse.statusCode === 200)
+          ) {
+            console.log(
+              `✅ 空のフォルダを削除しました: ${sourceFolderIds.join(", ")}`
+            );
+          } else {
+            console.warn(
+              "⚠️ フォルダ削除に失敗しましたが、統合は完了しています"
+            );
+          }
+        } catch (deleteError) {
+          console.error(
+            "⚠️ フォルダ削除中にエラーが発生しましたが、統合は完了しています:",
+            deleteError
+          );
+        }
+
+        setSelectedImages([]);
+        setIsMultiSelectMode(false);
+
+        // 統合完了をコールバックで通知
+        if (onFolderMoveComplete) {
+          await onFolderMoveComplete(sourceFolderIds.join(","), targetFolderId);
+        }
+
+        // バックエンド処理完了後にページをリロード
+        console.log("フォルダ統合完了 - ページリロード実行中...");
+        // router.refresh();
+        window.location.reload();
+      } else {
+        console.error(
+          "フォルダ統合に失敗しました:",
+          response?.data?.message || response?.message || "不明なエラー"
+        );
+      }
+    } catch (error) {
+      console.error("フォルダ統合エラー:", error);
+      console.error(
+        "フォルダ統合に失敗しました:",
+        (error as any)?.response?.data?.message ||
+          (error as any)?.message ||
+          "不明なエラー"
+      );
+    }
   };
 
   const handleMoveSelectedImages = async (
@@ -210,10 +322,8 @@ const DndFinder: React.FC<dndFinderProps> = ({
       );
 
       // レスポンスの構造を確認
-      if (
-        response &&
-        (response.status === 200 || response.statusCode === 200)
-      ) {
+      console.log("API Response:", response);
+      if (response && response.message === "success") {
         setMovedImages((prev) => [...prev, ...imagesToMove]);
         setSelectedImages([]);
         setIsMultiSelectMode(false);
@@ -223,9 +333,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
           await onFolderMoveComplete(sourceFolder, targetFolder);
         }
 
-        alert(
-          `✅ まとめて移動成功!\n${imagesToMove.length}個の画像を移動しました`
-        );
+        // バックエンド処理完了後にページをリロード
+        console.log("画像移動完了 - ページリロード実行中...");
+        // router.refresh();
+        window.location.reload();
       } else {
         console.error("移動に失敗しました - 詳細:");
         console.error("response:", response);
@@ -238,7 +349,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
           response?.message ||
           `HTTP ${response?.status || response?.statusCode || "Unknown"}`;
 
-        alert(`❌ 移動に失敗しました\n${errorMessage}`);
+        console.error(`移動に失敗しました: ${errorMessage}`);
       }
     } catch (error) {
       console.error("=== 移動処理でエラーが発生 ===");
@@ -256,7 +367,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
         (error as any)?.message ||
         "不明なエラーが発生しました";
 
-      alert(`❌ 移動に失敗しました\n${errorMessage}`);
+      console.error(`移動に失敗しました: ${errorMessage}`);
     }
   };
 
@@ -284,10 +395,8 @@ const DndFinder: React.FC<dndFinderProps> = ({
       );
 
       // レスポンスの構造を確認
-      if (
-        response &&
-        (response.status === 200 || response.statusCode === 200)
-      ) {
+      console.log("API Response:", response);
+      if (response && response.message === "success") {
         setSelectedImages([]);
         setIsMultiSelectMode(false);
 
@@ -296,9 +405,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
           onFolderMoveComplete(foldersToMove[0], targetFolder);
         }
 
-        alert(
-          `✅ フォルダ移動完了!\n移動したフォルダ: ${foldersToMove.length}個\n移動先: ${targetFolder}`
-        );
+        // バックエンド処理完了後にページをリロード
+        console.log("フォルダ移動完了 - ページリロード実行中...");
+        // router.refresh();
+        window.location.reload();
       } else {
         console.error("フォルダ移動に失敗しました - 詳細:");
         console.error("response:", response);
@@ -311,7 +421,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
           response?.message ||
           `HTTP ${response?.status || response?.statusCode || "Unknown"}`;
 
-        alert(`❌ フォルダ移動に失敗しました\n${errorMessage}`);
+        console.error(`フォルダ移動に失敗しました: ${errorMessage}`);
       }
     } catch (error) {
       console.error("=== フォルダ移動処理でエラーが発生 ===");
@@ -329,7 +439,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
         (error as any)?.message ||
         "不明なエラーが発生しました";
 
-      alert(`❌ フォルダ移動に失敗しました\n${errorMessage}`);
+      console.error(`フォルダ移動に失敗しました: ${errorMessage}`);
     }
   };
 
@@ -353,7 +463,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
         if (!isLeaf(result, selectedFolder)) {
           // 同じフォルダへのドロップをチェック
           if (dragData.sourceFolder === selectedFolder) {
-            alert("同じフォルダへの移動はできません");
+            console.log("同じフォルダへの移動はできません");
             return;
           }
 
@@ -462,9 +572,19 @@ const DndFinder: React.FC<dndFinderProps> = ({
                   {isMultiSelectMode ? "選択モード解除" : "フォルダ選択"}
                 </button>
                 {isMultiSelectMode && selectedImages.length > 0 && (
-                  <span className="selection-count">
-                    {selectedImages.length}個選択中
-                  </span>
+                  <>
+                    <span className="selection-count">
+                      {selectedImages.length}個選択中
+                    </span>
+                    {canMergeFolders() && (
+                      <button
+                        className="merge-folders-btn"
+                        onClick={handleMergeFolders}
+                      >
+                        フォルダを統合
+                      </button>
+                    )}
+                  </>
                 )}
                 <div style={{ flex: 1 }}></div>
                 <div className="view-mode-toggle">

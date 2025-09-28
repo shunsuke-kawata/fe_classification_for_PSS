@@ -88,19 +88,25 @@ const ReclassificationInterface: React.FC<reclassificationInterfaceProps> = ({
   };
 
   // フォルダ変更時の処理（before/afterのフォルダ選択が変更された時）
-  const handleBeforeFolderChange = useCallback((folderId: string) => {
-    setCurrentBeforeFolderId(folderId);
-    if (onFolderChange) {
-      onFolderChange(folderId, currentAfterFolderId);
-    }
-  }, [onFolderChange, currentAfterFolderId]);
+  const handleBeforeFolderChange = useCallback(
+    (folderId: string) => {
+      setCurrentBeforeFolderId(folderId);
+      if (onFolderChange) {
+        onFolderChange(folderId, currentAfterFolderId);
+      }
+    },
+    [onFolderChange, currentAfterFolderId]
+  );
 
-  const handleAfterFolderChange = useCallback((folderId: string) => {
-    setCurrentAfterFolderId(folderId);
-    if (onFolderChange) {
-      onFolderChange(currentBeforeFolderId, folderId);
-    }
-  }, [onFolderChange, currentBeforeFolderId]);
+  const handleAfterFolderChange = useCallback(
+    (folderId: string) => {
+      setCurrentAfterFolderId(folderId);
+      if (onFolderChange) {
+        onFolderChange(currentBeforeFolderId, folderId);
+      }
+    },
+    [onFolderChange, currentBeforeFolderId]
+  );
 
   useEffect(() => {
     if (initClusteringState !== clusteringStatus.Finished) return;
