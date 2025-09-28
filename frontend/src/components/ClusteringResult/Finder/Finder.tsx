@@ -47,6 +47,9 @@ const Finder: React.FC<finderProps> = ({
     getInitialFolder()
   );
 
+  // 選択された画像のパスを管理
+  const [selectedImagePath, setSelectedImagePath] = useState<string>("");
+
   // カスタムなフォルダ変更関数（パラメータ更新を確実に実行）
   const handleFolderChange = (folderId: string) => {
     setSelectedFolder(folderId);
@@ -64,6 +67,16 @@ const Finder: React.FC<finderProps> = ({
     const newFolderId =
       typeof value === "function" ? value(selectedFolder) : value;
     handleFolderChange(newFolderId);
+  };
+
+  // 画像選択のハンドラー
+  const handleImageSelect = (imagePath: string) => {
+    console.log("=== Finder: 画像選択ハンドラー ===");
+    console.log("選択された画像パス:", imagePath);
+    console.log("現在のフォルダ:", selectedFolder);
+    console.log("フォルダがis_leafか:", isLeaf(result, selectedFolder));
+    console.log("現在のフォルダの状態:", currentFolderState);
+    setSelectedImagePath(imagePath);
   };
 
   const [currentFolderState, setCurrentFolderState] = useState<{
@@ -92,6 +105,8 @@ const Finder: React.FC<finderProps> = ({
 
   useEffect(() => {
     getNodesInCurrentFolder(selectedFolder);
+    // フォルダが変更されたら選択されている画像をリセット
+    setSelectedImagePath("");
   }, [selectedFolder]);
 
   // 初回アクセス時にrootディレクトリをc_folderパラメータに設定
@@ -136,10 +151,14 @@ const Finder: React.FC<finderProps> = ({
             }
             setSelectedFolder={handleBreadcrumbFolderChange}
             result={result}
+            onImageSelect={handleImageSelect}
+            selectedImagePath={selectedImagePath}
           />
           <ImageFileView
             files={currentFolderState.files}
             originalImageFolderPath={originalImageFolderPath}
+            selectedImagePath={selectedImagePath}
+            onImageSelect={handleImageSelect}
           />
         </div>
       </div>

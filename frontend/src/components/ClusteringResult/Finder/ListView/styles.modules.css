@@ -45,3 +45,21 @@
   font-size: 12px;
   margin-left: 4px;
 }
+
+/* 選択された項目のスタイル */
+.list-view-item.selected {
+  background-color: #4a90e2 !important; /* 統一された青色の背景 */
+  color: #FFFFFF !important; /* 白色の文字 */
+  border-left: 4px solid #357abd; /* より濃い青色の左側枠 */
+}
+
+.list-view-item.selected:hover {
+  background-color: #4a90e2 !important; /* ホバー時も同じ色を維持 */
+  color: #FFFFFF !important; /* ホバー時も白色文字を維持 */
+}
+
+/* 選択された項目内のテキスト要素も白色にする */
+.list-view-item.selected .folder-name-span,
+.list-view-item.selected .image-count {
+  color: #FFFFFF !important;
+}

@@ -12,12 +12,16 @@ interface listViewProps {
   result: {
     [topLevelNodeId: string]: treeNode;
   };
+  onImageSelect?: (imagePath: string) => void;
+  selectedImagePath?: string;
 }
 const ListView: React.FC<listViewProps> = ({
   isLeaf,
   folders,
   setSelectedFolder,
   result,
+  onImageSelect,
+  selectedImagePath,
 }: listViewProps) => {
   return (
     <div className="list-view-main">
@@ -29,13 +33,38 @@ const ListView: React.FC<listViewProps> = ({
           ? getImageCountInFolder(result, foldername)
           : 0;
 
+        // 画像が選択されているかチェック（is_leafの場合のみ）
+        const isSelected = isLeaf && selectedImagePath === foldername;
+
         return (
           <div
             key={idx}
             className={`list-view-item ${
               idx % 2 === 0 ? "list-view-item-even" : "list-view-item-odd"
-            }`}
-            onClick={isLeaf ? () => {} : () => setSelectedFolder(foldername)}
+            } ${isSelected ? "selected" : ""}`}
+            onClick={() => {
+              console.log("=== ListViewアイテムがクリックされました ===");
+              console.log("ファイル名:", foldername);
+              console.log("isLeaf:", isLeaf);
+              console.log("folderIsLeaf:", folderIsLeaf);
+              console.log("onImageSelect存在:", !!onImageSelect);
+
+              if (isLeaf) {
+                // is_leafフォルダ内では、すべてのアイテムを画像として扱う
+                console.log("is_leafフォルダ内のファイルをクリック");
+                if (onImageSelect) {
+                  console.log("画像選択処理を実行");
+                  onImageSelect(foldername);
+                } else {
+                  console.log(
+                    "画像選択処理をスキップ - onImageSelectが存在しません"
+                  );
+                }
+              } else {
+                console.log("通常フォルダをクリック - フォルダ移動処理");
+                setSelectedFolder(foldername);
+              }
+            }}
           >
             {isLeaf ? <></> : <span className="arrow">{"＞"}</span>}
             <img
