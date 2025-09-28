@@ -15,26 +15,13 @@
     align-items: center;
     padding-left:10px;
 }
-.arrow{
-}
-.list-view-item-even{
-
-}
 
 .list-view-item-odd{
     background-color: #f8f9fa;
 }
 
-.list-view-item.selected {
-    background-color: rgba(74, 144, 226, 0.2) !important;
-}
-
 .list-view-item.selectable:hover {
     background-color: rgba(74, 144, 226, 0.1);
-}
-
-.folder-icon{
-
 }
 
 .img-icon{

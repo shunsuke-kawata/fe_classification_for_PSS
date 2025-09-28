@@ -9,15 +9,36 @@
     padding-top: 2px; /* 上部に少し余白を追加 */
 }
 
+/* 基本スタイル */
 .list-view-item{
     height: 30px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
     padding-left:10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: #ffffff;
 }
+
 .list-view-item-odd{
+    height: 30px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left:10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
     background-color: #f8f9fa;
+}
+
+/* 通常のホバー効果 */
+.list-view-item:hover {
+    background-color: #f0f0f0;
+}
+
+.list-view-item-odd:hover {
+    background-color: #f0f0f0;
 }
 
 .img-icon{
@@ -46,20 +67,50 @@
   margin-left: 4px;
 }
 
-/* 選択された項目のスタイル */
-.list-view-item.selected {
-  background-color: #4a90e2 !important; /* 統一された青色の背景 */
-  color: #FFFFFF !important; /* 白色の文字 */
-  border-left: 4px solid #357abd; /* より濃い青色の左側枠 */
+/* 選択された項目のスタイル - より高い特異性で定義 */
+.list-view-main .list-view-item.selected {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+  border-left: 4px solid #357abd;
 }
 
-.list-view-item.selected:hover {
-  background-color: #4a90e2 !important; /* ホバー時も同じ色を維持 */
-  color: #FFFFFF !important; /* ホバー時も白色文字を維持 */
+.list-view-main .list-view-item-odd.selected {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+  border-left: 4px solid #357abd;
 }
 
-/* 選択された項目内のテキスト要素も白色にする */
-.list-view-item.selected .folder-name-span,
-.list-view-item.selected .image-count {
-  color: #FFFFFF !important;
+/* 選択された項目のホバー状態 - さらに高い特異性 */
+.list-view-main .list-view-item.selected:hover {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+}
+
+.list-view-main .list-view-item-odd.selected:hover {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+}
+
+/* 選択された項目のフォーカスとアクティブ状態 */
+.list-view-main .list-view-item.selected:focus,
+.list-view-main .list-view-item.selected:active {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+}
+
+.list-view-main .list-view-item-odd.selected:focus,
+.list-view-main .list-view-item-odd.selected:active {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+}
+
+/* 選択された項目内のテキスト要素 */
+.list-view-main .list-view-item.selected .folder-name-span,
+.list-view-main .list-view-item-odd.selected .folder-name-span {
+  color: #FFFFFF;
+}
+
+.list-view-main .list-view-item.selected .image-count,
+.list-view-main .list-view-item-odd.selected .image-count {
+  color: #FFFFFF;
 }

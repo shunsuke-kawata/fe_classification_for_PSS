@@ -348,3 +348,15 @@ background-color: #3453b3;
 .images-count{
   margin: 10px 0 0px 5px;
 }
+
+/* 全タブ共通のデータがありません表示 */
+.no-data-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  color: #666;
+  text-align: center;
+  z-index: 1;
+}

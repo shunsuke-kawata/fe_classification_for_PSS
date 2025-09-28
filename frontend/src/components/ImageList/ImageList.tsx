@@ -18,6 +18,12 @@ const ImageList: React.FC<imagesListProps> = ({
   const sortedImagesByDate: imageInfo[] = [...fullImageInfolist].sort(
     (a, b) => a.created_at.getTime() - b.created_at.getTime()
   );
+
+  // データがない場合の表示
+  if (fullImageInfolist.length === 0) {
+    return <div className="no-data-display">データがありません</div>;
+  }
+
   return (
     <>
       <div className="image-thumb-list">

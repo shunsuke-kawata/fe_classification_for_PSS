@@ -77,7 +77,7 @@ html, body {
     max-width: 500px;
     min-width: 320px;
     height: 560px;
-    margin: 60px auto 0px auto;
+    margin: calc(80px + 20px) auto 0px auto; /* ヘッダー高さ + マージン */
     box-sizing: border-box;
 }
 
@@ -86,7 +86,7 @@ html, body {
     .user-form-main {
         width: 95%;
         height: 500px;
-        margin: 40px auto 0px auto;
+        margin: calc(60px + 20px) auto 0px auto; /* モバイル用ヘッダー高さ + マージン */
         padding: 20px 10px;
     }
 }
@@ -95,7 +95,7 @@ html, body {
     .user-form-main {
         width: 98%;
         height: 450px;
-        margin: 20px auto 0px auto;
+        margin: calc(50px + 20px) auto 0px auto; /* 小画面用ヘッダー高さ + マージン */
         padding: 15px 5px;
     }
 }

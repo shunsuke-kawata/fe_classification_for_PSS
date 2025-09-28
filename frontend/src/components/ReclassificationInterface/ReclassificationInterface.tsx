@@ -226,18 +226,7 @@ const ReclassificationInterface: React.FC<reclassificationInterfaceProps> = ({
           />
         </>
       ) : (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-            fontSize: "18px",
-            color: "#666",
-          }}
-        >
-          データがありません
-        </div>
+        <div className="no-data-display">データがありません</div>
       )}
     </div>
   );

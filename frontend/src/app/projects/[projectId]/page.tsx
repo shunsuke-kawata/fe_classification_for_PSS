@@ -294,7 +294,8 @@ const ProjectDetail: React.FC = () => {
                       project.init_clustering_state ===
                         clusteringStatus.Executing ||
                       project.init_clustering_state ===
-                        clusteringStatus.Finished
+                        clusteringStatus.Finished ||
+                      imagesInProject.length === 0
                         ? "option-buttons locked-clustering-buttons"
                         : "option-buttons clustering-buttons"
                     }
@@ -303,10 +304,12 @@ const ProjectDetail: React.FC = () => {
                       project.init_clustering_state ===
                         clusteringStatus.Executing ||
                       project.init_clustering_state ===
-                        clusteringStatus.Finished
+                        clusteringStatus.Finished ||
+                      imagesInProject.length === 0
                     }
                     onClick={
-                      typeof loginedUser.id === "number"
+                      typeof loginedUser.id === "number" &&
+                      imagesInProject.length > 0
                         ? () => {
                             executeInitClustering(
                               project.id,
