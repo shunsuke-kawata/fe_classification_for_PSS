@@ -616,7 +616,8 @@ background-color: #3453b3;
 }
 
 .modal-contents{
-    height:80%;
+    height: calc(100% - 120px);
+    overflow: hidden;
 }
 
 .file-preview{
@@ -649,6 +650,81 @@ background-color: #3453b3;
 
 .upload-image-buttons{
     margin: 0 30px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    background-color: #FFFFFF;
+    padding: 10px 0;
+    border-top: 1px solid #e9ecef;
+}
+
+.button-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 50px;
+}
+
+.center-button {
+    margin: 0 auto !important;
+}
+
+
+
+.input-container {
+    margin: 25px 0 15px 0;
+}
+
+.input-buttons-row {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.folder-input-wrapper, .file-input-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    max-width: 200px;
+}
+
+.input-description {
+    font-size: 12px;
+    color: #6c757d;
+    margin: 8px 0 0 0;
+    text-align: center;
+    font-weight: normal;
+}
+
+.select-image-input-hidden {
+    display: none;
+}
+
+.select-file-button {
+    display: inline-block;
+    padding: 6px 12px;
+    background-color: #FFFFFF;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #495057;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    text-align: center;
+    min-width: 150px;
+}
+
+.select-file-button:hover {
+    border-color: #80bdff;
+}
+
+.select-file-button:focus {
+    outline: 0;
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
 .select-image-input{
@@ -659,4 +735,320 @@ background-color: #3453b3;
 .file-index{
     display: inline;
     min-width: 200px;
+}
+
+/* アップロード進捗バーとステータス表示 */
+.upload-progress-section {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.progress-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.total-files {
+    color: #495057;
+    font-weight: bold;
+}
+
+.success-files {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.failed-files {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.progress-bar-container {
+    width: 90%;
+    max-width: 600px;
+    min-width: 200px;
+    height: 24px;
+    background-color: #e9ecef;
+    border-radius: 15px;
+    overflow: hidden;
+    margin: 0 auto 10px auto;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #4169e1 0%, #6c8aef 100%);
+    transition: width 0.3s ease;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(65, 105, 225, 0.3);
+}
+
+.progress-percentage {
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: #495057;
+    margin-top: 5px;
+}
+
+/* ファイル一覧表示の改善 */
+.file-list-header {
+    background-color: #4169e1;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin: 10px 0;
+    font-weight: bold;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.selected-files-count {
+    font-size: 16px;
+}
+
+.file-item-card, .file-upload-card {
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.file-item-card:hover, .file-upload-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    border-color: #4169e1;
+}
+
+.file-item-content, .file-upload-content {
+    display: flex;
+    align-items: center;
+    padding: 12px 15px;
+    gap: 12px;
+}
+
+.file-icon {
+    font-size: 24px;
+    color: #4169e1;
+}
+
+.file-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.file-name {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-info {
+    display: flex;
+    gap: 10px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.file-size {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.file-type {
+    color: #6c757d;
+    background-color: #f8f9fa;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+.file-number {
+    background-color: #4169e1;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.file-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.upload-status {
+    font-size: 20px;
+}
+
+.no-files-selected {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6c757d;
+}
+
+.no-files-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.no-files-selected p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.file-hint {
+    font-size: 12px !important;
+    color: #adb5bd !important;
+}
+
+/* ファイル状態別スタイル */
+.upload-status-waiting {
+    color: #6c757d;
+}
+
+.upload-status-uploading {
+    color: #007bff;
+    animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+.upload-status-success {
+    color: #28a745;
+}
+
+.upload-status-failed {
+    color: #dc3545;
+}
+
+.retry-info {
+    font-size: 11px;
+    color: #ffc107;
+    font-style: italic;
+    background-color: #fff8dc;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 5px;
+}
+
+@keyframes pulse {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0.6;
+    }
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .progress-stats {
+        flex-direction: column;
+        gap: 5px;
+    }
+    
+    .upload-progress-section {
+        padding: 10px;
+    }
+    
+    .file-item-content, .file-upload-content {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+    
+    .file-name {
+        font-size: 13px;
+    }
+    
+    .file-info {
+        font-size: 11px;
+    }
+    
+    .file-icon {
+        font-size: 20px;
+    }
+    
+
+    
+    .upload-image-buttons {
+        margin: 0 15px;
+        background-color: #FFFFFF;
+        padding: 8px 0;
+    }
+    
+    .input-buttons-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .folder-input-wrapper, .file-input-wrapper {
+        max-width: none;
+    }
+    
+    .select-file-button {
+        min-width: 120px;
+        font-size: 13px;
+        padding: 5px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .progress-stats {
+        font-size: 12px;
+    }
+    
+    .file-number {
+        width: 24px;
+        height: 24px;
+        font-size: 11px;
+    }
+    
+    .upload-status {
+        font-size: 16px;
+    }
+    
+
+    
+    .input-description {
+        font-size: 11px;
+    }
+    
+    .upload-image-buttons {
+        margin: 0 10px;
+        min-height: 50px;
+        background-color: #FFFFFF;
+        padding: 6px 0;
+    }
+    
+    .button-container {
+        min-height: 40px;
+    }
+    
+    .input-buttons-row {
+        gap: 8px;
+    }
+    
+    .select-file-button {
+        min-width: 100px;
+        font-size: 12px;
+        padding: 4px 8px;
+    }
 }

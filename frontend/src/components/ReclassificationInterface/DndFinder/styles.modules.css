@@ -92,6 +92,34 @@
     color: #20873a;
 }
 
+.move-to-parent-btn {
+    padding: 8px 16px;
+    border: 1px solid #ff7f00;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #ff7f00;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-left: 10px;
+}
+
+.move-to-parent-btn:hover {
+    background-color: #fff8f0;
+    border-color: #e66600;
+    color: #e66600;
+}
+
+/* ボタンテキストのレスポンシブ制御 */
+.btn-short-text {
+    display: none;
+}
+
+.btn-full-text {
+    display: inline;
+}
+
 .view-mode-toggle {
     display: flex;
     gap: 2px;
@@ -124,63 +152,191 @@
 }
 
 /* レスポンシブ対応 */
+@media (max-width: 1400px) {
+    .dnd-finder-controls {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .multi-select-btn, 
+    .merge-folders-btn, 
+    .move-to-parent-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+        margin-left: 5px;
+    }
+    
+    .selection-count {
+        font-size: 13px;
+        margin-left: 5px;
+    }
+}
+
 @media (max-width: 1200px) {
     .dnd-finder-div-main {
-        height: 100%; /* 親要素の高さに合わせる */
-        max-width: 700px; /* 中画面での最大幅を調整 */
-        min-width: 350px; /* 中画面での最小幅を調整 */
+        height: 100%;
+        max-width: 700px;
+        min-width: 350px;
+    }
+    
+    .dnd-finder-controls {
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .multi-select-btn, 
+    .merge-folders-btn, 
+    .move-to-parent-btn {
+        padding: 5px 10px;
+        font-size: 12px;
+        margin-left: 4px;
+        white-space: nowrap;
+    }
+    
+    .selection-count {
+        font-size: 12px;
+        margin-left: 4px;
+    }
+    
+    .view-mode-btn {
+        padding: 5px 8px;
+        font-size: 11px;
     }
 }
 
 @media (max-width: 768px) {
     .dnd-finder-div-main {
-        height: 100%; /* 親要素の高さに合わせる */
+        height: 100%;
         margin-bottom: 20px;
         max-width: 100%;
         min-width: 280px;
-        width: 100%; /* 幅を100%に設定 */
+        width: 100%;
     }
     
     .dnd-finder-header {
         padding: 4px 8px;
-        height: 32px;
+        height: auto;
+        min-height: 32px;
     }
     
-    .multi-select-btn {
-        padding: 6px 12px;
-        font-size: 12px;
+    .dnd-finder-controls {
+        gap: 4px;
+        flex-wrap: wrap;
+    }
+    
+    .multi-select-btn, 
+    .merge-folders-btn, 
+    .move-to-parent-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+        margin-left: 2px;
+        white-space: nowrap;
+    }
+    
+    .selection-count {
+        font-size: 11px;
+        margin-left: 2px;
+        order: 100;
+        width: 100%;
+        margin-top: 2px;
     }
     
     .view-mode-btn {
-        padding: 4px 8px;
-        font-size: 11px;
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+    
+    .view-mode-toggle {
+        margin-left: auto;
+    }
+    
+    /* 小画面でボタンテキストを短縮 */
+    .btn-full-text {
+        display: none;
+    }
+    
+    .btn-short-text {
+        display: inline;
     }
 }
 
 @media (max-width: 480px) {
     .dnd-finder-div-main {
-        height: 100%; /* 親要素の高さに合わせる */
+        height: 100%;
         min-width: 250px;
-        width: 100%; /* 幅を100%に設定 */
+        width: 100%;
     }
     
     .dnd-finder-header {
         padding: 3px 6px;
-        height: 28px;
+        height: auto;
+        min-height: 28px;
+    }
+    
+    .dnd-finder-controls {
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: flex-start;
     }
     
     .multi-select-btn {
-        padding: 4px 8px;
-        font-size: 11px;
-    }
-    
-    .view-mode-btn {
         padding: 3px 6px;
         font-size: 10px;
+        margin-left: 0;
+        flex-shrink: 0;
+    }
+    
+    .merge-folders-btn, 
+    .move-to-parent-btn {
+        padding: 3px 5px;
+        font-size: 9px;
+        margin-left: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 80px;
+        min-width: 50px;
     }
     
     .selection-count {
-        font-size: 12px;
-        margin-left: 5px;
+        font-size: 10px;
+        margin-left: 0;
+        order: 100;
+        width: 100%;
+        margin-top: 2px;
+        text-align: left;
+    }
+    
+    .view-mode-btn {
+        padding: 3px 5px;
+        font-size: 9px;
+    }
+    
+    .view-mode-toggle {
+        margin-left: auto;
+        margin-top: 2px;
+    }
+    
+    /* 極小画面では更に短いテキストを使用 */
+    .btn-full-text {
+        display: none;
+    }
+    
+    .btn-short-text {
+        display: inline;
+    }
+    
+    /* 極小画面用の更に短いテキスト */
+    .merge-folders-btn .btn-short-text::after {
+        content: "統合";
+    }
+    
+    .move-to-parent-btn .btn-short-text::after {
+        content: "↑";
+    }
+    
+    .merge-folders-btn .btn-short-text,
+    .move-to-parent-btn .btn-short-text {
+        display: none;
     }
 }
