@@ -75,6 +75,88 @@ const DndFinder: React.FC<dndFinderProps> = ({
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<"list" | "icon">("icon");
 
+  // レスポンシブなボタンテキストを取得する関数
+  const getResponsiveButtonText = (
+    fullText: string,
+    shortText: string
+  ): string => {
+    // 画面幅に基づいてテキストを選択（実際にはCSSで制御）
+    return fullText;
+  };
+
+  // 親フォルダへ移動できるかどうかを判定する関数
+  const canMoveToParentFolder = (): boolean => {
+    // 複数選択モードでないと無効
+    if (!isMultiSelectMode) return false;
+
+    // 1つ以上のフォルダが選択されている必要がある
+    if (selectedImages.length < 1) return false;
+
+    // 現在のフォルダの階層を確認
+    const currentPath = findPathToNode(result, selectedFolder);
+    if (!currentPath || currentPath.length < 2) {
+      // 2階層未満（topLevel, level1が存在しない）場合は無効
+      return false;
+    }
+
+    return true;
+  };
+
+  // 親フォルダのIDを取得する関数
+  const getParentFolderId = (): string | null => {
+    const currentPath = findPathToNode(result, selectedFolder);
+    if (!currentPath || currentPath.length < 2) {
+      return null;
+    }
+
+    // 現在のパス配列から親フォルダのIDを取得
+    // currentPath = [topLevel, parent, current] の場合、親フォルダはparent
+    return currentPath[currentPath.length - 2];
+  };
+
+  // 親フォルダに移動する関数
+  const handleMoveToParentFolder = async () => {
+    if (!canMoveToParentFolder()) return;
+
+    const parentFolderId = getParentFolderId();
+    if (!parentFolderId) return;
+
+    try {
+      const response = await moveClusteringItems(
+        mongo_result_id,
+        "folders", // フォルダ移動として処理
+        selectedImages, // 選択されたフォルダID配列
+        parentFolderId // 親フォルダをdestinationとして設定
+      );
+
+      console.log("API Response:", response);
+      if (response && response.message === "success") {
+        setSelectedImages([]);
+        setIsMultiSelectMode(false);
+
+        // 移動完了をコールバックで通知してデータをリロード
+        if (onFolderMoveComplete) {
+          await onFolderMoveComplete(selectedImages.join(","), parentFolderId);
+        }
+
+        console.log("親フォルダへの移動完了 - ページリロード実行中...");
+      } else {
+        console.error(
+          "親フォルダへの移動に失敗しました:",
+          response?.data?.message || response?.message || "不明なエラー"
+        );
+      }
+    } catch (error) {
+      console.error("親フォルダへの移動エラー:", error);
+      console.error(
+        "親フォルダへの移動に失敗しました:",
+        (error as any)?.response?.data?.message ||
+          (error as any)?.message ||
+          "不明なエラー"
+      );
+    }
+  };
+
   const getNodesInCurrentFolder = (folderId: string) => {
     const folders = getFoldersInFolder(result, folderId);
     const files = getFilesInFolder(result, folderId);
@@ -253,27 +335,45 @@ const DndFinder: React.FC<dndFinderProps> = ({
       if (response && response.message === "success") {
         // 画像移動が成功した場合、空になったフォルダを削除
         try {
+          console.log(`🗂️ フォルダ削除API呼び出し開始:`);
+          console.log(`   mongo_result_id: ${mongo_result_id}`);
+          console.log(`   統合先フォルダ: ${targetFolderId}`);
+          console.log(
+            `   空になるフォルダ (sources): [${sourceFolderIds.join(", ")}]`
+          );
+
           const deleteResponse = await deleteEmptyFolders(
             mongo_result_id,
             sourceFolderIds
           );
-          if (
-            deleteResponse &&
-            (deleteResponse.status === 200 || deleteResponse.statusCode === 200)
-          ) {
+          console.log(
+            "🔍 フォルダ削除APIレスポンス:",
+            JSON.stringify(deleteResponse, null, 2)
+          );
+
+          // 500エラー（開発中）の処理
+          if (deleteResponse && deleteResponse.status === 200) {
             console.log(
               `✅ 空のフォルダを削除しました: ${sourceFolderIds.join(", ")}`
             );
           } else {
             console.warn(
-              "⚠️ フォルダ削除に失敗しましたが、統合は完了しています"
+              "⚠️ フォルダ削除API（開発中）からの応答:",
+              deleteResponse?.message ||
+                "500エラーが返されました（開発中のため正常です）"
             );
+            console.log("📋 削除対象だったフォルダID:", sourceFolderIds);
           }
-        } catch (deleteError) {
-          console.error(
-            "⚠️ フォルダ削除中にエラーが発生しましたが、統合は完了しています:",
-            deleteError
+        } catch (deleteError: any) {
+          console.warn(
+            "⚠️ フォルダ削除API（開発中）でエラーが発生しましたが、統合は完了しています:"
           );
+          console.log("📋 削除対象だったフォルダID:", sourceFolderIds);
+          if (deleteError?.response?.status === 500) {
+            console.log("   → 500エラー（開発中のため正常です）");
+          } else {
+            console.error("   → 予期しないエラー:", deleteError);
+          }
         }
 
         setSelectedImages([]);
@@ -287,7 +387,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
         // バックエンド処理完了後にページをリロード
         console.log("フォルダ統合完了 - ページリロード実行中...");
         // router.refresh();
-        window.location.reload();
+        // window.location.reload();
       } else {
         console.error(
           "フォルダ統合に失敗しました:",
@@ -576,7 +676,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
                   }`}
                   onClick={handleMultiSelectToggle}
                 >
-                  {isMultiSelectMode ? "選択モード解除" : "フォルダ選択"}
+                  {isMultiSelectMode ? "選択解除" : "フォルダ選択"}
                 </button>
                 {isMultiSelectMode && selectedImages.length > 0 && (
                   <>
@@ -587,8 +687,22 @@ const DndFinder: React.FC<dndFinderProps> = ({
                       <button
                         className="merge-folders-btn"
                         onClick={handleMergeFolders}
+                        data-full-text="フォルダ統合"
+                        data-short-text="統合"
                       >
-                        フォルダを統合
+                        <span className="btn-full-text">フォルダ統合</span>
+                        <span className="btn-short-text">統合</span>
+                      </button>
+                    )}
+                    {canMoveToParentFolder() && (
+                      <button
+                        className="move-to-parent-btn"
+                        onClick={handleMoveToParentFolder}
+                        data-full-text="親フォルダに移動"
+                        data-short-text="親に移動"
+                      >
+                        <span className="btn-full-text">親フォルダに移動</span>
+                        <span className="btn-short-text">親に移動</span>
                       </button>
                     )}
                   </>

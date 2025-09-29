@@ -4,6 +4,7 @@ body{
     min-width: 320px; /* モバイル対応 */
     overflow-x: hidden; /* 横スクロールを防ぐ */
     overflow-y: auto; /* 縦スクロールは許可 */
+    min-width: 915px;
 }
 
 .common-buttons{

@@ -217,6 +217,12 @@ const DndListView: React.FC<dndListViewProps> = ({
                   ? getFolderPreviewImagePath?.(item.key)
                   : null;
 
+                // isLeafフォルダの場合、画像枚数を取得
+                const imageCount =
+                  isFolderLeaf && result
+                    ? Object.keys(getFilesInFolder(result, item.key)).length
+                    : 0;
+
                 return (
                   <div
                     key={idx}
@@ -261,7 +267,11 @@ const DndListView: React.FC<dndListViewProps> = ({
                         <div className="selection-indicator">✓</div>
                       )}
                     </div>
-                    <span className="folder-name-label">{item.key}</span>
+                    <span className="folder-name-label">
+                      {isFolderLeaf && imageCount > 0
+                        ? `${item.key} (${imageCount})`
+                        : item.key}
+                    </span>
                   </div>
                 );
               })}
@@ -358,6 +368,12 @@ const DndListView: React.FC<dndListViewProps> = ({
                   ? getFolderPreviewImagePath?.(item.key)
                   : null;
 
+                // isLeafフォルダの場合、画像枚数を取得
+                const imageCount =
+                  isFolderLeaf && result
+                    ? Object.keys(getFilesInFolder(result, item.key)).length
+                    : 0;
+
                 return (
                   <div
                     key={idx}
@@ -402,7 +418,11 @@ const DndListView: React.FC<dndListViewProps> = ({
                         <div className="selection-indicator">✓</div>
                       )}
                     </div>
-                    <span className="folder-name-label">{item.key}</span>
+                    <span className="folder-name-label">
+                      {isFolderLeaf && imageCount > 0
+                        ? `${item.key} (${imageCount})`
+                        : item.key}
+                    </span>
                   </div>
                 );
               })}
