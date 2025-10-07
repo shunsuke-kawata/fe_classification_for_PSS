@@ -66,6 +66,24 @@
     border-color: #e5e7eb;
 }
 
+.select-all-btn {
+    padding: 8px 16px;
+    border: 1px solid #4a90e2;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #4a90e2;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.select-all-btn:hover {
+    background-color: #f0f7ff;
+    border-color: #357abd;
+    color: #357abd;
+}
+
 .selection-count {
     color: #4a90e2;
     font-size: 14px;
@@ -159,6 +177,7 @@
     }
     
     .multi-select-btn, 
+    .select-all-btn,
     .merge-folders-btn, 
     .move-to-parent-btn {
         padding: 6px 12px;
@@ -185,6 +204,7 @@
     }
     
     .multi-select-btn, 
+    .select-all-btn,
     .merge-folders-btn, 
     .move-to-parent-btn {
         padding: 5px 10px;
@@ -225,6 +245,7 @@
     }
     
     .multi-select-btn, 
+    .select-all-btn,
     .merge-folders-btn, 
     .move-to-parent-btn {
         padding: 4px 8px;
@@ -280,6 +301,13 @@
     }
     
     .multi-select-btn {
+        padding: 3px 6px;
+        font-size: 10px;
+        margin-left: 0;
+        flex-shrink: 0;
+    }
+    
+    .select-all-btn {
         padding: 3px 6px;
         font-size: 10px;
         margin-left: 0;

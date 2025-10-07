@@ -12,6 +12,7 @@ import {
   isLeaf,
   leafData,
   treeNode,
+  findNodeById,
 } from "@/utils/result";
 import config from "@/config/config.json";
 import { moveClusteringItems, deleteEmptyFolders } from "@/api/api";
@@ -278,6 +279,33 @@ const DndFinder: React.FC<dndFinderProps> = ({
     }
   };
 
+  // 全て選択ボタンのハンドラー
+  const handleSelectAll = () => {
+    // 選択モードでない場合は選択モードに切り替える
+    if (!isMultiSelectMode) {
+      setIsMultiSelectMode(true);
+    }
+
+    // 現在のフォルダ内の全要素を取得
+    let allItems: string[] = [];
+
+    if (isLeaf(result, selectedFolder)) {
+      // リーフノード（画像が含まれるフォルダ）の場合、全画像を選択
+      const files = getFilesInFolder(result, selectedFolder);
+      if (files) {
+        allItems = Object.keys(files);
+      }
+    } else {
+      // フォルダノードの場合、全フォルダを選択
+      const folders = getFoldersInFolder(result, selectedFolder);
+      if (folders) {
+        allItems = folders;
+      }
+    }
+
+    setSelectedImages(allItems);
+  };
+
   const handleImageSelect = (imagePath: string) => {
     if (!isMultiSelectMode) return;
 
@@ -292,38 +320,79 @@ const DndFinder: React.FC<dndFinderProps> = ({
 
   // フォルダ統合の判定・実行関数
   const canMergeFolders = (): boolean => {
+    // 基本データの検証
+    if (!result || !selectedFolder) {
+      console.log("🚫 canMergeFolders: 基本データが不足しています");
+      return false;
+    }
+
     // フォルダが2つ以上選択されている
-    if (selectedImages.length < 2) return false;
+    if (selectedImages.length < 2) {
+      console.log("🚫 canMergeFolders: 選択フォルダが2つ未満です");
+      return false;
+    }
 
     // 現在のフォルダが非リーフ（フォルダ表示モード）
-    if (isLeaf(result, selectedFolder)) return false;
+    if (isLeaf(result, selectedFolder)) {
+      console.log("🚫 canMergeFolders: 現在のフォルダがリーフフォルダです");
+      return false;
+    }
 
     // 選択されたすべてのフォルダがisLeafである
-    return selectedImages.every((folderId) => isLeaf(result, folderId));
+    const allIsLeaf = selectedImages.every((folderId) => {
+      const isLeafResult = isLeaf(result, folderId);
+      console.log(`📁 フォルダ ${folderId} is_leaf: ${isLeafResult}`);
+      return isLeafResult;
+    });
+
+    if (!allIsLeaf) {
+      console.log(
+        "🚫 canMergeFolders: 選択されたフォルダの中に非リーフフォルダがあります"
+      );
+      return false;
+    }
+
+    console.log("✅ canMergeFolders: フォルダ統合が可能です");
+    return true;
   };
 
   const handleMergeFolders = async () => {
+    console.log("🔄 フォルダ統合開始");
+
     if (!canMergeFolders()) {
+      console.log("🚫 フォルダ統合の条件を満たしていません");
       return;
     }
 
     const targetFolderId = selectedImages[0]; // 1番目のフォルダを統合先とする
     const sourceFolderIds = selectedImages.slice(1); // 2番目以降のフォルダ
 
+    console.log(`📋 統合設定:`);
+    console.log(`   統合先フォルダ: ${targetFolderId}`);
+    console.log(`   統合元フォルダ: [${sourceFolderIds.join(", ")}]`);
+
     // 2番目以降のフォルダ内のすべての画像を取得
     const allImageIds: string[] = [];
     sourceFolderIds.forEach((folderId) => {
       const files = getFilesInFolder(result, folderId);
       if (files) {
-        allImageIds.push(...Object.keys(files));
+        const fileIds = Object.keys(files);
+        console.log(`📁 フォルダ ${folderId} の画像数: ${fileIds.length}`);
+        allImageIds.push(...fileIds);
+      } else {
+        console.log(`📁 フォルダ ${folderId} にはファイルがありません`);
       }
     });
 
+    console.log(`📊 移動対象画像数: ${allImageIds.length}`);
+
     if (allImageIds.length === 0) {
+      console.log("🚫 移動する画像がありません");
       return;
     }
 
     try {
+      console.log("🚀 画像移動API呼び出し開始...");
       const response = await moveClusteringItems(
         mongo_result_id,
         "images", // ファイル移動として処理
@@ -331,8 +400,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
         targetFolderId
       );
 
-      console.log("API Response:", response);
+      console.log("📋 画像移動API Response:", response);
       if (response && response.message === "success") {
+        console.log("✅ 画像移動が成功しました");
+
         // 画像移動が成功した場合、空になったフォルダを削除
         try {
           console.log(`🗂️ フォルダ削除API呼び出し開始:`);
@@ -351,16 +422,24 @@ const DndFinder: React.FC<dndFinderProps> = ({
             JSON.stringify(deleteResponse, null, 2)
           );
 
-          // 500エラー（開発中）の処理
-          if (deleteResponse && deleteResponse.status === 200) {
-            console.log(
-              `✅ 空のフォルダを削除しました: ${sourceFolderIds.join(", ")}`
-            );
+          // 200以外の場合も成功として扱う（開発中のAPI）
+          if (
+            deleteResponse &&
+            (deleteResponse.status === 200 || deleteResponse.status === 500)
+          ) {
+            if (deleteResponse.status === 200) {
+              console.log(
+                `✅ 空のフォルダを削除しました: ${sourceFolderIds.join(", ")}`
+              );
+            } else {
+              console.log(
+                "⚠️ フォルダ削除API（開発中）から500エラーが返されましたが、処理は継続します"
+              );
+            }
           } else {
             console.warn(
               "⚠️ フォルダ削除API（開発中）からの応答:",
-              deleteResponse?.message ||
-                "500エラーが返されました（開発中のため正常です）"
+              deleteResponse?.message || "予期しないレスポンスが返されました"
             );
             console.log("📋 削除対象だったフォルダID:", sourceFolderIds);
           }
@@ -376,26 +455,28 @@ const DndFinder: React.FC<dndFinderProps> = ({
           }
         }
 
+        console.log("🎉 フォルダ統合処理が完了しました");
         setSelectedImages([]);
         setIsMultiSelectMode(false);
 
         // 統合完了をコールバックで通知
         if (onFolderMoveComplete) {
+          console.log("📞 フォルダ移動完了コールバック呼び出し");
           await onFolderMoveComplete(sourceFolderIds.join(","), targetFolderId);
         }
 
         // バックエンド処理完了後にページをリロード
-        console.log("フォルダ統合完了 - ページリロード実行中...");
+        console.log("♻️ フォルダ統合完了 - ページリロード実行中...");
         // router.refresh();
         // window.location.reload();
       } else {
         console.error(
-          "フォルダ統合に失敗しました:",
+          "❌ フォルダ統合に失敗しました:",
           response?.data?.message || response?.message || "不明なエラー"
         );
       }
     } catch (error) {
-      console.error("フォルダ統合エラー:", error);
+      console.error("❌ フォルダ統合エラー:", error);
       console.error(
         "フォルダ統合に失敗しました:",
         (error as any)?.response?.data?.message ||
@@ -678,6 +759,9 @@ const DndFinder: React.FC<dndFinderProps> = ({
                 >
                   {isMultiSelectMode ? "選択解除" : "フォルダ選択"}
                 </button>
+                <button className="select-all-btn" onClick={handleSelectAll}>
+                  全て選択
+                </button>
                 {isMultiSelectMode && selectedImages.length > 0 && (
                   <>
                     <span className="selection-count">
@@ -687,10 +771,8 @@ const DndFinder: React.FC<dndFinderProps> = ({
                       <button
                         className="merge-folders-btn"
                         onClick={handleMergeFolders}
-                        data-full-text="フォルダ統合"
-                        data-short-text="統合"
                       >
-                        <span className="btn-full-text">フォルダ統合</span>
+                        <span className="btn-full-text">統合</span>
                         <span className="btn-short-text">統合</span>
                       </button>
                     )}
@@ -698,10 +780,8 @@ const DndFinder: React.FC<dndFinderProps> = ({
                       <button
                         className="move-to-parent-btn"
                         onClick={handleMoveToParentFolder}
-                        data-full-text="親フォルダに移動"
-                        data-short-text="親に移動"
                       >
-                        <span className="btn-full-text">親フォルダに移動</span>
+                        <span className="btn-full-text">親に移動</span>
                         <span className="btn-short-text">親に移動</span>
                       </button>
                     )}
@@ -735,7 +815,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
                   }`}
                   onClick={handleMultiSelectToggle}
                 >
-                  {isMultiSelectMode ? "選択モード解除" : "まとめて選択"}
+                  {isMultiSelectMode ? "選択解除" : "画像選択"}
+                </button>
+                <button className="select-all-btn" onClick={handleSelectAll}>
+                  全て選択
                 </button>
                 {isMultiSelectMode && selectedImages.length > 0 && (
                   <span className="selection-count">
@@ -745,9 +828,6 @@ const DndFinder: React.FC<dndFinderProps> = ({
               </>
             ) : finderType === "after" && !isLeaf(result, selectedFolder) ? (
               <>
-                <button className="multi-select-btn disabled" disabled>
-                  まとめて選択
-                </button>
                 <div style={{ flex: 1 }}></div>
                 <div className="view-mode-toggle">
                   <button
@@ -769,9 +849,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
                 </div>
               </>
             ) : (
-              <button className="multi-select-btn disabled" disabled>
-                まとめて選択
-              </button>
+              <></>
             )}
           </div>
         </div>

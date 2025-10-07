@@ -114,3 +114,96 @@
 .list-view-main .list-view-item-odd.selected .image-count {
   color: #FFFFFF;
 }
+
+/* 選択された項目でのコンテキストメニューボタンスタイル */
+.list-view-main .list-view-item.selected .context-menu-button,
+.list-view-main .list-view-item-odd.selected .context-menu-button {
+  color: #FFFFFF;
+}
+
+.list-view-main .list-view-item.selected:hover .context-menu-button,
+.list-view-main .list-view-item-odd.selected:hover .context-menu-button {
+  opacity: 1;
+  visibility: visible;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+}
+
+/* 3点リーダーメニューのスタイル */
+.list-view-item, .list-view-item-odd {
+  position: relative;
+}
+
+.context-menu-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #6c757d;
+  transition: all 0.2s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.list-view-item:hover .context-menu-button,
+.list-view-item-odd:hover .context-menu-button {
+  opacity: 1;
+  visibility: visible;
+}
+
+.context-menu-button:hover {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+.context-menu-button:active {
+  background-color: #e9ecef;
+}
+
+.context-menu {
+  position: absolute;
+  right: 8px;
+  top: 100%;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 140px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #495057;
+  transition: background-color 0.15s ease;
+}
+
+.context-menu button:hover {
+  background-color: #f8f9fa;
+}
+
+.context-menu button:first-child {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.context-menu button:last-child {
+  color: #1A2421;
+}
+
+.context-menu button:last-child:hover {
+  background-color: #fff5f5;
+}

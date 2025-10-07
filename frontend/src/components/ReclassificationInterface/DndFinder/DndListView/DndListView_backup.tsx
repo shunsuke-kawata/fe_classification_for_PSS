@@ -10,7 +10,7 @@ import {
   getImageCountInFolder,
   findNodeById,
 } from "@/utils/result";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 interface dndListViewProps {
   finderType: finderType;
@@ -49,9 +49,6 @@ const DndListView: React.FC<dndListViewProps> = ({
   console.log("folders:", folders);
   console.log("movedImages:", movedImages);
   console.log("selectedImages:", selectedImages);
-
-  // コンテキストメニューの状態管理
-  const [contextMenuIndex, setContextMenuIndex] = useState<number | null>(null);
 
   // foldersを統一的に扱うためのヘルパー関数
   const getFolderItems = (): Array<{ key: string; value: string }> => {
@@ -133,36 +130,6 @@ const DndListView: React.FC<dndListViewProps> = ({
     }
   };
 
-  // コンテキストメニューのハンドラー
-  const handleContextMenuClick = (index: number) => {
-    setContextMenuIndex(contextMenuIndex === index ? -1 : index);
-  };
-
-  const handleRenameFolder = (folderName: string) => {
-    console.log("Rename folder:", folderName);
-    setContextMenuIndex(-1);
-  };
-
-  const handleDeleteFolder = (folderName: string) => {
-    console.log("Delete folder:", folderName);
-    setContextMenuIndex(-1);
-  };
-
-  // コンテキストメニューを閉じるためのクリックハンドラー
-  useEffect(() => {
-    const handleClickOutside = () => {
-      setContextMenuIndex(-1);
-    };
-
-    if (contextMenuIndex !== -1) {
-      document.addEventListener("click", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [contextMenuIndex]);
-
   //forldersファイルnameのstringが渡されてしまっているので変更する
   useEffect(() => {
     // フォルダ情報の監視（デバッグ用のログを削除）
@@ -240,11 +207,7 @@ const DndListView: React.FC<dndListViewProps> = ({
                     <span className="arrow">{"＞"}</span>
                     <img
                       className="img-icon"
-                      src={
-                        isEmpty
-                          ? "/assets/empty-folder-icon.svg"
-                          : "/assets/folder-icon.svg"
-                      }
+                      src={"/assets/folder-icon.svg"}
                       alt=""
                     />
                     <span className="folder-name-span">
@@ -252,38 +215,6 @@ const DndListView: React.FC<dndListViewProps> = ({
                         ? `${item.key} (${imageCount})`
                         : item.key}
                     </span>
-                    {/* 3点リーダーとコンテキストメニュー */}
-                    <button
-                      className="context-menu-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleContextMenuClick(idx);
-                      }}
-                    >
-                      ⋮
-                    </button>
-                    {contextMenuIndex === idx && (
-                      <div className="context-menu">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRenameFolder(item.key);
-                          }}
-                        >
-                          名前の変更
-                        </button>
-                        {isEmpty && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteFolder(item.key);
-                            }}
-                          >
-                            削除
-                          </button>
-                        )}
-                      </div>
-                    )}
                   </div>
                 );
               })}
@@ -306,9 +237,6 @@ const DndListView: React.FC<dndListViewProps> = ({
                     ? Object.keys(getFilesInFolder(result, item.key)).length
                     : 0;
 
-                // フォルダが空かどうかを判定
-                const isEmpty = isFolderEmpty(item.key);
-
                 return (
                   <div
                     key={idx}
@@ -328,14 +256,10 @@ const DndListView: React.FC<dndListViewProps> = ({
                     <div className="folder-icon-container">
                       <img
                         className="folder-icon-large"
-                        src={
-                          isEmpty
-                            ? "/assets/empty-folder-icon.svg"
-                            : "/assets/folder-icon.svg"
-                        }
+                        src={"/assets/folder-icon.svg"}
                         alt=""
                       />
-                      {previewImagePath && isFolderLeaf && !isEmpty && (
+                      {previewImagePath && isFolderLeaf && (
                         <div className="folder-preview-overlay">
                           <img
                             src={previewImagePath}
@@ -411,9 +335,6 @@ const DndListView: React.FC<dndListViewProps> = ({
                     ? Object.keys(getFilesInFolder(result, item.key)).length
                     : 0;
 
-                // フォルダが空かどうかを判定
-                const isEmpty = isFolderEmpty(item.key);
-
                 return (
                   <div
                     key={idx}
@@ -437,11 +358,7 @@ const DndListView: React.FC<dndListViewProps> = ({
                     <span className="arrow">{"＞"}</span>
                     <img
                       className="img-icon"
-                      src={
-                        isEmpty
-                          ? "/assets/empty-folder-icon.svg"
-                          : "/assets/folder-icon.svg"
-                      }
+                      src={"/assets/folder-icon.svg"}
                       alt=""
                     />
                     <span className="folder-name-span">
@@ -449,38 +366,6 @@ const DndListView: React.FC<dndListViewProps> = ({
                         ? `${item.key} (${imageCount})`
                         : item.key}
                     </span>
-                    {/* 3点リーダーとコンテキストメニュー */}
-                    <button
-                      className="context-menu-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleContextMenuClick(idx);
-                      }}
-                    >
-                      ⋮
-                    </button>
-                    {contextMenuIndex === idx && (
-                      <div className="context-menu">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRenameFolder(item.key);
-                          }}
-                        >
-                          名前の変更
-                        </button>
-                        {isEmpty && (
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteFolder(item.key);
-                            }}
-                          >
-                            削除
-                          </button>
-                        )}
-                      </div>
-                    )}
                   </div>
                 );
               })}
@@ -503,9 +388,6 @@ const DndListView: React.FC<dndListViewProps> = ({
                     ? Object.keys(getFilesInFolder(result, item.key)).length
                     : 0;
 
-                // フォルダが空かどうかを判定
-                const isEmpty = isFolderEmpty(item.key);
-
                 return (
                   <div
                     key={idx}
@@ -525,14 +407,10 @@ const DndListView: React.FC<dndListViewProps> = ({
                     <div className="folder-icon-container">
                       <img
                         className="folder-icon-large"
-                        src={
-                          isEmpty
-                            ? "/assets/empty-folder-icon.svg"
-                            : "/assets/folder-icon.svg"
-                        }
+                        src={"/assets/folder-icon.svg"}
                         alt=""
                       />
-                      {previewImagePath && isFolderLeaf && !isEmpty && (
+                      {previewImagePath && isFolderLeaf && (
                         <div className="folder-preview-overlay">
                           <img
                             src={previewImagePath}
