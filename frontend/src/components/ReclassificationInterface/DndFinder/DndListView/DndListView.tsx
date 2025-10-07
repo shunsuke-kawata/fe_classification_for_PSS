@@ -11,6 +11,7 @@ import {
   findNodeById,
 } from "@/utils/result";
 import { useEffect, useState } from "react";
+import { deleteEmptyFolders } from "@/api/api";
 
 interface dndListViewProps {
   finderType: finderType;
@@ -27,6 +28,7 @@ interface dndListViewProps {
   getFolderPreviewImage?: (folderName: string) => string | null;
   getFolderPreviewImagePath?: (folderName: string) => string | null;
   result?: { [topLevelNodeId: string]: treeNode };
+  mongo_result_id?: string;
 }
 const DndListView: React.FC<dndListViewProps> = ({
   finderType,
@@ -43,6 +45,7 @@ const DndListView: React.FC<dndListViewProps> = ({
   getFolderPreviewImage,
   getFolderPreviewImagePath,
   result,
+  mongo_result_id,
 }: dndListViewProps) => {
   // 配列形式のpropsを出力
   console.log("=== DndListView 配列形式props ===");
@@ -139,13 +142,58 @@ const DndListView: React.FC<dndListViewProps> = ({
   };
 
   const handleRenameFolder = (folderName: string) => {
+    alert(folderName);
     console.log("Rename folder:", folderName);
     setContextMenuIndex(-1);
   };
 
-  const handleDeleteFolder = (folderName: string) => {
+  const handleDeleteFolder = async (folderName: string) => {
     console.log("Delete folder:", folderName);
     setContextMenuIndex(-1);
+
+    // mongo_result_idが存在するかチェック
+    if (!mongo_result_id) {
+      console.error("mongo_result_id が設定されていません");
+      alert("削除に失敗しました：mongo_result_id が設定されていません");
+      return;
+    }
+
+    try {
+      console.log(`フォルダ削除API呼び出し: ${folderName}`);
+      const response = await deleteEmptyFolders(mongo_result_id, [folderName]);
+
+      console.log("削除API応答:", response);
+
+      // 成功レスポンスの判定：message が "success" かどうかで判定
+      if (response && response.message === "success") {
+        console.log(`✅ フォルダ「${folderName}」を削除しました`);
+
+        // ページをリロードして最新状態を反映
+        window.location.reload();
+      } else {
+        // エラーレスポンスの場合
+        const errorMessage = response?.message || "削除に失敗しました";
+        console.error("フォルダ削除失敗:", errorMessage);
+        alert(`フォルダ削除に失敗しました: ${errorMessage}`);
+      }
+    } catch (error) {
+      console.error("フォルダ削除エラー:", error);
+
+      // APIエラーの詳細を取得
+      const apiError = (error as any)?.response;
+      let errorMessage = "不明なエラーが発生しました";
+
+      if (apiError) {
+        errorMessage =
+          apiError.data?.message ||
+          apiError.statusText ||
+          `HTTP ${apiError.status} エラー`;
+      } else if ((error as any)?.message) {
+        errorMessage = (error as any).message;
+      }
+
+      alert(`フォルダ削除に失敗しました: ${errorMessage}`);
+    }
   };
 
   // コンテキストメニューを閉じるためのクリックハンドラー

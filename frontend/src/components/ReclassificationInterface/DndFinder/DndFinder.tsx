@@ -879,6 +879,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
           getFolderPreviewImage={getFolderPreviewImage}
           getFolderPreviewImagePath={getFolderPreviewImagePath}
           result={result}
+          mongo_result_id={mongo_result_id}
         />
       </div>
     </>

@@ -111,10 +111,15 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
       <div className="result-div-main">
         {clusteringResult?.result ? (
           <Finder
-            result={clusteringResult.result}
+            result={
+              clusteringResult.result as unknown as {
+                [topLevelNodeId: string]: treeNode;
+              }
+            }
             originalImageFolderPath={originalImageFolderPath}
             currentFolder={currentFolder}
             onCurrentFolderChange={onCurrentFolderChange}
+            mongo_result_id={mongoResultId}
           />
         ) : (
           <div className="no-data-display">データがありません</div>

@@ -6,6 +6,7 @@ import {
   findNodeById,
 } from "@/utils/result";
 import { useState, useEffect } from "react";
+import { deleteEmptyFolders } from "@/api/api";
 
 interface listViewProps {
   isLeaf: boolean;
@@ -16,6 +17,7 @@ interface listViewProps {
   };
   onImageSelect?: (imagePath: string) => void;
   selectedImagePath?: string;
+  mongo_result_id?: string;
 }
 const ListView: React.FC<listViewProps> = ({
   isLeaf,
@@ -24,6 +26,7 @@ const ListView: React.FC<listViewProps> = ({
   result,
   onImageSelect,
   selectedImagePath,
+  mongo_result_id,
 }: listViewProps) => {
   // コンテキストメニューの状態管理
   const [contextMenuIndex, setContextMenuIndex] = useState<number | null>(null);
@@ -38,12 +41,55 @@ const ListView: React.FC<listViewProps> = ({
     setContextMenuIndex(null);
   };
 
-  const handleDeleteFolder = (folderName: string) => {
+  const handleDeleteFolder = async (folderName: string) => {
     console.log("フォルダ削除:", folderName);
     setContextMenuIndex(null);
-  };
 
-  // コンテキストメニューを閉じるためのクリックハンドラー
+    // mongo_result_idが存在するかチェック
+    if (!mongo_result_id) {
+      console.error("mongo_result_id が設定されていません");
+      alert("削除に失敗しました：mongo_result_id が設定されていません");
+      return;
+    }
+
+    try {
+      console.log(`フォルダ削除API呼び出し: ${folderName}`);
+      const response = await deleteEmptyFolders(mongo_result_id, [folderName]);
+
+      console.log("削除API応答:", response);
+
+      // 成功レスポンスの判定：message が "success" かどうかで判定
+      if (response && response.message === "success") {
+        console.log(`✅ フォルダ「${folderName}」を削除しました`);
+        alert(`フォルダ「${folderName}」を削除しました`);
+
+        // ページをリロードして最新状態を反映
+        window.location.reload();
+      } else {
+        // エラーレスポンスの場合
+        const errorMessage = response?.message || "削除に失敗しました";
+        console.error("フォルダ削除失敗:", errorMessage);
+        alert(`フォルダ削除に失敗しました: ${errorMessage}`);
+      }
+    } catch (error) {
+      console.error("フォルダ削除エラー:", error);
+
+      // APIエラーの詳細を取得
+      const apiError = (error as any)?.response;
+      let errorMessage = "不明なエラーが発生しました";
+
+      if (apiError) {
+        errorMessage =
+          apiError.data?.message ||
+          apiError.statusText ||
+          `HTTP ${apiError.status} エラー`;
+      } else if ((error as any)?.message) {
+        errorMessage = (error as any).message;
+      }
+
+      alert(`フォルダ削除に失敗しました: ${errorMessage}`);
+    }
+  }; // コンテキストメニューを閉じるためのクリックハンドラー
   useEffect(() => {
     const handleClickOutside = () => {
       setContextMenuIndex(null);

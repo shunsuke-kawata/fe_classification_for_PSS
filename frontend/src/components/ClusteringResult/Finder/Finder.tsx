@@ -20,6 +20,7 @@ interface finderProps {
   };
   currentFolder?: string | null;
   onCurrentFolderChange?: (currentFolderId: string) => void;
+  mongo_result_id?: string;
 }
 
 const Finder: React.FC<finderProps> = ({
@@ -27,6 +28,7 @@ const Finder: React.FC<finderProps> = ({
   originalImageFolderPath,
   currentFolder,
   onCurrentFolderChange,
+  mongo_result_id,
 }: finderProps) => {
   const topLevelId = getTopLevelFolderId(result);
 
@@ -153,6 +155,7 @@ const Finder: React.FC<finderProps> = ({
             result={result}
             onImageSelect={handleImageSelect}
             selectedImagePath={selectedImagePath}
+            mongo_result_id={mongo_result_id}
           />
           <ImageFileView
             files={currentFolderState.files}
