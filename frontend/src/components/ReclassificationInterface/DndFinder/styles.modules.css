@@ -129,6 +129,25 @@
     color: #e66600;
 }
 
+.delete-folders-btn {
+    padding: 8px 16px;
+    border: 1px solid #ff002b;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #ff002b;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-left: 10px;
+}
+
+.delete-folders-btn:hover {
+    background-color: #fff8f0;
+    border-color: #e60026;
+    color: #e60026;
+}
+
 /* ボタンテキストのレスポンシブ制御 */
 .btn-short-text {
     display: none;
@@ -179,7 +198,8 @@
     .multi-select-btn, 
     .select-all-btn,
     .merge-folders-btn, 
-    .move-to-parent-btn {
+    .move-to-parent-btn,
+    .delete-folders-btn {
         padding: 6px 12px;
         font-size: 13px;
         margin-left: 5px;
@@ -206,7 +226,8 @@
     .multi-select-btn, 
     .select-all-btn,
     .merge-folders-btn, 
-    .move-to-parent-btn {
+    .move-to-parent-btn,
+    .delete-folders-btn {
         padding: 5px 10px;
         font-size: 12px;
         margin-left: 4px;
@@ -247,7 +268,8 @@
     .multi-select-btn, 
     .select-all-btn,
     .merge-folders-btn, 
-    .move-to-parent-btn {
+    .move-to-parent-btn,
+    .delete-folders-btn {
         padding: 4px 8px;
         font-size: 11px;
         margin-left: 2px;
@@ -315,7 +337,8 @@
     }
     
     .merge-folders-btn, 
-    .move-to-parent-btn {
+    .move-to-parent-btn,
+    .delete-folders-btn {
         padding: 3px 5px;
         font-size: 9px;
         margin-left: 0;
@@ -363,8 +386,13 @@
         content: "↑";
     }
     
+    .delete-folders-btn .btn-short-text::after {
+        content: "削除";
+    }
+    
     .merge-folders-btn .btn-short-text,
-    .move-to-parent-btn .btn-short-text {
+    .move-to-parent-btn .btn-short-text,
+    .delete-folders-btn .btn-short-text {
         display: none;
     }
 }

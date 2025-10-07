@@ -352,6 +352,20 @@ const DndFinder: React.FC<dndFinderProps> = ({
       return false;
     }
 
+    // 選択されたフォルダの中に空のフォルダが含まれていないかチェック
+    const hasEmptyFolder = selectedImages.some((folderId) => {
+      const isEmpty = isFolderEmpty(folderId);
+      console.log(`📁 フォルダ ${folderId} is_empty: ${isEmpty}`);
+      return isEmpty;
+    });
+
+    if (hasEmptyFolder) {
+      console.log(
+        "🚫 canMergeFolders: 選択されたフォルダの中に空のフォルダがあります（統合不可）"
+      );
+      return false;
+    }
+
     console.log("✅ canMergeFolders: フォルダ統合が可能です");
     return true;
   };
@@ -483,6 +497,134 @@ const DndFinder: React.FC<dndFinderProps> = ({
           (error as any)?.message ||
           "不明なエラー"
       );
+    }
+  };
+
+  // 空フォルダかどうかを判定する関数
+  const isFolderEmpty = (folderId: string): boolean => {
+    const node = findNodeById(result, folderId);
+    if (!node || !node.data) {
+      return true; // ノードが見つからない、またはdataがない場合は空と判定
+    }
+
+    // dataが空のオブジェクト{}かどうかを判定
+    return Object.keys(node.data).length === 0;
+  };
+
+  // 選択されたフォルダがすべて空かどうかを判定する関数
+  const canDeleteSelectedFolders = (): boolean => {
+    // 基本データの検証
+    if (!result || !selectedFolder) {
+      console.log("🚫 canDeleteSelectedFolders: 基本データが不足しています");
+      return false;
+    }
+
+    // 複数選択モードでない場合は無効
+    if (!isMultiSelectMode) {
+      console.log("🚫 canDeleteSelectedFolders: 複数選択モードではありません");
+      return false;
+    }
+
+    // 1つ以上のフォルダが選択されている必要がある
+    if (selectedImages.length < 1) {
+      console.log(
+        "🚫 canDeleteSelectedFolders: 選択されたフォルダがありません"
+      );
+      return false;
+    }
+
+    // 現在のフォルダが非リーフ（フォルダ表示モード）
+    if (isLeaf(result, selectedFolder)) {
+      console.log(
+        "🚫 canDeleteSelectedFolders: 現在のフォルダがリーフフォルダです"
+      );
+      return false;
+    }
+
+    // 選択されたすべてのフォルダが空である
+    const allIsEmpty = selectedImages.every((folderId) => {
+      const isEmpty = isFolderEmpty(folderId);
+      console.log(`📁 フォルダ ${folderId} is_empty: ${isEmpty}`);
+      return isEmpty;
+    });
+
+    if (!allIsEmpty) {
+      console.log(
+        "🚫 canDeleteSelectedFolders: 選択されたフォルダの中に空でないフォルダがあります"
+      );
+      return false;
+    }
+
+    console.log(
+      "✅ canDeleteSelectedFolders: 選択されたフォルダをすべて削除可能です"
+    );
+    return true;
+  };
+
+  // 選択されたフォルダをまとめて削除する関数
+  const handleDeleteSelectedFolders = async () => {
+    console.log("🗑️ フォルダ一括削除開始");
+
+    if (!canDeleteSelectedFolders()) {
+      console.log("🚫 フォルダ削除の条件を満たしていません");
+      return;
+    }
+
+    console.log(`📋 削除設定:`);
+    console.log(`   削除対象フォルダ: [${selectedImages.join(", ")}]`);
+    console.log(`📊 削除対象フォルダ数: ${selectedImages.length}`);
+
+    try {
+      console.log("🚀 フォルダ削除API呼び出し開始...");
+      const response = await deleteEmptyFolders(
+        mongo_result_id,
+        selectedImages
+      );
+
+      console.log("📋 フォルダ削除API Response:", response);
+      if (response && response.message === "success") {
+        console.log("✅ フォルダ削除が成功しました");
+        alert(`${selectedImages.length}個のフォルダを削除しました`);
+
+        console.log("🎉 フォルダ削除処理が完了しました");
+        setSelectedImages([]);
+        setIsMultiSelectMode(false);
+
+        // 削除完了をコールバックで通知
+        if (onFolderMoveComplete) {
+          console.log("📞 フォルダ削除完了コールバック呼び出し");
+          await onFolderMoveComplete(selectedImages.join(","), selectedFolder);
+        }
+
+        // バックエンド処理完了後にページをリロード
+        console.log("♻️ フォルダ削除完了 - ページリロード実行中...");
+        window.location.reload();
+      } else {
+        console.error(
+          "❌ フォルダ削除に失敗しました:",
+          response?.message || "不明なエラー"
+        );
+        alert(
+          `フォルダ削除に失敗しました: ${response?.message || "不明なエラー"}`
+        );
+      }
+    } catch (error) {
+      console.error("❌ フォルダ削除エラー:", error);
+
+      // APIエラーの詳細を取得
+      const apiError = (error as any)?.response;
+      let errorMessage = "不明なエラーが発生しました";
+
+      if (apiError) {
+        errorMessage =
+          apiError.data?.message ||
+          apiError.statusText ||
+          `HTTP ${apiError.status} エラー`;
+      } else if ((error as any)?.message) {
+        errorMessage = (error as any).message;
+      }
+
+      alert(`フォルダ削除に失敗しました: ${errorMessage}`);
     }
   };
 
@@ -783,6 +925,15 @@ const DndFinder: React.FC<dndFinderProps> = ({
                       >
                         <span className="btn-full-text">親に移動</span>
                         <span className="btn-short-text">親に移動</span>
+                      </button>
+                    )}
+                    {canDeleteSelectedFolders() && (
+                      <button
+                        className="delete-folders-btn"
+                        onClick={handleDeleteSelectedFolders}
+                      >
+                        <span className="btn-full-text">削除</span>
+                        <span className="btn-short-text">削除</span>
                       </button>
                     )}
                   </>
