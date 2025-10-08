@@ -4,6 +4,7 @@ import {
   getImageCountInFolder,
   isLeaf as isLeafFunction,
   findNodeById,
+  getFolderName,
 } from "@/utils/result";
 import { useState, useEffect } from "react";
 import { deleteEmptyFolders } from "@/api/api";
@@ -172,7 +173,7 @@ const ListView: React.FC<listViewProps> = ({
               alt=""
             />
             <span className="folder-name-span">
-              {foldername}
+              {getFolderName(result, foldername)}
               {folderIsLeaf && imageCount > 0 && (
                 <span className="image-count">({imageCount})</span>
               )}

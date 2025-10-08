@@ -3,6 +3,7 @@ export interface treeNode {
   is_leaf: boolean;
   data: treeData;
   parent_id: string | null;
+  name?: string;
 }
 
 export type treeData = leafData | { [nodeId: string]: treeNode };
@@ -144,4 +145,15 @@ export const getImageCountInFolder = (
 
   const files = node.data as leafData;
   return Object.keys(files).length;
+};
+
+// フォルダ名（name）を取得する関数
+export const getFolderName = (
+  result: {
+    [topLevelNodeId: string]: treeNode;
+  },
+  folderId: string
+): string => {
+  const node = findNodeById(result, folderId);
+  return node?.name || folderId; // nameが存在しない場合はidをフォールバック
 };

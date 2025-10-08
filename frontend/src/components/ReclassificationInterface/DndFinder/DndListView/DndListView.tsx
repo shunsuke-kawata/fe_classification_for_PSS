@@ -9,6 +9,7 @@ import {
   leafData,
   getImageCountInFolder,
   findNodeById,
+  getFolderName,
 } from "@/utils/result";
 import { useEffect, useState } from "react";
 import { deleteEmptyFolders } from "@/api/api";
@@ -297,7 +298,11 @@ const DndListView: React.FC<dndListViewProps> = ({
                     />
                     <span className="folder-name-span">
                       {isFolderLeaf && imageCount > 0
-                        ? `${item.key} (${imageCount})`
+                        ? `${
+                            result ? getFolderName(result, item.key) : item.key
+                          } (${imageCount})`
+                        : result
+                        ? getFolderName(result, item.key)
                         : item.key}
                     </span>
                     {/* 3点リーダーとコンテキストメニュー */}
@@ -407,7 +412,11 @@ const DndListView: React.FC<dndListViewProps> = ({
                     </div>
                     <span className="folder-name-label">
                       {isFolderLeaf && imageCount > 0
-                        ? `${item.key} (${imageCount})`
+                        ? `${
+                            result ? getFolderName(result, item.key) : item.key
+                          } (${imageCount})`
+                        : result
+                        ? getFolderName(result, item.key)
                         : item.key}
                     </span>
                   </div>
@@ -494,7 +503,11 @@ const DndListView: React.FC<dndListViewProps> = ({
                     />
                     <span className="folder-name-span">
                       {isFolderLeaf && imageCount > 0
-                        ? `${item.key} (${imageCount})`
+                        ? `${
+                            result ? getFolderName(result, item.key) : item.key
+                          } (${imageCount})`
+                        : result
+                        ? getFolderName(result, item.key)
                         : item.key}
                     </span>
                     {/* 3点リーダーとコンテキストメニュー */}
@@ -604,7 +617,11 @@ const DndListView: React.FC<dndListViewProps> = ({
                     </div>
                     <span className="folder-name-label">
                       {isFolderLeaf && imageCount > 0
-                        ? `${item.key} (${imageCount})`
+                        ? `${
+                            result ? getFolderName(result, item.key) : item.key
+                          } (${imageCount})`
+                        : result
+                        ? getFolderName(result, item.key)
                         : item.key}
                     </span>
                   </div>

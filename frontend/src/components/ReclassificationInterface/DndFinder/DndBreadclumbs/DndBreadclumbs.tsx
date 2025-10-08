@@ -1,5 +1,10 @@
 import "./styles.modules.css";
-import { treeNode, getImageCountInFolder, isLeaf } from "@/utils/result";
+import {
+  treeNode,
+  getImageCountInFolder,
+  isLeaf,
+  getFolderName,
+} from "@/utils/result";
 
 interface dndBreadcrumbsProps {
   parentFolders: string[];
@@ -52,7 +57,7 @@ const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
         </span>
       </div>
       <span className="breadcrumb-item">
-        {currentFolder}
+        {currentFolder ? getFolderName(result, currentFolder) : "Root"}
         {currentFolderIsLeaf && imageCount > 0 && (
           <span className="image-count">({imageCount})</span>
         )}

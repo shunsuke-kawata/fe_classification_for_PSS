@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import "./styles.modules.css";
-import { treeNode, getImageCountInFolder, isLeaf } from "@/utils/result";
+import {
+  treeNode,
+  getImageCountInFolder,
+  isLeaf,
+  getFolderName,
+} from "@/utils/result";
 
 interface BreadcrumbsProps {
   parentFolders: string[];
@@ -101,7 +106,8 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     <div className="breadcrumbs">
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
-        const displayName = truncateString(item);
+        const folderName = getFolderName(result, item);
+        const displayName = truncateString(folderName);
         const itemIsLeaf = isLeaf(result, item);
         const imageCount = itemIsLeaf ? getImageCountInFolder(result, item) : 0;
 
@@ -110,7 +116,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
             <span
               className="breadcrumb-item"
               onClick={() => setSelectedFolder(item)}
-              title={item} // ホバー時に完全な名前を表示
+              title={folderName} // ホバー時に完全な名前を表示
             >
               {displayName}
               {itemIsLeaf && imageCount > 0 && (
