@@ -12,7 +12,7 @@ import {
   getFolderName,
 } from "@/utils/result";
 import { useEffect, useState } from "react";
-import { deleteEmptyFolders, renameFolderOrFile } from "@/api/api";
+import { deleteEmptyFolders } from "@/api/api";
 
 interface dndListViewProps {
   finderType: finderType;
@@ -153,77 +153,15 @@ const DndListView: React.FC<dndListViewProps> = ({
   };
 
   // 名前変更の確定
-  const handleNameChangeConfirm = async (folderId: string) => {
+  const handleNameChangeConfirm = (folderId: string) => {
     console.log("=== 名前変更確定 ===");
     console.log("mongo_result_id:", mongo_result_id);
     console.log("folder node_id:", folderId);
     console.log("新しい名前:", editingName);
 
-    // mongo_result_idの存在チェック
-    if (!mongo_result_id) {
-      console.error("mongo_result_id が設定されていません");
-      alert("名前変更に失敗しました：mongo_result_id が設定されていません");
-      return;
-    }
-
-    // 名前が空でないかチェック
-    if (!editingName.trim()) {
-      console.error("新しい名前が空です");
-      alert("名前を入力してください");
-      return;
-    }
-
-    try {
-      console.log(`名前変更API呼び出し: ${folderId} -> ${editingName}`);
-
-      // フォルダがleafかどうかを判定
-      const folderIsLeaf = result ? isLeafFunction(result, folderId) : false;
-
-      const response = await renameFolderOrFile(
-        mongo_result_id,
-        folderId,
-        editingName.trim(),
-        folderIsLeaf
-      );
-
-      console.log("名前変更API応答:", response);
-
-      // 成功レスポンスの判定：message が "success" かどうかで判定
-      if (response && response.message === "success") {
-        console.log(
-          `✅ 「${folderId}」の名前を「${editingName}」に変更しました`
-        );
-
-        // ページをリロードして最新状態を反映
-        window.location.reload();
-      } else {
-        // エラーレスポンスの場合
-        const errorMessage = response?.message || "名前変更に失敗しました";
-        console.error("名前変更失敗:", errorMessage);
-        alert(`名前変更に失敗しました: ${errorMessage}`);
-      }
-    } catch (error) {
-      console.error("名前変更エラー:", error);
-
-      // APIエラーの詳細を取得
-      const apiError = (error as any)?.response;
-      let errorMessage = "不明なエラーが発生しました";
-
-      if (apiError) {
-        errorMessage =
-          apiError.data?.message ||
-          apiError.statusText ||
-          `HTTP ${apiError.status} エラー`;
-      } else if ((error as any)?.message) {
-        errorMessage = (error as any).message;
-      }
-
-      alert(`名前変更に失敗しました: ${errorMessage}`);
-    } finally {
-      // 編集モードを終了
-      setEditingIndex(null);
-      setEditingName("");
-    }
+    // 編集モードを終了
+    setEditingIndex(null);
+    setEditingName("");
   };
 
   // 名前変更のキャンセル

@@ -334,6 +334,35 @@ export type {
   loginUserType,
   joinUserType,
 };
+
+// フォルダまたはファイルの名前を変更
+const renameFolderOrFile = async (
+  mongo_result_id: string,
+  node_id: string,
+  new_name: string,
+  is_leaf?: boolean
+) => {
+  try {
+    const params = new URLSearchParams({
+      name: new_name,
+    });
+
+    if (is_leaf !== undefined) {
+      params.append("is_leaf", is_leaf.toString());
+    }
+
+    const response = await axios.put(
+      `${
+        config.backend_base_url
+      }/action/folders/${mongo_result_id}/${node_id}?${params.toString()}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("名前変更エラー:", error);
+    throw error;
+  }
+};
+
 export {
   getData,
   getProject,
@@ -349,4 +378,5 @@ export {
   getClusteringResult,
   moveClusteringItems,
   deleteEmptyFolders,
+  renameFolderOrFile,
 };

@@ -14,6 +14,7 @@
     justify-content: flex-start;
     align-items: center;
     padding-left:10px;
+    position: relative;
 }
 
 .list-view-item-odd{
@@ -529,4 +530,76 @@
 
 .context-menu button:last-child:hover {
   background-color: #fff5f5;
+}
+
+/* 編集モード用スタイル */
+.folder-name-input {
+  padding: 1px 2px;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  font-size: 14px;
+  background-color: #ffffff;
+  margin-left: 10px;
+  width: 250px;
+  height: 18px;
+  box-sizing: border-box;
+  color: #495057;
+  flex: 0 0 auto;
+}
+
+.folder-name-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 1px rgba(74, 144, 226, 0.15);
+}
+
+.edit-buttons-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding-right: 8px;
+  flex: 0 0 auto;
+}
+
+.edit-confirm-btn, .edit-cancel-btn {
+  padding: 4px 8px;
+  border: 1px solid #4a90e2;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #4a90e2;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-confirm-btn:hover {
+  background-color: #f0f7ff;
+  border-color: #357abd;
+  color: #357abd;
+}
+
+.edit-cancel-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+/* 編集モードのレスポンシブ対応 */
+@media (max-width: 768px) {
+  .folder-name-input {
+    width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .folder-name-input {
+    width: 150px;
+  }
 }

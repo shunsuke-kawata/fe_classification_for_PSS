@@ -7,7 +7,7 @@ import {
   getFolderName,
 } from "@/utils/result";
 import { useState, useEffect } from "react";
-import { deleteEmptyFolders } from "@/api/api";
+import { deleteEmptyFolders, renameFolderOrFile } from "@/api/api";
 
 interface listViewProps {
   isLeaf: boolean;
@@ -32,14 +32,104 @@ const ListView: React.FC<listViewProps> = ({
   // コンテキストメニューの状態管理
   const [contextMenuIndex, setContextMenuIndex] = useState<number | null>(null);
 
+  // 編集モードの状態管理
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [editingName, setEditingName] = useState<string>("");
+
   // コンテキストメニューのハンドラー
   const handleContextMenuClick = (index: number) => {
     setContextMenuIndex(contextMenuIndex === index ? null : index);
   };
 
-  const handleRenameFolder = (folderName: string) => {
+  const handleRenameFolder = (folderName: string, index: number) => {
     console.log("フォルダ名変更:", folderName);
     setContextMenuIndex(null);
+
+    // 編集モードに入る
+    setEditingIndex(index);
+    const currentName = getFolderName(result, folderName);
+    setEditingName(currentName);
+  };
+
+  // 名前変更の確定
+  const handleNameChangeConfirm = async (folderId: string) => {
+    console.log("=== 名前変更確定 ===");
+    console.log("フォルダID:", folderId);
+    console.log("新しい名前:", editingName);
+    console.log("mongo_result_id:", mongo_result_id);
+
+    // mongo_result_idの存在チェック
+    if (!mongo_result_id) {
+      console.error("mongo_result_id が設定されていません");
+      alert("名前変更に失敗しました：mongo_result_id が設定されていません");
+      return;
+    }
+
+    // 名前が空でないかチェック
+    if (!editingName.trim()) {
+      console.error("新しい名前が空です");
+      alert("名前を入力してください");
+      return;
+    }
+
+    try {
+      console.log(`名前変更API呼び出し: ${folderId} -> ${editingName}`);
+
+      // フォルダがleafかどうかを判定
+      const folderIsLeaf = isLeafFunction(result, folderId);
+
+      const response = await renameFolderOrFile(
+        mongo_result_id,
+        folderId,
+        editingName.trim(),
+        folderIsLeaf
+      );
+
+      console.log("名前変更API応答:", response);
+
+      // 成功レスポンスの判定：message が "success" かどうかで判定
+      if (response && response.message === "success") {
+        console.log(
+          `✅ 「${folderId}」の名前を「${editingName}」に変更しました`
+        );
+
+        // ページをリロードして最新状態を反映
+        window.location.reload();
+      } else {
+        // エラーレスポンスの場合
+        const errorMessage = response?.message || "名前変更に失敗しました";
+        console.error("名前変更失敗:", errorMessage);
+        alert(`名前変更に失敗しました: ${errorMessage}`);
+      }
+    } catch (error) {
+      console.error("名前変更エラー:", error);
+
+      // APIエラーの詳細を取得
+      const apiError = (error as any)?.response;
+      let errorMessage = "不明なエラーが発生しました";
+
+      if (apiError) {
+        errorMessage =
+          apiError.data?.message ||
+          apiError.statusText ||
+          `HTTP ${apiError.status} エラー`;
+      } else if ((error as any)?.message) {
+        errorMessage = (error as any).message;
+      }
+
+      alert(`名前変更に失敗しました: ${errorMessage}`);
+    } finally {
+      // 編集モードを終了
+      setEditingIndex(null);
+      setEditingName("");
+    }
+  };
+
+  // 名前変更のキャンセル
+  const handleNameChangeCancel = () => {
+    console.log("名前変更キャンセル");
+    setEditingIndex(null);
+    setEditingName("");
   };
 
   const handleDeleteFolder = async (folderName: string) => {
@@ -137,11 +227,10 @@ const ListView: React.FC<listViewProps> = ({
               idx % 2 === 0 ? "list-view-item-even" : "list-view-item-odd"
             } ${isSelected ? "selected" : ""}`}
             onClick={() => {
-              console.log("=== ListViewアイテムがクリックされました ===");
-              console.log("ファイル名:", foldername);
-              console.log("isLeaf:", isLeaf);
-              console.log("folderIsLeaf:", folderIsLeaf);
-              console.log("onImageSelect存在:", !!onImageSelect);
+              if (editingIndex === idx) {
+                // 編集モード時はクリックを無効化
+                return;
+              }
 
               if (isLeaf) {
                 // is_leafフォルダ内では、すべてのアイテムを画像として扱う
@@ -172,45 +261,88 @@ const ListView: React.FC<listViewProps> = ({
               }
               alt=""
             />
-            <span className="folder-name-span">
-              {getFolderName(result, foldername)}
-              {folderIsLeaf && imageCount > 0 && (
-                <span className="image-count">({imageCount})</span>
-              )}
-            </span>
-            {/* 3点リーダーとコンテキストメニュー（フォルダのみ表示） */}
-            {!isLeaf && (
+            {editingIndex === idx ? (
               <>
-                <button
-                  className="context-menu-button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleContextMenuClick(idx);
+                <input
+                  type="text"
+                  value={editingName}
+                  onChange={(e) => setEditingName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      handleNameChangeConfirm(foldername);
+                    } else if (e.key === "Escape") {
+                      handleNameChangeCancel();
+                    }
                   }}
-                >
-                  ⋮
-                </button>
-                {contextMenuIndex === idx && (
-                  <div className="context-menu">
+                  onClick={(e) => e.stopPropagation()}
+                  className="folder-name-input"
+                  autoFocus
+                />
+                {/* 編集時の確定・キャンセルボタンを右端に配置 */}
+                <div className="edit-buttons-container">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNameChangeConfirm(foldername);
+                    }}
+                    className="edit-confirm-btn"
+                  >
+                    ✓
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleNameChangeCancel();
+                    }}
+                    className="edit-cancel-btn"
+                  >
+                    ✗
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <span className="folder-name-span">
+                  {getFolderName(result, foldername)}
+                  {folderIsLeaf && imageCount > 0 && (
+                    <span className="image-count">({imageCount})</span>
+                  )}
+                </span>
+                {/* 3点リーダーとコンテキストメニュー（フォルダのみ表示） */}
+                {!isLeaf && (
+                  <>
                     <button
+                      className="context-menu-button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleRenameFolder(foldername);
+                        handleContextMenuClick(idx);
                       }}
                     >
-                      名前の変更
+                      ⋮
                     </button>
-                    {isEmpty && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteFolder(foldername);
-                        }}
-                      >
-                        削除
-                      </button>
+                    {contextMenuIndex === idx && (
+                      <div className="context-menu">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRenameFolder(foldername, idx);
+                          }}
+                        >
+                          名前の変更
+                        </button>
+                        {isEmpty && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteFolder(foldername);
+                            }}
+                          >
+                            削除
+                          </button>
+                        )}
+                      </div>
                     )}
-                  </div>
+                  </>
                 )}
               </>
             )}
