@@ -5,8 +5,8 @@
     margin: 20px auto 20px auto;
     margin-top: calc(80px + 20px); /* ヘッダー高さ + 上マージン */
     background-color: #FFFFFF;
-    min-width: 320px; /* モバイル対応 */
-    max-width: 1400px; /* 大画面での過度な拡大を防止 */
+    min-width: 280px; /* モバイル対応 */
+    max-width: 1600px; /* 大画面での最大幅を拡大してFinderとバランスを取る */
     border-radius: 5px;
     padding: 10px;
     box-sizing: border-box;
@@ -22,9 +22,9 @@
 @media (max-width: 1200px) {
     .project-detail-main {
         width: 98%;
-        height: calc(100vh - 80px - 30px); /* ヘッダー高さとマージン調整 */
+        height: calc(100vh - 70px - 30px); /* ヘッダー高さとマージン調整 */
         margin: 15px auto;
-        margin-top: calc(80px + 15px);
+        margin-top: calc(70px + 15px);
         padding: 8px;
     }
 }
@@ -33,17 +33,25 @@
     .project-detail-main {
         width: 100%;
         height: calc(100vh - 60px - 20px); /* モバイル用ヘッダー高さ */
-        margin: 10px auto;
+        margin: 10px 0;
         margin-top: calc(60px + 10px);
         padding: 5px;
         border-radius: 0;
     }
 }
 
+/* 550px付近での調整 - ヘッダー高さとmargin-topの調整 */
+@media (max-width: 600px) and (min-width: 480px) {
+    .project-detail-main {
+        margin-top: calc(60px + 15px); /* ヘッダーとの距離を調整 */
+        height: calc(100vh - 60px - 25px); /* 高さも微調整 */
+    }
+}
+
 @media (max-width: 480px) {
     .project-detail-main {
         height: calc(100vh - 50px - 10px); /* 小画面用ヘッダー高さ */
-        margin: 5px auto;
+        margin: 5px 0;
         margin-top: calc(50px + 5px);
         padding: 3px;
     }
@@ -88,24 +96,51 @@
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap; /* 小さい画面で折り返し */
+    padding: 5px 0;
 }
 
 /* レスポンシブ対応 */
+@media (max-width: 1024px) {
+    .menu-outer-flex {
+        height: auto;
+        min-height: 45px;
+        gap: 0.8rem;
+    }
+}
+
 @media (max-width: 768px) {
     .menu-outer-flex {
         height: auto;
         min-height: 50px;
         gap: 0.5rem;
         padding: 5px 0;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: nowrap; /* 折り返しを防ぐ */
+    }
+}
+
+@media (max-width: 600px) {
+    .menu-outer-flex {
+        flex-direction: row; /* 横並びを維持 */
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 0;
+        height: auto;
+        flex-wrap: nowrap;
     }
 }
 
 @media (max-width: 480px) {
     .menu-outer-flex {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        padding: 10px 0;
+        flex-direction: row; /* 横並びを維持 */
+        align-items: center;
+        justify-content: space-between;
+        gap: 5px;
+        padding: 5px 0;
+        flex-wrap: nowrap;
     }
 }
 .select-display-status {
@@ -113,43 +148,129 @@
     width: 260px;
     display: flex;
     align-items: center;
+    justify-content: space-between; /* 要素間のスペースを自動調整 */
     background-color: #FFFFFF;
     border: #000000 solid 1px;
     border-radius: 5px;
     height: 50px;
     flex-shrink: 0; /* 縮小を防ぐ */
+    z-index: 10; /* DndFinderより前面に表示 */
+    padding: 0 8px; /* 左右に適度なパディング */
+    box-sizing: border-box;
 }
 
 /* レスポンシブ対応 */
+@media (max-width: 1024px) {
+    .select-display-status {
+        width: 220px;
+        height: 45px;
+    }
+}
+
+/* 1000px～700px幅でのタブセレクト調整 */
+@media (max-width: 1000px) and (min-width: 700px) {
+    .select-display-status {
+        width: 240px; /* 幅を広げてアイコンのスペースを確保 */
+        height: 45px;
+    }
+}
+
 @media (max-width: 768px) {
     .select-display-status {
         width: 200px;
-        height: 45px;
+        height: 40px;
+    }
+}
+
+/* 770px~590px幅での重複対策 - タブセレクター */
+@media (max-width: 770px) and (min-width: 590px) {
+    .select-display-status {
+        z-index: 15; /* より高いz-indexで確実に前面に */
+        position: relative;
+        background-color: #FFFFFF; /* 背景色を明示的に設定 */
+    }
+}
+
+@media (max-width: 600px) {
+    .select-display-status {
+        width: 180px; /* より具体的な幅に設定 */
+        height: 40px;
+        min-width: 160px;
+        flex-shrink: 1; /* 必要に応じて縮小を許可 */
     }
 }
 
 @media (max-width: 480px) {
     .select-display-status {
-        width: 100%;
-        height: 40px;
+        width: 150px; /* さらに小さく */
+        height: 35px;
+        min-width: 130px;
+        flex-shrink: 1;
+    }
+}
+
+@media (max-width: 400px) {
+    .select-display-status {
+        width: 130px;
+        height: 32px;
+        min-width: 120px;
     }
 }
   
   .pulldown-icon {
     width: 20px;
+    margin-right: 8px; /* 右マージンを追加してはみ出しを防ぐ */
+    flex-shrink: 0; /* アイコンの縮小を防ぐ */
   }
+  
+  /* 1000px～700px幅でのプルダウンアイコン調整 */
+  @media (max-width: 1000px) and (min-width: 700px) {
+    .pulldown-icon {
+        width: 18px;
+        margin-right: 10px; /* 十分な右マージンを確保 */
+    }
+  }
+  
+  @media (max-width: 600px) {
+    .pulldown-icon {
+        width: 16px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .pulldown-icon {
+        width: 14px;
+    }
+  }
+  
   .checked-icon{
     width: 16px;
     margin-left: 20px;
   }
+
+  @media (max-width: 600px) {
+    .checked-icon {
+        width: 14px;
+        margin-left: 15px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .checked-icon {
+        width: 12px;
+        margin-left: 10px;
+    }
+  }
   
   .select-status-label {
-    padding-left: 10px;
+    padding-left: 2px; /* パディングを削減 */
     width: 210px;
     font-size: 16px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    flex: 1; /* 利用可能なスペースを使用 */
+    min-width: 0; /* flexアイテムの最小幅制限を解除 */
   }
 
 /* レスポンシブ対応 */
@@ -157,13 +278,41 @@
     .select-status-label {
         width: 150px;
         font-size: 14px;
+        padding-left: 8px;
+    }
+}
+
+/* 1000px～700px幅でのラベル調整 */
+@media (max-width: 1000px) and (min-width: 700px) {
+    .select-status-label {
+        width: auto; /* 幅を自動調整に変更 */
+        font-size: 15px;
+        padding-left: 2px;
+        flex: 1; /* 残りのスペースを使用 */
+    }
+}
+
+@media (max-width: 600px) {
+    .select-status-label {
+        width: 120px;
+        font-size: 13px;
+        padding-left: 8px;
     }
 }
 
 @media (max-width: 480px) {
     .select-status-label {
-        width: calc(100% - 50px);
+        width: 100px;
         font-size: 12px;
+        padding-left: 6px;
+    }
+}
+
+@media (max-width: 400px) {
+    .select-status-label {
+        width: 85px;
+        font-size: 11px;
+        padding-left: 5px;
     }
 }
   
@@ -180,17 +329,38 @@
   }
 
 /* レスポンシブ対応 */
+@media (max-width: 1024px) {
+    .select-status-menu {
+        width: 220px;
+        top: 45px;
+    }
+}
+
 @media (max-width: 768px) {
     .select-status-menu {
         width: 200px;
-        top: 45px;
+        top: 40px;
+    }
+}
+
+@media (max-width: 600px) {
+    .select-status-menu {
+        width: 180px;
+        top: 40px;
     }
 }
 
 @media (max-width: 480px) {
     .select-status-menu {
-        width: 100%;
-        top: 40px;
+        width: 150px;
+        top: 35px;
+    }
+}
+
+@media (max-width: 400px) {
+    .select-status-menu {
+        width: 130px;
+        top: 32px;
     }
 }
   
@@ -202,6 +372,40 @@
     height: 50px;
     background-color: #FFFFFF;
   } 
+
+  /* レスポンシブ対応 */
+  @media (max-width: 768px) {
+      .menu-content {
+          font-size: 14px;
+          height: 45px;
+          padding-left: 8px;
+      }
+  }
+
+  @media (max-width: 600px) {
+      .menu-content {
+          font-size: 13px;
+          height: 40px;
+          padding-left: 6px;
+      }
+  }
+
+  @media (max-width: 480px) {
+      .menu-content {
+          font-size: 12px;
+          height: 35px;
+          padding-left: 5px;
+      }
+  }
+
+  @media (max-width: 400px) {
+      .menu-content {
+          font-size: 11px;
+          height: 32px;
+          padding-left: 4px;
+      }
+  }
+
   .menu-content:hover{
     background-color: #d3d3d3;
   }
@@ -220,20 +424,49 @@
     gap: 20px;
     width: fit-content;
     flex-wrap: wrap; /* 小さい画面で折り返し */
+    align-items: center;
+    position: relative; /* z-indexを有効にするため */
+    z-index: 10; /* DndFinderより前面に表示 */
   }
 
 /* レスポンシブ対応 */
+@media (max-width: 1024px) {
+    .option-buttons-div {
+        gap: 15px;
+    }
+}
+
 @media (max-width: 768px) {
     .option-buttons-div {
         gap: 10px;
+        justify-content: flex-end;
+    }
+}
+
+/* 770px~590px幅での重複対策 - オプションボタン */
+@media (max-width: 770px) and (min-width: 590px) {
+    .option-buttons-div {
+        z-index: 15; /* より高いz-indexで確実に前面に */
+        position: relative;
+        background-color: transparent; /* 背景は透明のまま */
+    }
+}
+
+@media (max-width: 600px) {
+    .option-buttons-div {
+        width: auto; /* fit-contentの代わり */
+        justify-content: flex-end;
+        gap: 8px;
+        flex-wrap: nowrap; /* 折り返しを防ぐ */
     }
 }
 
 @media (max-width: 480px) {
     .option-buttons-div {
-        width: 100%;
-        justify-content: center;
-        gap: 10px;
+        width: auto;
+        justify-content: flex-end;
+        gap: 5px;
+        flex-wrap: nowrap;
     }
 }
 
@@ -244,24 +477,56 @@
     font-size: 20px;
     height: 50px;
     min-width: 120px; /* 最小幅を設定 */
+    padding: 0 10px;
+    white-space: nowrap;
   }
 
 /* レスポンシブ対応 */
+@media (max-width: 1024px) {
+    .option-buttons {
+        font-size: 18px;
+        height: 45px;
+        min-width: 110px;
+        padding: 0 8px;
+    }
+}
+
 @media (max-width: 768px) {
     .option-buttons {
         font-size: 16px;
-        height: 45px;
+        height: 40px;
         min-width: 100px;
+        padding: 0 6px;
+    }
+}
+
+@media (max-width: 600px) {
+    .option-buttons {
+        font-size: 14px;
+        height: 38px;
+        min-width: 70px;
+        max-width: 100px;
+        padding: 0 5px;
     }
 }
 
 @media (max-width: 480px) {
     .option-buttons {
-        font-size: 14px;
-        height: 40px;
-        min-width: 80px;
-        flex: 1;
-        max-width: 150px;
+        font-size: 12px;
+        height: 35px;
+        min-width: 60px;
+        max-width: 80px;
+        padding: 0 4px;
+    }
+}
+
+@media (max-width: 400px) {
+    .option-buttons {
+        font-size: 11px;
+        height: 32px;
+        min-width: 50px;
+        max-width: 70px;
+        padding: 0 3px;
     }
 }
 
@@ -278,6 +543,21 @@
   display: flex; /* ← flexが指定されているので横幅制御が特に重要 */
   box-sizing: border-box;
   max-width: 1600px; /* 大画面での最大幅を設定 */
+}
+
+/* 再分類インターフェース用のdisplay-area */
+.display-area.reclassification {
+  margin-top: 15px; /* タブセレクターとの適切な間隔 */
+  height: calc(100vh - 200px); /* ビューポート高さを適切に調整 */
+  padding-top: 0; /* 上部パディングを削除 */
+}
+
+/* 550px付近での再分類インターフェース調整 */
+@media (max-width: 600px) and (min-width: 480px) {
+  .display-area.reclassification {
+    margin-top: 20px; /* より大きなマージンで確実に分離 */
+    height: calc(100vh - 220px); /* 高さを調整してスペースを確保 */
+  }
 }
 
 /* 分類結果一覧表示と再分類時のスクロール無効化 */
@@ -324,6 +604,7 @@ background-color: #3453b3;
 
 .clustering-buttons{
     background-color: #66ccaa;
+    width: 200px;
 }
 
 /* レスポンシブ対応 */
