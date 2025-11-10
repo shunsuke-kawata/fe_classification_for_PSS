@@ -1,6 +1,6 @@
 .dnd-finder-div-main {
     width: 100%;
-    height: 100%; /* 親要素の高さに合わせる */
+    height: 700px; /* 大画面では大きめの高さを設定 */
     display: flex;
     flex-direction: column;
     border: 1px solid #e1e5e9; /* より柔らかい境界線 */
@@ -8,8 +8,58 @@
     background-color: #ffffff; /* 純白の背景 */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); /* 軽い影を追加 */
     min-width: 400px; /* 最小幅を拡大 */
-    max-width: 800px; /* 最大幅を拡大 */
+    max-width: 900px; /* 最大幅をさらに拡大 */
     box-sizing: border-box;
+    margin-top: 5px; /* タブセレクトに近づけるためmargin-topを削減 */
+    position: relative; /* positionを明示的に設定 */
+    z-index: 2; /* タブやボタンより上に */
+    overflow: hidden; /* 子要素がはみ出ないようにする */
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1400px) {
+    .dnd-finder-div-main {
+        height: 650px; /* 適切な高さに変更 */
+        max-width: 800px;
+        min-width: 350px;
+        margin-top: 8px; /* margin-topを小さく */
+    }
+}
+
+@media (max-width: 1200px) {
+    .dnd-finder-div-main {
+        height: 600px; /* 適切な高さに変更 */
+        max-width: 700px;
+        min-width: 320px;
+        margin-top: 10px; /* margin-topを小さく */
+    }
+}
+
+@media (max-width: 768px) {
+    .dnd-finder-div-main {
+@media (max-width: 768px) {
+    .dnd-finder-div-main {
+        height: 500px; /* モバイルでは適度な高さ */
+        width: 100%;
+        max-width: none;
+        min-width: 280px;
+        margin-top: 12px; /* margin-topを小さく */
+    }
+}
+
+@media (max-width: 600px) {
+    .dnd-finder-div-main {
+        height: 450px; /* より小さな画面では高さを調整 */
+        margin-top: 15px; /* margin-topを小さく */
+    }
+}
+
+@media (max-width: 480px) {
+    .dnd-finder-div-main {
+        height: 400px; /* 最小画面サイズでは適切な高さ */
+        margin-top: 18px; /* margin-topを小さく */
+        min-width: 250px;
+    }
 }
 
 .dnd-finder-header {
@@ -19,6 +69,9 @@
     height: 36px; /* 固定の高さを小さく */
     display: flex;
     align-items: center;
+    position: relative; /* positionを明示的に設定 */
+    z-index: 5; /* 他の要素より上に表示 */
+    border-radius: 8px 8px 0 0; /* 上部の角を丸くしてメインコンテナに合わせる */
 }
 
 .dnd-finder-controls {
@@ -66,24 +119,6 @@
     border-color: #e5e7eb;
 }
 
-.select-all-btn {
-    padding: 8px 16px;
-    border: 1px solid #4a90e2;
-    border-radius: 6px;
-    background-color: #ffffff;
-    color: #4a90e2;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-}
-
-.select-all-btn:hover {
-    background-color: #f0f7ff;
-    border-color: #357abd;
-    color: #357abd;
-}
-
 .selection-count {
     color: #4a90e2;
     font-size: 14px;
@@ -127,25 +162,6 @@
     background-color: #fff8f0;
     border-color: #e66600;
     color: #e66600;
-}
-
-.delete-folders-btn {
-    padding: 8px 16px;
-    border: 1px solid #ff002b;
-    border-radius: 6px;
-    background-color: #ffffff;
-    color: #ff002b;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    margin-left: 10px;
-}
-
-.delete-folders-btn:hover {
-    background-color: #fff8f0;
-    border-color: #e60026;
-    color: #e60026;
 }
 
 /* ボタンテキストのレスポンシブ制御 */
@@ -196,10 +212,8 @@
     }
     
     .multi-select-btn, 
-    .select-all-btn,
     .merge-folders-btn, 
-    .move-to-parent-btn,
-    .delete-folders-btn {
+    .move-to-parent-btn {
         padding: 6px 12px;
         font-size: 13px;
         margin-left: 5px;
@@ -224,10 +238,8 @@
     }
     
     .multi-select-btn, 
-    .select-all-btn,
     .merge-folders-btn, 
-    .move-to-parent-btn,
-    .delete-folders-btn {
+    .move-to-parent-btn {
         padding: 5px 10px;
         font-size: 12px;
         margin-left: 4px;
@@ -266,10 +278,8 @@
     }
     
     .multi-select-btn, 
-    .select-all-btn,
     .merge-folders-btn, 
-    .move-to-parent-btn,
-    .delete-folders-btn {
+    .move-to-parent-btn {
         padding: 4px 8px;
         font-size: 11px;
         margin-left: 2px;
@@ -329,16 +339,8 @@
         flex-shrink: 0;
     }
     
-    .select-all-btn {
-        padding: 3px 6px;
-        font-size: 10px;
-        margin-left: 0;
-        flex-shrink: 0;
-    }
-    
     .merge-folders-btn, 
-    .move-to-parent-btn,
-    .delete-folders-btn {
+    .move-to-parent-btn {
         padding: 3px 5px;
         font-size: 9px;
         margin-left: 0;
@@ -386,13 +388,8 @@
         content: "↑";
     }
     
-    .delete-folders-btn .btn-short-text::after {
-        content: "削除";
-    }
-    
     .merge-folders-btn .btn-short-text,
-    .move-to-parent-btn .btn-short-text,
-    .delete-folders-btn .btn-short-text {
+    .move-to-parent-btn .btn-short-text {
         display: none;
     }
 }

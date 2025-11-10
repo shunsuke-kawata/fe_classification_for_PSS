@@ -1,24 +1,43 @@
 .dnd-interface-div-main {
     width: 100%;
-    margin-top: 20px;
-    height: calc(100vh - 220px); /* ビューポート高さからヘッダーやマージン分を引く（少し余裕を持たせる） */
+    height: calc(100vh - 200px); /* 高さを調整してFinderが収まるように */
     display: flex;
     justify-content: center;
     align-items: flex-start;
     gap: 20px;
-    padding: 0 20px;
+    padding: 5px 20px; /* 上部パディングをさらに小さく */
     box-sizing: border-box;
     max-width: 1800px; /* 大画面での最大幅を設定 */
     margin-left: auto;
     margin-right: auto;
+    overflow: visible; /* スクロール可能にする */
+    position: relative; /* z-indexを有効にするためのposition設定 */
+    z-index: 1; /* 他の要素より下に配置 */
+    margin-top: 10px; /* 全体的にタブセレクトに近づける */
 }
 
 /* レスポンシブ対応 */
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     .dnd-interface-div-main {
         gap: 15px;
         padding: 0 15px;
-        height: calc(100vh - 200px); /* ビューポート高さからヘッダーやマージン分を引く */
+        height: calc(100vh - 220px);
+    }
+}
+
+@media (max-width: 1200px) {
+    .dnd-interface-div-main {
+        gap: 12px;
+        padding: 0 12px;
+        height: calc(100vh - 240px);
+    }
+}
+
+@media (max-width: 1024px) {
+    .dnd-interface-div-main {
+        gap: 10px;
+        padding: 0 10px;
+        height: calc(100vh - 260px);
     }
 }
 
@@ -26,19 +45,48 @@
     .dnd-interface-div-main {
         flex-direction: column;
         gap: 15px;
-        padding: 0 10px;
-        height: calc(100vh - 180px); /* ビューポート高さからヘッダーやマージン分を引く */
-        align-items: center; /* 中央揃え */
+        padding: 0 8px;
+        height: calc(100vh - 240px);
+        align-items: center;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 1; /* z-indexを維持 */
     }
 }
 
-@media (max-width: 480px) {
+/* 770px~590px幅での重複対策 */
+@media (max-width: 770px) and (min-width: 590px) {
+    .dnd-interface-div-main {
+        height: calc(100vh - 280px); /* 高さを調整 */
+        z-index: 1; /* z-indexを明示的に設定 */
+        position: relative;
+    }
+}
+
+@media (max-width: 600px) {
     .dnd-interface-div-main {
         gap: 10px;
         padding: 0 5px;
-        margin-top: 10px;
-        height: calc(100vh - 160px); /* ビューポート高さからヘッダーやマージン分を引く */
-        align-items: center; /* 中央揃え */
+        height: calc(100vh - 220px);
+        margin-top: 20px; /* 固定値に統一 */
     }
 }
 
+
+@media (max-width: 560px) {
+    .dnd-interface-div-main {
+        gap: 8px;
+        padding: 0 3px;
+        height: calc(100vh - 200px);
+        margin-top: 20px; /* 固定値に統一 */
+    }
+}
+
+@media (max-width: 580px) {
+    .dnd-interface-div-main {
+        gap: 8px;
+        padding: 0 3px;
+        height: calc(100vh - 200px);
+        margin-top: 20px; /* 固定値に統一 */
+    }
+}

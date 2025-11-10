@@ -1,11 +1,33 @@
 .list-view-main{
     width: 100%;
-    height: calc(100%); /* ヘッダー(36px) + ブレッドクラム(48px)分を引く */
+    height: 100%; /* 親コンテナーの残り高さを使用 */
     border: 0.5px #e1e5e9 solid;
     overflow-y: auto;
     flex: 1; /* 残りのスペースを占有 */
     background-color: #ffffff;
     box-sizing: border-box;
+    /* スクロールバーのカスタマイズ */
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Webkitベースブラウザ用スクロールバーカスタマイズ */
+.list-view-main::-webkit-scrollbar {
+    width: 8px;
+}
+
+.list-view-main::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.list-view-main::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.list-view-main::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
 .list-view-item{
@@ -14,7 +36,6 @@
     justify-content: flex-start;
     align-items: center;
     padding-left:10px;
-    position: relative;
 }
 
 .list-view-item-odd{
@@ -38,7 +59,7 @@
 .dnd-image-file-view-main {
   border: 0.5px #e1e5e9 solid;
   width: 100%;
-  height: calc(100% - 84px); /* ヘッダー(36px) + ブレッドクラム(48px)分を引く */
+  height: 100%; /* 親コンテナーの残り高さを使用 */
   overflow-y: auto;
   display: flex;
   flex-wrap: wrap;
@@ -49,6 +70,28 @@
   background-color: #ffffff;
   padding: 10px;
   box-sizing: border-box;
+  /* スクロールバーのカスタマイズ */
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Webkitベースブラウザ用スクロールバーカスタマイズ */
+.dnd-image-file-view-main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dnd-image-file-view-main::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.dnd-image-file-view-main::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.dnd-image-file-view-main::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .dnd-listview-div-main {
@@ -111,6 +154,31 @@
   height: 120px;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+/* 大画面での画像表示サイズ拡大 */
+@media (min-width: 1400px) {
+  .dnd-folder-icon-item {
+    width: 140px; /* 大画面では幅を拡大 */
+    height: 160px; /* 大画面では高さを拡大 */
+  }
+  
+  .dnd-image-file-view-main {
+    gap: 25px 15px; /* 大画面では間隔も広げる */
+    padding: 15px; /* パディングも拡大 */
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .dnd-folder-icon-item {
+    width: 120px; /* 中画面では中間サイズ */
+    height: 140px;
+  }
+  
+  .dnd-image-file-view-main {
+    gap: 22px 12px;
+    padding: 12px;
+  }
 }
 
 .dnd-folder-icon-item:hover {
@@ -451,155 +519,5 @@
     width: 16px;
     height: 16px;
     font-size: 10px;
-  }
-}
-
-/* 3点リーダーメニューのスタイル */
-.list-view-item {
-  position: relative;
-}
-
-.context-menu-button {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 16px;
-  color: #6c757d;
-  transition: all 0.2s ease;
-  opacity: 0;
-  visibility: hidden;
-}
-
-.list-view-item:hover .context-menu-button {
-  opacity: 1;
-  visibility: visible;
-}
-
-.context-menu-button:hover {
-  background-color: #f8f9fa;
-  color: #495057;
-}
-
-.context-menu-button:active {
-  background-color: #e9ecef;
-}
-
-.context-menu {
-  position: absolute;
-  right: 8px;
-  top: 100%;
-  background: white;
-  border: 1px solid #dee2e6;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  min-width: 140px;
-  z-index: 1000;
-  overflow: hidden;
-}
-
-.context-menu button {
-  display: block;
-  width: 100%;
-  padding: 8px 12px;
-  border: none;
-  background: none;
-  text-align: left;
-  cursor: pointer;
-  font-size: 14px;
-  color: #495057;
-  transition: background-color 0.15s ease;
-}
-
-.context-menu button:hover {
-  background-color: #f8f9fa;
-}
-
-.context-menu button:first-child {
-  border-bottom: 1px solid #dee2e6;
-}
-
-.context-menu button:last-child {
-  color: #1A2421;
-}
-
-.context-menu button:last-child:hover {
-  background-color: #fff5f5;
-}
-
-/* 編集モード用スタイル */
-.folder-name-input {
-  padding: 1px 2px;
-  border: 1px solid #dee2e6;
-  border-radius: 3px;
-  font-size: 14px;
-  background-color: #ffffff;
-  margin-left: 10px;
-  width: 250px;
-  height: 18px;
-  box-sizing: border-box;
-  color: #495057;
-  flex: 0 0 auto;
-}
-
-.folder-name-input:focus {
-  outline: none;
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 1px rgba(74, 144, 226, 0.15);
-}
-
-.edit-buttons-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  margin-left: auto;
-  padding-right: 8px;
-  flex: 0 0 auto;
-}
-
-.edit-confirm-btn, .edit-cancel-btn {
-  padding: 4px 8px;
-  border: 1px solid #4a90e2;
-  border-radius: 4px;
-  background-color: #ffffff;
-  color: #4a90e2;
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  min-width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.edit-confirm-btn:hover {
-  background-color: #f0f7ff;
-  border-color: #357abd;
-  color: #357abd;
-}
-
-.edit-cancel-btn:hover {
-  background-color: #f8f9fa;
-  border-color: #6c757d;
-  color: #6c757d;
-}
-
-/* 編集モードのレスポンシブ対応 */
-@media (max-width: 768px) {
-  .folder-name-input {
-    width: 180px;
-  }
-}
-
-@media (max-width: 480px) {
-  .folder-name-input {
-    width: 150px;
   }
 }
