@@ -31,6 +31,7 @@ type projectType = {
   root_folder_id: string;
   original_images_folder_path: string;
   init_clustering_state: number;
+  continuous_clustering_state: number;
   mongo_result_id: string;
   joined: boolean;
 };
@@ -239,6 +240,21 @@ const executeInitClustering = async (project_id: number, user_id: number) => {
   }
 };
 
+const executeContinuousClustering = async (
+  project_id: number,
+  user_id: number
+) => {
+  try {
+    const url = `${config.backend_base_url}/action/clustering/continuous/${project_id}?user_id=${user_id}`;
+    const response = await axios.get(url);
+    return response;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+  }
+};
+
 const getClusteringResult = async (mongo_result_id: string) => {
   try {
     const url = `${config.backend_base_url}/action/clustering/result/${mongo_result_id}`;
@@ -363,6 +379,61 @@ const renameFolderOrFile = async (
   }
 };
 
+// プロジェクト内の全ユーザーのcontinuous_clustering_stateを更新（画像アップロード時）
+const updateAllMembersContinuousState = async (project_id: number) => {
+  try {
+    const url = `${config.backend_base_url}/project_memberships/state/${project_id}`;
+    const response = await axios.put(url);
+    return response.data;
+  } catch (error) {
+    console.error("continuous_clustering_state更新エラー:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
+// 初期クラスタリング完了ユーザー一覧を取得
+const getCompletedClusteringUsers = async (project_id: number) => {
+  try {
+    const url = `${config.backend_base_url}/project_memberships/completed_users/${project_id}`;
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("完了ユーザー取得エラー:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
+// クラスタリングデータをコピー
+const copyClusteringData = async (
+  source_user_id: number,
+  target_user_id: number,
+  project_id: number
+) => {
+  try {
+    const url = `${config.backend_base_url}/action/clustering/copy`;
+    const response = await axios.post(url, null, {
+      params: {
+        source_user_id,
+        target_user_id,
+        project_id,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("データコピーエラー:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
 export {
   getData,
   getProject,
@@ -375,8 +446,12 @@ export {
   executeLogin,
   executeJoinProject,
   executeInitClustering,
+  executeContinuousClustering,
   getClusteringResult,
   moveClusteringItems,
   deleteEmptyFolders,
   renameFolderOrFile,
+  updateAllMembersContinuousState,
+  getCompletedClusteringUsers,
+  copyClusteringData,
 };

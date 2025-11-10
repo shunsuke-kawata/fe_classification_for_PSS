@@ -1,10 +1,20 @@
-.breadcrumbs {
+.dnd-breadcrumbs {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center; /* ← これで親 flex の子は縦中央に */
   padding: 6px 12px;
   background-color: #ebe9e6;
   /* border:0.5px #a9a9a9 solid;s */
+}
+
+.breadcrumbs-left {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumbs-right {
+  display: flex;
+  align-items: center;
 }
 
 .breadcrumb-item {
@@ -45,4 +55,64 @@
   color: #666;
   font-size: 12px;
   margin-left: 4px;
+}
+
+/* フォルダ作成ボタン */
+.create-folder-btn {
+  padding: 6px 12px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.create-folder-btn:hover {
+  background-color: #357abd;
+}
+
+/* 作成モードのボタンコンテナ */
+.create-mode-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* カテゴリ作成ボタン */
+.create-category-btn {
+  padding: 6px 12px;
+  background-color: #FFFFFF;
+  color: #28a745;
+  border: 1px solid #28a745;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ファイル作成ボタン */
+.create-file-btn {
+  padding: 6px 12px;
+  background-color: #FFFFFF;
+  color: #fd7e14;
+  border: 1px solid #fd7e14;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* キャンセルボタン */
+.cancel-btn {
+  padding: 6px 12px;
+  background-color: #FFFFFF;
+  color: #6c757d;
+  border: 1px solid #6c757d;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
 }

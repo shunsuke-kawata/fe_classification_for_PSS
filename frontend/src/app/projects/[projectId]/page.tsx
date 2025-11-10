@@ -8,6 +8,9 @@ import {
   projectType,
   getImagesInProject,
   executeInitClustering,
+  executeContinuousClustering,
+  getCompletedClusteringUsers,
+  copyClusteringData,
 } from "@/api/api";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
@@ -66,6 +69,15 @@ const ProjectDetail: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const loginedUser = getLoginedUser();
   const [imagesInProject, setImagesInProject] = useState<imageInfo[]>([]);
+
+  // データコピー機能用のstate
+  const [isCopyMode, setIsCopyMode] = useState<boolean>(false);
+  const [completedUsers, setCompletedUsers] = useState<any[]>([]);
+  const [selectedSourceUserId, setSelectedSourceUserId] = useState<
+    number | null
+  >(null);
+  const [isLoadingCopy, setIsLoadingCopy] = useState<boolean>(false);
+  const [isOpenCopyPullDown, setIsOpenCopyPullDown] = useState<boolean>(false); // コピーモード専用のプルダウン状態
 
   // クエリパラメータを更新する関数
   const updateQueryParam = (
@@ -208,6 +220,43 @@ const ProjectDetail: React.FC = () => {
     closePulldown();
   };
 
+  // データコピーボタンのクリック処理
+  const handleCopyButtonClick = async () => {
+    // コピーモードに入る - 完了ユーザーを取得
+    setIsLoadingCopy(true);
+    try {
+      const response = await getCompletedClusteringUsers(Number(projectId));
+      if (response && response.data) {
+        // 自分以外のユーザーをフィルタリング
+        const otherUsers = response.data.filter(
+          (user: any) => user.user_id !== loginedUser.id
+        );
+        if (otherUsers.length === 0) {
+          alert("コピー可能なユーザーが見つかりませんでした");
+          return;
+        }
+        setCompletedUsers(otherUsers);
+        setIsCopyMode(true);
+        setIsOpenCopyPullDown(false); // コピーモード専用のプルダウンを閉じる
+      } else {
+        alert("完了したユーザーが見つかりませんでした");
+      }
+    } catch (error) {
+      console.error("完了ユーザー取得エラー:", error);
+      alert("完了したユーザーの取得に失敗しました");
+    } finally {
+      setIsLoadingCopy(false);
+    }
+  };
+
+  // コピーモードをキャンセル
+  const handleCancelCopyMode = () => {
+    setIsCopyMode(false);
+    setSelectedSourceUserId(null);
+    setCompletedUsers([]);
+    setIsOpenCopyPullDown(false); // コピーモード専用のプルダウンを閉じる
+  };
+
   if (isLoading) {
     return (
       <>
@@ -223,7 +272,7 @@ const ProjectDetail: React.FC = () => {
         <>
           <div
             className={`project-detail-main ${
-              displayStatus === "group" || displayStatus === "reclassification"
+              ["group", "reclassification"].includes(displayStatus)
                 ? "no-scroll"
                 : ""
             }`}
@@ -288,38 +337,183 @@ const ProjectDetail: React.FC = () => {
                     />
                   </>
                 ) : displayStatus === "group" ? (
-                  <input
-                    type="button"
-                    className={
-                      project.init_clustering_state ===
-                        clusteringStatus.Executing ||
-                      project.init_clustering_state ===
-                        clusteringStatus.Finished ||
-                      imagesInProject.length === 0
-                        ? "option-buttons locked-clustering-buttons"
-                        : "option-buttons clustering-buttons"
-                    }
-                    value="初期クラスタリング"
-                    disabled={
-                      project.init_clustering_state ===
-                        clusteringStatus.Executing ||
-                      project.init_clustering_state ===
-                        clusteringStatus.Finished ||
-                      imagesInProject.length === 0
-                    }
-                    onClick={
-                      typeof loginedUser.id === "number" &&
-                      imagesInProject.length > 0
-                        ? () => {
-                            executeInitClustering(
-                              project.id,
-                              loginedUser.id as number
-                            );
-                            window.location.reload();
+                  <>
+                    {!isCopyMode ? (
+                      <>
+                        <input
+                          type="button"
+                          className={
+                            project.init_clustering_state ===
+                              clusteringStatus.Executing ||
+                            project.init_clustering_state ===
+                              clusteringStatus.Finished ||
+                            imagesInProject.length === 0
+                              ? "option-buttons locked-clustering-buttons"
+                              : "option-buttons clustering-buttons"
                           }
-                        : () => {}
-                    }
-                  />
+                          value="初期"
+                          disabled={
+                            project.init_clustering_state ===
+                              clusteringStatus.Executing ||
+                            project.init_clustering_state ===
+                              clusteringStatus.Finished ||
+                            imagesInProject.length === 0
+                          }
+                          onClick={
+                            typeof loginedUser.id === "number" &&
+                            imagesInProject.length > 0
+                              ? () => {
+                                  executeInitClustering(
+                                    project.id,
+                                    loginedUser.id as number
+                                  );
+                                  window.location.reload();
+                                }
+                              : () => {}
+                          }
+                        />
+                        {project.init_clustering_state ===
+                          clusteringStatus.Finished &&
+                          project.continuous_clustering_state === 2 && (
+                            <input
+                              type="button"
+                              className="option-buttons clustering-buttons"
+                              value="継続的"
+                              onClick={
+                                typeof loginedUser.id === "number"
+                                  ? () => {
+                                      executeContinuousClustering(
+                                        project.id,
+                                        loginedUser.id as number
+                                      );
+                                      window.location.reload();
+                                    }
+                                  : () => {}
+                              }
+                              style={{ marginLeft: "10px" }}
+                            />
+                          )}
+                        {project.init_clustering_state !==
+                          clusteringStatus.Finished && (
+                          <input
+                            type="button"
+                            className="option-buttons clustering-buttons"
+                            value="データをコピー"
+                            disabled={isLoadingCopy}
+                            onClick={handleCopyButtonClick}
+                            style={{ marginLeft: "10px" }}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                        }}
+                      >
+                        <div className="select-display-status">
+                          <label className="select-status-label">
+                            {selectedSourceUserId
+                              ? completedUsers.find(
+                                  (u: any) => u.user_id === selectedSourceUserId
+                                )?.user_name || "ユーザを選択"
+                              : "ユーザを選択"}
+                          </label>
+                          <img
+                            className="pulldown-icon"
+                            src={
+                              isOpenCopyPullDown
+                                ? "/assets/pulldown-open-icon.svg"
+                                : "/assets/pulldown-icon.svg"
+                            }
+                            alt=""
+                            onClick={() =>
+                              setIsOpenCopyPullDown(!isOpenCopyPullDown)
+                            }
+                          />
+                          {isOpenCopyPullDown && (
+                            <div className="select-status-menu">
+                              {completedUsers.map((user: any) => (
+                                <div
+                                  key={user.user_id}
+                                  onClick={() => {
+                                    setSelectedSourceUserId(user.user_id);
+                                    setIsOpenCopyPullDown(false);
+                                  }}
+                                >
+                                  <label className="menu-content">
+                                    <span>
+                                      {user.user_name} ({user.user_email})
+                                    </span>
+                                    {user.user_id === selectedSourceUserId && (
+                                      <img
+                                        className="checked-icon"
+                                        src="/assets/checked-icon.svg"
+                                        alt=""
+                                      />
+                                    )}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <input
+                          type="button"
+                          className="option-buttons clustering-buttons"
+                          value="コピー"
+                          disabled={!selectedSourceUserId || isLoadingCopy}
+                          onClick={async () => {
+                            if (!selectedSourceUserId) {
+                              alert("コピー元のユーザーを選択してください");
+                              return;
+                            }
+
+                            if (
+                              !confirm(
+                                "選択したユーザーのデータをコピーしますか？"
+                              )
+                            ) {
+                              return;
+                            }
+
+                            setIsLoadingCopy(true);
+                            try {
+                              const response = await copyClusteringData(
+                                selectedSourceUserId,
+                                loginedUser.id as number,
+                                Number(projectId)
+                              );
+
+                              if (
+                                response &&
+                                response.message ===
+                                  "succeeded to copy clustering data"
+                              ) {
+                                alert("データのコピーが完了しました");
+                                window.location.reload();
+                              } else {
+                                alert("データのコピーに失敗しました");
+                              }
+                            } catch (error) {
+                              console.error("データコピーエラー:", error);
+                              alert("データのコピーに失敗しました");
+                            } finally {
+                              setIsLoadingCopy(false);
+                            }
+                          }}
+                        />
+                        <input
+                          type="button"
+                          className="option-buttons delete-buttons"
+                          value="キャンセル"
+                          onClick={handleCancelCopyMode}
+                        />
+                      </div>
+                    )}
+                  </>
                 ) : (
                   ""
                 )}
@@ -333,8 +527,7 @@ const ProjectDetail: React.FC = () => {
                 </div> */}
                 <div
                   className={`display-area ${
-                    displayStatus === "group" ||
-                    displayStatus === "reclassification"
+                    ["group", "reclassification"].includes(displayStatus)
                       ? "no-scroll"
                       : ""
                   }`}

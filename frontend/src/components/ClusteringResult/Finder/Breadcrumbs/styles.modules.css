@@ -1,7 +1,7 @@
 .breadcrumbs {
   display: flex;
   justify-content: flex-start;
-  align-items: center;
+  align-items:flex-start;
   padding: 10px 12px;
   background-color: #ebe9e6;
   border: 0.5px #a9a9a9 solid;

@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { newImageType, postImage } from "@/api/api";
+import {
+  newImageType,
+  postImage,
+  updateAllMembersContinuousState,
+} from "@/api/api";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, selectUser } from "@/lib/store";
 
@@ -184,11 +188,18 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
   const uploadImages = async () => {
     if (!uploadingImages) return;
 
+    let hasSuccessfulUpload = false;
+
     // 逐次実行で0.5秒間隔を設ける
     for (let i = 0; i < uploadingImages.length; i++) {
       const imageData = uploadingImages[i];
 
-      const _ = await uploadSingleImage(imageData, i);
+      const success = await uploadSingleImage(imageData, i);
+
+      // 少なくとも1つ成功した場合はフラグを立てる
+      if (success) {
+        hasSuccessfulUpload = true;
+      }
 
       // 次のリクエストまで0.01秒待機（最後のファイル以外）
       if (i < uploadingImages.length - 1) {
@@ -197,6 +208,20 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
     }
 
     console.log(`🎉 全てのアップロード処理完了`);
+
+    // 少なくとも1つの画像が正常にアップロードされた場合、continuous_clustering_stateを更新
+    if (hasSuccessfulUpload) {
+      try {
+        console.log(
+          `📤 プロジェクト${projectId}の全メンバーのcontinuous_clustering_stateを更新中...`
+        );
+        await updateAllMembersContinuousState(projectId);
+        console.log(`✅ continuous_clustering_state更新完了`);
+      } catch (error) {
+        console.error(`❌ continuous_clustering_state更新に失敗:`, error);
+        // エラーが発生してもアップロード自体は成功しているため、処理は続行
+      }
+    }
 
     setIsUploading(false);
     setUploadModalStatus("finish");
