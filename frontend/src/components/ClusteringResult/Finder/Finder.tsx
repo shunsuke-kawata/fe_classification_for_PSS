@@ -21,6 +21,8 @@ interface finderProps {
   currentFolder?: string | null;
   onCurrentFolderChange?: (currentFolderId: string) => void;
   mongo_result_id?: string;
+  selectedClusteringCount?: number | null;
+  imageClusteringCounts?: { [clustering_id: string]: number };
 }
 
 const Finder: React.FC<finderProps> = ({
@@ -29,6 +31,8 @@ const Finder: React.FC<finderProps> = ({
   currentFolder,
   onCurrentFolderChange,
   mongo_result_id,
+  selectedClusteringCount,
+  imageClusteringCounts,
 }: finderProps) => {
   const topLevelId = getTopLevelFolderId(result);
 
@@ -162,6 +166,8 @@ const Finder: React.FC<finderProps> = ({
             originalImageFolderPath={originalImageFolderPath}
             selectedImagePath={selectedImagePath}
             onImageSelect={handleImageSelect}
+            selectedClusteringCount={selectedClusteringCount}
+            imageClusteringCounts={imageClusteringCounts}
           />
         </div>
       </div>

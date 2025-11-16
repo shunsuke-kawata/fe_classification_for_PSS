@@ -11,6 +11,8 @@ import {
   executeContinuousClustering,
   getCompletedClusteringUsers,
   copyClusteringData,
+  downloadClassificationResult,
+  getClusteringCounts,
 } from "@/api/api";
 import { useEffect, useState, useRef } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
@@ -69,6 +71,19 @@ const ProjectDetail: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const loginedUser = getLoginedUser();
   const [imagesInProject, setImagesInProject] = useState<imageInfo[]>([]);
+
+  // クラスタリング回数フィルタ関連
+  const [availableClusteringCounts, setAvailableClusteringCounts] = useState<
+    number[]
+  >([]);
+  const [imageClusteringCountsMap, setImageClusteringCountsMap] = useState<{
+    [clustering_id: string]: number;
+  }>({});
+  const [selectedClusteringCount, setSelectedClusteringCount] = useState<
+    number | null
+  >(null);
+  const [isCountDropdownOpen, setIsCountDropdownOpen] =
+    useState<boolean>(false);
 
   // データコピー機能用のstate
   const [isCopyMode, setIsCopyMode] = useState<boolean>(false);
@@ -195,6 +210,24 @@ const ProjectDetail: React.FC = () => {
     fetchProject(loginedUser.id);
     fetchImagesInProject();
 
+    // クラスタリング回数情報を取得
+    const fetchCounts = async () => {
+      try {
+        const countsRes = await getClusteringCounts(
+          Number(projectId),
+          loginedUser.id as number
+        );
+        if (countsRes && countsRes.data) {
+          setAvailableClusteringCounts(countsRes.data.available_counts || []);
+          setImageClusteringCountsMap(countsRes.data.image_counts || {});
+        }
+      } catch (error) {
+        console.error("クラスタリング回数情報の取得に失敗しました:", error);
+      }
+    };
+
+    fetchCounts();
+
     if (!projectId) {
       router.push("/projects");
     }
@@ -247,6 +280,15 @@ const ProjectDetail: React.FC = () => {
     } finally {
       setIsLoadingCopy(false);
     }
+  };
+
+  // プルダウン用ラベル取得
+  const getCountLabel = (count: number | null) => {
+    if (count === null) return "全て";
+    // 初期分類は 0 としてそのまま表示
+    if (count === 0) return "0";
+    // それ以外は数値のみ表示
+    return `${count}`;
   };
 
   // コピーモードをキャンセル
@@ -340,6 +382,100 @@ const ProjectDetail: React.FC = () => {
                   <>
                     {!isCopyMode ? (
                       <>
+                        {/* クラスタリング回数プルダウン（ダウンロードボタンの左） */}
+                        {availableClusteringCounts &&
+                          availableClusteringCounts.length > 0 && (
+                            <div
+                              className="count-pulldown"
+                              style={{
+                                display: "inline-block",
+                                marginRight: "10px",
+                              }}
+                            >
+                              <div className="select-display-status">
+                                <label className="select-status-label">
+                                  {getCountLabel(selectedClusteringCount)}
+                                </label>
+                                <img
+                                  className="pulldown-icon"
+                                  src={
+                                    isCountDropdownOpen
+                                      ? "/assets/pulldown-open-icon.svg"
+                                      : "/assets/pulldown-icon.svg"
+                                  }
+                                  alt=""
+                                  onClick={() =>
+                                    setIsCountDropdownOpen(!isCountDropdownOpen)
+                                  }
+                                />
+                                {isCountDropdownOpen && (
+                                  <div className="select-status-menu">
+                                    <div
+                                      onClick={() => {
+                                        setSelectedClusteringCount(null);
+                                        setIsCountDropdownOpen(false);
+                                      }}
+                                    >
+                                      <label className="menu-content">
+                                        <span>全て</span>
+                                        {selectedClusteringCount === null && (
+                                          <img
+                                            className="checked-icon"
+                                            src="/assets/checked-icon.svg"
+                                            alt=""
+                                          />
+                                        )}
+                                      </label>
+                                    </div>
+                                    {availableClusteringCounts.map((count) => (
+                                      <div
+                                        key={count}
+                                        onClick={() => {
+                                          setSelectedClusteringCount(count);
+                                          setIsCountDropdownOpen(false);
+                                        }}
+                                      >
+                                        <label className="menu-content">
+                                          <span>{getCountLabel(count)}</span>
+                                          {selectedClusteringCount ===
+                                            count && (
+                                            <img
+                                              className="checked-icon"
+                                              src="/assets/checked-icon.svg"
+                                              alt=""
+                                            />
+                                          )}
+                                        </label>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        {/* ダウンロードボタン - 初期クラスタリング完了時のみ表示 */}
+                        {project.init_clustering_state ===
+                          clusteringStatus.Finished && (
+                          <input
+                            type="button"
+                            className="option-buttons clustering-buttons"
+                            value="ダウンロード"
+                            onClick={async () => {
+                              if (typeof loginedUser.id !== "number") return;
+                              try {
+                                await downloadClassificationResult(
+                                  project.id,
+                                  loginedUser.id,
+                                  project.name
+                                );
+                              } catch (error) {
+                                console.error("ダウンロードエラー:", error);
+                                alert("ダウンロードに失敗しました");
+                              }
+                            }}
+                            style={{ width: "auto", padding: "0 10px" }}
+                          />
+                        )}
                         <input
                           type="button"
                           className={
@@ -371,6 +507,11 @@ const ProjectDetail: React.FC = () => {
                                 }
                               : () => {}
                           }
+                          style={{
+                            marginLeft: "10px",
+                            width: "auto",
+                            padding: "0 10px",
+                          }}
                         />
                         {project.init_clustering_state ===
                           clusteringStatus.Finished &&
@@ -390,7 +531,11 @@ const ProjectDetail: React.FC = () => {
                                     }
                                   : () => {}
                               }
-                              style={{ marginLeft: "10px" }}
+                              style={{
+                                marginLeft: "10px",
+                                width: "auto",
+                                padding: "0 10px",
+                              }}
                             />
                           )}
                         {project.init_clustering_state !==
@@ -398,10 +543,14 @@ const ProjectDetail: React.FC = () => {
                           <input
                             type="button"
                             className="option-buttons clustering-buttons"
-                            value="データをコピー"
+                            value="コピー"
                             disabled={isLoadingCopy}
                             onClick={handleCopyButtonClick}
-                            style={{ marginLeft: "10px" }}
+                            style={{
+                              marginLeft: "10px",
+                              width: "auto",
+                              padding: "0 10px",
+                            }}
                           />
                         )}
                       </>
@@ -547,6 +696,10 @@ const ProjectDetail: React.FC = () => {
                 originalImageFolderPath={project.original_images_folder_path}
                 currentFolder={searchParams.get("c_folder")}
                 onCurrentFolderChange={handleCurrentFolderChange}
+                projectId={project.id}
+                userId={loginedUser.id as number}
+                selectedClusteringCount={selectedClusteringCount}
+                imageClusteringCounts={imageClusteringCountsMap}
               />
             ) : displayStatus === "reclassification" ? (
               <ReclassificationInterface

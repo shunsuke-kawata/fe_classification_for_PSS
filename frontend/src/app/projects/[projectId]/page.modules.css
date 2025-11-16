@@ -328,6 +328,23 @@
     z-index: 20;
   }
 
+/* カウント用プルダウンを短く表示するための調整 */
+.count-pulldown > .select-display-status {
+    width: 90px; /* 全体幅を短くする */
+    padding: 0 6px;
+}
+
+.count-pulldown > .select-display-status .select-status-label {
+    width: 48px;
+    font-size: 15px;
+    padding-left: 4px;
+}
+
+.count-pulldown .select-status-menu {
+    width: 90px; /* メニューも短く表示 */
+    left: 0px;
+}
+
 /* レスポンシブ対応 */
 @media (max-width: 1024px) {
     .select-status-menu {

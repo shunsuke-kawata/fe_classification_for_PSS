@@ -34,9 +34,6 @@
         margin-top: 10px; /* margin-topを小さく */
     }
 }
-
-@media (max-width: 768px) {
-    .dnd-finder-div-main {
 @media (max-width: 768px) {
     .dnd-finder-div-main {
         height: 500px; /* モバイルでは適度な高さ */

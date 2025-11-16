@@ -1,5 +1,5 @@
 import { clusteringStatus } from "@/config";
-import { getClusteringResult } from "@/api/api";
+import { getClusteringResult, getClusteringCounts } from "@/api/api";
 import { useEffect, useState } from "react";
 import Finder from "./Finder/Finder";
 import "./styles.modules.css";
@@ -11,6 +11,10 @@ type clusteringResultProps = {
   originalImageFolderPath: string;
   currentFolder?: string | null;
   onCurrentFolderChange?: (currentFolderId: string) => void;
+  projectId: number;
+  userId: number;
+  selectedClusteringCount?: number | null;
+  imageClusteringCounts?: { [clustering_id: string]: number };
 };
 
 interface clusteringResultType {
@@ -19,17 +23,32 @@ interface clusteringResultType {
   result: treeNode;
 }
 
+interface ClusteringCountsData {
+  available_counts: number[];
+  image_counts: { [clustering_id: string]: number };
+}
+
 const ClusteringResult: React.FC<clusteringResultProps> = ({
   mongoResultId,
   initClusteringState,
   originalImageFolderPath,
   currentFolder,
   onCurrentFolderChange,
+  projectId,
+  userId,
+  selectedClusteringCount,
+  imageClusteringCounts,
 }: clusteringResultProps) => {
   const [clusteringResult, setClusteringResult] =
     useState<clusteringResultType | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  // 外部から渡されるクラスタリング回数フィルタ (page.tsxから制御される)
+  const selectedCount =
+    typeof selectedClusteringCount !== "undefined"
+      ? selectedClusteringCount
+      : null;
 
   useEffect(() => {
     if (initClusteringState !== clusteringStatus.Finished) return;
@@ -64,9 +83,18 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
     fetchClusteringResult(mongoResultId);
   }, [mongoResultId, initClusteringState]);
 
+  // クラスタリング回数は親コンポーネントから渡されるため、ここでは取得処理を行いません
+
   useEffect(() => {
     // 状態更新の監視（デバッグ用のログを削除）
   }, [clusteringResult, isLoading, error]);
+
+  // プルダウンの表示ラベルを取得（親から渡された値表示用）
+  const getCountLabel = (count: number | null) => {
+    if (count === null) return "全て";
+    if (count === 0) return "初期分類";
+    return `第${count}回`;
+  };
 
   if (isLoading) {
     return (
@@ -109,6 +137,8 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
   return (
     <>
       <div className="result-div-main">
+        {/* クラスタリング回数フィルタは親コンポーネント(page.tsx)で表示されるためここではUIを表示しない */}
+
         {clusteringResult?.result ? (
           <Finder
             result={
@@ -120,6 +150,8 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
             currentFolder={currentFolder}
             onCurrentFolderChange={onCurrentFolderChange}
             mongo_result_id={mongoResultId}
+            selectedClusteringCount={selectedCount}
+            imageClusteringCounts={imageClusteringCounts || {}}
           />
         ) : (
           <div className="no-data-display">データがありません</div>

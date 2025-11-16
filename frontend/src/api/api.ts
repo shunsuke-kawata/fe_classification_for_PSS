@@ -434,6 +434,57 @@ const copyClusteringData = async (
   }
 };
 
+// 分類結果をダウンロード
+const downloadClassificationResult = async (
+  project_id: number,
+  user_id: number,
+  project_name: string
+) => {
+  try {
+    const url = `${config.backend_base_url}/action/clustering/download/${project_id}`;
+    const response = await axios.get(url, {
+      params: { user_id },
+      responseType: "blob", // ZIPファイルをBlobとして受信
+    });
+
+    // Blobからダウンロードリンクを作成
+    const blob = new Blob([response.data], { type: "application/zip" });
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = `${project_name}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+
+    return { success: true };
+  } catch (error) {
+    console.error("ダウンロードエラー:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
+// クラスタリング回数情報を取得
+const getClusteringCounts = async (project_id: number, user_id: number) => {
+  try {
+    const url = `${config.backend_base_url}/action/clustering/counts/${project_id}`;
+    const response = await axios.get(url, {
+      params: { user_id },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("クラスタリング回数情報取得エラー:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
 export {
   getData,
   getProject,
@@ -454,4 +505,6 @@ export {
   updateAllMembersContinuousState,
   getCompletedClusteringUsers,
   copyClusteringData,
+  downloadClassificationResult,
+  getClusteringCounts,
 };

@@ -901,7 +901,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
                 >
                   {isMultiSelectMode ? "選択解除" : "フォルダ選択"}
                 </button>
-                <button className="select-all-btn" onClick={handleSelectAll}>
+                <button
+                  className="multi-select-btn select-all-btn"
+                  onClick={handleSelectAll}
+                >
                   全て選択
                 </button>
                 {isMultiSelectMode && selectedImages.length > 0 && (
@@ -968,7 +971,10 @@ const DndFinder: React.FC<dndFinderProps> = ({
                 >
                   {isMultiSelectMode ? "選択解除" : "画像選択"}
                 </button>
-                <button className="select-all-btn" onClick={handleSelectAll}>
+                <button
+                  className="multi-select-btn select-all-btn"
+                  onClick={handleSelectAll}
+                >
                   全て選択
                 </button>
                 {isMultiSelectMode && selectedImages.length > 0 && (
