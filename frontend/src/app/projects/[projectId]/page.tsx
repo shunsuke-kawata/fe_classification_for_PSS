@@ -372,11 +372,11 @@ const ProjectDetail: React.FC = () => {
                       value="アップロード"
                       onClick={() => openUploadImageModal()}
                     />
-                    <input
+                    {/* <input
                       type="button"
                       className="option-buttons delete-buttons"
                       value="削除"
-                    />
+                    /> */}
                   </>
                 ) : displayStatus === "group" ? (
                   <>
@@ -613,6 +613,11 @@ const ProjectDetail: React.FC = () => {
                           type="button"
                           className="option-buttons clustering-buttons"
                           value="コピー"
+                          style={{
+                            marginLeft: "10px",
+                            width: "auto",
+                            padding: "0 10px",
+                          }}
                           disabled={!selectedSourceUserId || isLoadingCopy}
                           onClick={async () => {
                             if (!selectedSourceUserId) {

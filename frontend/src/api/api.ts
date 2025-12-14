@@ -485,6 +485,34 @@ const getClusteringCounts = async (project_id: number, user_id: number) => {
   }
 };
 
+// 新しいフォルダを作成
+const createFolder = async (
+  mongo_result_id: string,
+  parent_folder_id: string,
+  is_leaf: boolean
+) => {
+  try {
+    const url = `${config.backend_base_url}/action/folders/${mongo_result_id}`;
+
+    const params = new URLSearchParams();
+    params.append("parent_folder_id", parent_folder_id);
+    params.append("is_leaf", is_leaf.toString());
+
+    const response = await axios.post(url, null, {
+      params: params,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("=== フォルダ作成API呼び出しエラー ===");
+    console.error("error:", error);
+
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
 export {
   getData,
   getProject,
@@ -501,6 +529,7 @@ export {
   getClusteringResult,
   moveClusteringItems,
   deleteEmptyFolders,
+  createFolder,
   renameFolderOrFile,
   updateAllMembersContinuousState,
   getCompletedClusteringUsers,

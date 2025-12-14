@@ -204,6 +204,40 @@ const ListView: React.FC<listViewProps> = ({
     return Object.keys(node.data).length === 0;
   };
 
+  // 文字列を省略する関数（拡張子より前を省略：前8文字 + ... + 後8文字）
+  const truncateFileName = (fileName: string): string => {
+    // 文字列が短い場合は省略しない（8 + 3 + 8 = 19文字以下）
+    if (fileName.length <= 19) {
+      return fileName;
+    }
+
+    // 拡張子を分離
+    const lastDotIndex = fileName.lastIndexOf(".");
+
+    // 拡張子がない、または最初/最後の文字がドットの場合
+    if (lastDotIndex <= 0 || lastDotIndex === fileName.length - 1) {
+      // 拡張子なしの場合は全体を省略対象にする
+      const front = fileName.substring(0, 8);
+      const back = fileName.substring(fileName.length - 8);
+      return front + "..." + back;
+    }
+
+    // 拡張子より前の部分（ベース名）
+    const baseName = fileName.substring(0, lastDotIndex);
+    const extension = fileName.substring(lastDotIndex); // ".png" など
+
+    // ベース名が短い場合は省略しない
+    if (baseName.length <= 16) {
+      return fileName;
+    }
+
+    // ベース名の前8文字と後8文字を取得
+    const front = baseName.substring(0, 8);
+    const back = baseName.substring(baseName.length - 8);
+
+    return front + "..." + back + extension;
+  };
+
   return (
     <div className="list-view-main">
       {folders.map((foldername, idx) => {
@@ -302,8 +336,13 @@ const ListView: React.FC<listViewProps> = ({
               </>
             ) : (
               <>
-                <span className="folder-name-span">
-                  {getFolderName(result, foldername)}
+                <span
+                  className="folder-name-span"
+                  title={getFolderName(result, foldername)}
+                >
+                  {isLeaf
+                    ? truncateFileName(getFolderName(result, foldername))
+                    : getFolderName(result, foldername)}
                   {folderIsLeaf && imageCount > 0 && (
                     <span className="image-count">({imageCount})</span>
                   )}

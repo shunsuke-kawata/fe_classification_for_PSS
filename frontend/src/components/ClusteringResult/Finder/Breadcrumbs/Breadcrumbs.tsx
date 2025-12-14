@@ -83,7 +83,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     return false;
   };
 
-  // 文字列を省略する関数（前3文字 + ... + 後3文字）
+  // 文字列を省略する関数（前8文字 + ... + 後8文字）
   const truncateString = (str: string) => {
     if (!shouldTruncate()) {
       return str;
@@ -95,8 +95,8 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     }
 
     // 明示的に前3文字と後3文字を取得
-    const front = str.substring(0, 3);
-    const back = str.substring(str.length - 3);
+    const front = str.substring(0, 8);
+    const back = str.substring(str.length - 8);
     const result = front + "..." + back;
 
     return result;

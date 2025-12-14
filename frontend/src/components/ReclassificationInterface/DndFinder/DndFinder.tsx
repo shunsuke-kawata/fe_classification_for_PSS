@@ -81,7 +81,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
     fullText: string,
     shortText: string
   ): string => {
-    // 画面幅に基づいてテキストを選択（実際にはCSSで制御）
+    // 画面幅に基づいてテキストを選択(実際にはCSSで制御)
     return fullText;
   };
 
@@ -942,24 +942,26 @@ const DndFinder: React.FC<dndFinderProps> = ({
                   </>
                 )}
                 <div style={{ flex: 1 }}></div>
-                <div className="view-mode-toggle">
-                  <button
-                    className={`view-mode-btn ${
-                      viewMode === "list" ? "active" : ""
-                    }`}
-                    onClick={() => setViewMode("list")}
-                  >
-                    リスト
-                  </button>
-                  <button
-                    className={`view-mode-btn ${
-                      viewMode === "icon" ? "active" : ""
-                    }`}
-                    onClick={() => setViewMode("icon")}
-                  >
-                    アイコン
-                  </button>
-                </div>
+                {!isMultiSelectMode && (
+                  <div className="view-mode-toggle">
+                    <button
+                      className={`view-mode-btn ${
+                        viewMode === "list" ? "active" : ""
+                      }`}
+                      onClick={() => setViewMode("list")}
+                    >
+                      リスト
+                    </button>
+                    <button
+                      className={`view-mode-btn ${
+                        viewMode === "icon" ? "active" : ""
+                      }`}
+                      onClick={() => setViewMode("icon")}
+                    >
+                      アイコン
+                    </button>
+                  </div>
+                )}
               </>
             ) : finderType === "before" && isLeaf(result, selectedFolder) ? (
               <>
@@ -1016,6 +1018,8 @@ const DndFinder: React.FC<dndFinderProps> = ({
           setSelectedFolder={setSelectedFolder}
           topLevelId={topLevelId || undefined}
           result={result}
+          mongo_result_id={mongo_result_id}
+          onFolderMoveComplete={onFolderMoveComplete}
         />
         <DndListView
           finderType={finderType}
