@@ -75,7 +75,6 @@ const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
 
       if (response && response.message === "success") {
         console.log("✅ カテゴリフォルダ作成成功");
-        alert("カテゴリフォルダを作成しました");
 
         setIsCreateMode(false);
 
@@ -121,7 +120,6 @@ const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
 
       if (response && response.message === "success") {
         console.log("✅ ファイルフォルダ作成成功");
-        alert("ファイルフォルダを作成しました");
 
         setIsCreateMode(false);
 
@@ -186,13 +184,15 @@ const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
 
       <div className="breadcrumbs-right">
         {!isCreateMode ? (
-          // 通常モード: フォルダ作成ボタンを表示
-          <button
-            className="create-folder-btn"
-            onClick={handleCreateModeToggle}
-          >
-            フォルダ作成
-          </button>
+          // 通常モード: フォルダ作成ボタンを表示（リーフフォルダでは非表示）
+          !currentFolderIsLeaf && (
+            <button
+              className="create-folder-btn"
+              onClick={handleCreateModeToggle}
+            >
+              フォルダ作成
+            </button>
+          )
         ) : (
           // 作成モード: カテゴリ、ファイル、キャンセルボタンを表示
           <div className="create-mode-buttons">

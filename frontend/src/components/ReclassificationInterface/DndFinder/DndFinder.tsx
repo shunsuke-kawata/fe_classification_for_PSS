@@ -189,7 +189,8 @@ const DndFinder: React.FC<dndFinderProps> = ({
     // フォルダ内の画像を取得してフルパスを生成
     const previewImage = getFolderPreviewImage(folderName);
 
-    if (previewImage) {
+    // previewImageが文字列で存在する場合のみ処理
+    if (previewImage && typeof previewImage === "string") {
       // 提供された例の形式: http://localhost:8008/images/jUL6JBa4RROGhBWv-_Ixpw/object_camera0_20241212_225845_x545_y552_1.png
       // 拡張子がない場合は .png を追加
       const imageFileName = previewImage.includes(".")
@@ -507,7 +508,15 @@ const DndFinder: React.FC<dndFinderProps> = ({
       return true; // ノードが見つからない、またはdataがない場合は空と判定
     }
 
-    // dataが空のオブジェクト{}かどうかを判定
+    // is_leafの場合のみ、有効な文字列データのみをカウント（表示できないデータは無視）
+    if (node.is_leaf) {
+      const validEntries = Object.values(node.data).filter(
+        (value) => typeof value === "string" && value.trim() !== ""
+      );
+      return validEntries.length === 0;
+    }
+
+    // is_leafでない場合は従来通り、dataが空のオブジェクト{}かどうかを判定
     return Object.keys(node.data).length === 0;
   };
 

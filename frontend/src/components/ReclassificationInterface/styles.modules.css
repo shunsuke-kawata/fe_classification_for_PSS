@@ -1,9 +1,10 @@
 .dnd-interface-div-main {
     width: 100%;
     height: calc(100vh - 200px); /* 高さを調整してFinderが収まるように */
+    min-height: 500px; /* 最小高さを確保 */
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: stretch; /* 子要素を引き伸ばして高さを揃える */
     gap: 20px;
     padding: 5px 20px; /* 上部パディングをさらに小さく */
     box-sizing: border-box;
@@ -47,7 +48,8 @@
         gap: 15px;
         padding: 0 8px;
         height: calc(100vh - 240px);
-        align-items: center;
+        min-height: 600px; /* モバイルでも十分な高さを確保 */
+        align-items: stretch; /* 子要素を引き伸ばす */
         overflow-y: auto;
         overflow-x: hidden;
         z-index: 1; /* z-indexを維持 */
@@ -68,25 +70,17 @@
         gap: 10px;
         padding: 0 5px;
         height: calc(100vh - 220px);
+        min-height: 500px; /* 最小高さを確保 */
         margin-top: 20px; /* 固定値に統一 */
     }
 }
-
 
 @media (max-width: 560px) {
     .dnd-interface-div-main {
         gap: 8px;
         padding: 0 3px;
         height: calc(100vh - 200px);
-        margin-top: 20px; /* 固定値に統一 */
-    }
-}
-
-@media (max-width: 580px) {
-    .dnd-interface-div-main {
-        gap: 8px;
-        padding: 0 3px;
-        height: calc(100vh - 200px);
+        min-height: 450px; /* 最小高さを確保 */
         margin-top: 20px; /* 固定値に統一 */
     }
 }

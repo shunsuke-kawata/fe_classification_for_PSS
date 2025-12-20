@@ -228,9 +228,13 @@ const executeJoinProject = async (
   }
 };
 
-const executeInitClustering = async (project_id: number, user_id: number) => {
+const executeInitClustering = async (
+  project_id: number,
+  user_id: number,
+  use_hierarchical: boolean = false
+) => {
   try {
-    const url = `${config.backend_base_url}/action/clustering/init/${project_id}?user_id=${user_id}`;
+    const url = `${config.backend_base_url}/action/clustering/init/${project_id}?user_id=${user_id}&use_hierarchical=${use_hierarchical}`;
     const response = await axios.get(url);
     return response;
   } catch (error) {

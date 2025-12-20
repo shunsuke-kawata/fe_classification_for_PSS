@@ -75,6 +75,16 @@ const DndListView: React.FC<dndListViewProps> = ({
     if (!node || !node.data) {
       return true; // ノードが見つからない、またはdataがない場合は空と判定
     }
+
+    // is_leafの場合のみ、有効な文字列データのみをカウント（表示できないデータは無視）
+    if (node.is_leaf) {
+      const validEntries = Object.values(node.data).filter(
+        (value) => typeof value === "string" && value.trim() !== ""
+      );
+      return validEntries.length === 0;
+    }
+
+    // is_leafでない場合は従来通り、dataが空のオブジェクト{}かどうかを判定
     return Object.keys(node.data).length === 0;
   };
 

@@ -94,6 +94,10 @@ const ProjectDetail: React.FC = () => {
   const [isLoadingCopy, setIsLoadingCopy] = useState<boolean>(false);
   const [isOpenCopyPullDown, setIsOpenCopyPullDown] = useState<boolean>(false); // コピーモード専用のプルダウン状態
 
+  // 初期階層分類トグル用のstate（デフォルトはfalse）
+  const [useHierarchicalClassification, setUseHierarchicalClassification] =
+    useState<boolean>(false);
+
   // クエリパラメータを更新する関数
   const updateQueryParam = (
     status: "object" | "group" | "reclassification",
@@ -260,12 +264,12 @@ const ProjectDetail: React.FC = () => {
     try {
       const response = await getCompletedClusteringUsers(Number(projectId));
       if (response && response.data) {
-        // 自分以外のユーザーをフィルタリング
+        // 自分以外のユーザーをフィルタリング（自分自身にデータがあっても他のユーザーからコピー可能）
         const otherUsers = response.data.filter(
           (user: any) => user.user_id !== loginedUser.id
         );
         if (otherUsers.length === 0) {
-          alert("コピー可能なユーザーが見つかりませんでした");
+          alert("コピー可能な他のユーザーが見つかりませんでした");
           return;
         }
         setCompletedUsers(otherUsers);
@@ -501,7 +505,8 @@ const ProjectDetail: React.FC = () => {
                               ? () => {
                                   executeInitClustering(
                                     project.id,
-                                    loginedUser.id as number
+                                    loginedUser.id as number,
+                                    useHierarchicalClassification
                                   );
                                   window.location.reload();
                                 }
@@ -513,6 +518,35 @@ const ProjectDetail: React.FC = () => {
                             padding: "0 10px",
                           }}
                         />
+                        {/* 初期階層分類トグル - 初期分類が可能な状態の時のみ表示 */}
+                        {project.init_clustering_state !==
+                          clusteringStatus.Executing &&
+                          project.init_clustering_state !==
+                            clusteringStatus.Finished &&
+                          imagesInProject.length > 0 && (
+                            <label
+                              className="hierarchical-toggle-container"
+                              style={{
+                                marginLeft: "10px",
+                                display: "inline-flex",
+                                alignItems: "center",
+                              }}
+                            >
+                              <div className="toggle-switch">
+                                <input
+                                  type="checkbox"
+                                  checked={useHierarchicalClassification}
+                                  onChange={(e) =>
+                                    setUseHierarchicalClassification(
+                                      e.target.checked
+                                    )
+                                  }
+                                  className="toggle-checkbox"
+                                />
+                                <span className="toggle-slider"></span>
+                              </div>
+                            </label>
+                          )}
                         {project.init_clustering_state ===
                           clusteringStatus.Finished &&
                           project.continuous_clustering_state === 2 && (
@@ -538,21 +572,18 @@ const ProjectDetail: React.FC = () => {
                               }}
                             />
                           )}
-                        {project.init_clustering_state !==
-                          clusteringStatus.Finished && (
-                          <input
-                            type="button"
-                            className="option-buttons clustering-buttons"
-                            value="コピー"
-                            disabled={isLoadingCopy}
-                            onClick={handleCopyButtonClick}
-                            style={{
-                              marginLeft: "10px",
-                              width: "auto",
-                              padding: "0 10px",
-                            }}
-                          />
-                        )}
+                        <input
+                          type="button"
+                          className="option-buttons clustering-buttons"
+                          value="コピー"
+                          disabled={isLoadingCopy}
+                          onClick={handleCopyButtonClick}
+                          style={{
+                            marginLeft: "10px",
+                            width: "auto",
+                            padding: "0 10px",
+                          }}
+                        />
                       </>
                     ) : (
                       <div
@@ -625,11 +656,15 @@ const ProjectDetail: React.FC = () => {
                               return;
                             }
 
-                            if (
-                              !confirm(
-                                "選択したユーザーのデータをコピーしますか？"
-                              )
-                            ) {
+                            // 既存の分類結果がある場合は上書き確認
+                            let confirmMessage =
+                              "選択したユーザーのデータをコピーしますか？";
+                            if (project?.init_clustering_state === 2) {
+                              confirmMessage =
+                                "既存の分類結果が上書きされます。\n選択したユーザーのデータをコピーしますか？";
+                            }
+
+                            if (!confirm(confirmMessage)) {
                               return;
                             }
 
@@ -646,7 +681,6 @@ const ProjectDetail: React.FC = () => {
                                 response.message ===
                                   "succeeded to copy clustering data"
                               ) {
-                                alert("データのコピーが完了しました");
                                 window.location.reload();
                               } else {
                                 alert("データのコピーに失敗しました");
