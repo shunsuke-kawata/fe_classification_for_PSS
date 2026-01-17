@@ -512,15 +512,19 @@ const DndListView: React.FC<dndListViewProps> = ({
                     } ${selectedImages.includes(item.key) ? "selected" : ""}`}
                     draggable={!isLeaf}
                     onDragStart={(e) => handleFolderDragStart(e, item.key)}
-                    onClick={
-                      isLeaf
-                        ? () => {}
-                        : isMultiSelectMode
-                        ? () => handleFolderClick(item.key)
-                        : () => setSelectedFolder(item.key)
-                    }
                   >
-                    <div className="folder-icon-container">
+                    <div
+                      className="folder-icon-container"
+                      onClick={
+                        editingIndex === idx
+                          ? (e) => e.preventDefault() // 編集モード時はクリックを無効化
+                          : isLeaf
+                          ? () => {}
+                          : isMultiSelectMode
+                          ? () => handleFolderClick(item.key)
+                          : () => setSelectedFolder(item.key)
+                      }
+                    >
                       <img
                         className="folder-icon-large"
                         src={
@@ -551,16 +555,90 @@ const DndListView: React.FC<dndListViewProps> = ({
                       {selectedImages.includes(item.key) && (
                         <div className="selection-indicator">✓</div>
                       )}
+                      {/* 3点リーダーボタン（アイコンモード用） */}
+                      <button
+                        className="context-menu-button-icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleContextMenuClick(idx);
+                        }}
+                      >
+                        ⋮
+                      </button>
+                      {contextMenuIndex === idx && (
+                        <div className="context-menu-icon">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRenameFolder(item.key, idx);
+                            }}
+                          >
+                            名前の変更
+                          </button>
+                          {isEmpty && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteFolder(item.key);
+                              }}
+                            >
+                              削除
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <span className="folder-name-label">
-                      {isFolderLeaf && imageCount > 0
-                        ? `${
-                            result ? getFolderName(result, item.key) : item.key
-                          } (${imageCount})`
-                        : result
-                        ? getFolderName(result, item.key)
-                        : item.key}
-                    </span>
+                    {editingIndex === idx ? (
+                      <div className="folder-name-edit-container">
+                        <input
+                          type="text"
+                          value={editingName}
+                          onChange={(e) => setEditingName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleNameChangeConfirm(item.key);
+                            } else if (e.key === "Escape") {
+                              handleNameChangeCancel();
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="folder-name-input-icon"
+                          autoFocus
+                        />
+                        <div className="edit-buttons-icon">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleNameChangeConfirm(item.key);
+                            }}
+                            className="edit-confirm-btn-icon"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleNameChangeCancel();
+                            }}
+                            className="edit-cancel-btn-icon"
+                          >
+                            ✗
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="folder-name-label">
+                        {isFolderLeaf && imageCount > 0
+                          ? `${
+                              result
+                                ? getFolderName(result, item.key)
+                                : item.key
+                            } (${imageCount})`
+                          : result
+                          ? getFolderName(result, item.key)
+                          : item.key}
+                      </span>
+                    )}
                   </div>
                 );
               })}
@@ -764,15 +842,19 @@ const DndListView: React.FC<dndListViewProps> = ({
                     } ${selectedImages.includes(item.key) ? "selected" : ""}`}
                     draggable={!isLeaf}
                     onDragStart={(e) => handleFolderDragStart(e, item.key)}
-                    onClick={
-                      isLeaf
-                        ? () => {}
-                        : isMultiSelectMode
-                        ? () => handleFolderClick(item.key)
-                        : () => setSelectedFolder(item.key)
-                    }
                   >
-                    <div className="folder-icon-container">
+                    <div
+                      className="folder-icon-container"
+                      onClick={
+                        editingIndex === idx
+                          ? (e) => e.preventDefault() // 編集モード時はクリックを無効化
+                          : isLeaf
+                          ? () => {}
+                          : isMultiSelectMode
+                          ? () => handleFolderClick(item.key)
+                          : () => setSelectedFolder(item.key)
+                      }
+                    >
                       <img
                         className="folder-icon-large"
                         src={
@@ -803,16 +885,90 @@ const DndListView: React.FC<dndListViewProps> = ({
                       {selectedImages.includes(item.key) && (
                         <div className="selection-indicator">✓</div>
                       )}
+                      {/* 3点リーダーボタン（アイコンモード用） */}
+                      <button
+                        className="context-menu-button-icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleContextMenuClick(idx);
+                        }}
+                      >
+                        ⋮
+                      </button>
+                      {contextMenuIndex === idx && (
+                        <div className="context-menu-icon">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRenameFolder(item.key, idx);
+                            }}
+                          >
+                            名前の変更
+                          </button>
+                          {isEmpty && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteFolder(item.key);
+                              }}
+                            >
+                              削除
+                            </button>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <span className="folder-name-label">
-                      {isFolderLeaf && imageCount > 0
-                        ? `${
-                            result ? getFolderName(result, item.key) : item.key
-                          } (${imageCount})`
-                        : result
-                        ? getFolderName(result, item.key)
-                        : item.key}
-                    </span>
+                    {editingIndex === idx ? (
+                      <div className="folder-name-edit-container">
+                        <input
+                          type="text"
+                          value={editingName}
+                          onChange={(e) => setEditingName(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              handleNameChangeConfirm(item.key);
+                            } else if (e.key === "Escape") {
+                              handleNameChangeCancel();
+                            }
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="folder-name-input-icon"
+                          autoFocus
+                        />
+                        <div className="edit-buttons-icon">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleNameChangeConfirm(item.key);
+                            }}
+                            className="edit-confirm-btn-icon"
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleNameChangeCancel();
+                            }}
+                            className="edit-cancel-btn-icon"
+                          >
+                            ✗
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="folder-name-label">
+                        {isFolderLeaf && imageCount > 0
+                          ? `${
+                              result
+                                ? getFolderName(result, item.key)
+                                : item.key
+                            } (${imageCount})`
+                          : result
+                          ? getFolderName(result, item.key)
+                          : item.key}
+                      </span>
+                    )}
                   </div>
                 );
               })}

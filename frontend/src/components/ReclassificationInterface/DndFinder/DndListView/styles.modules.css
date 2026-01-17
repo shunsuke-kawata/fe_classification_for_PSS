@@ -423,6 +423,133 @@
   background: #e9ecef;
 }
 
+/* アイコンモード用：コンテキストメニューボタン */
+.context-menu-button-icon {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #6b7280;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  transition: all 0.2s ease;
+}
+
+.context-menu-button-icon:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #374151;
+  border-color: #9ca3af;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* アイコンモード用：コンテキストメニュー */
+.context-menu-icon {
+  position: absolute;
+  top: 28px;
+  right: 2px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 120px;
+  overflow: hidden;
+}
+
+.context-menu-icon button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  color: #374151;
+  transition: background 0.15s ease;
+}
+
+.context-menu-icon button:hover {
+  background: #f3f4f6;
+}
+
+.context-menu-icon button:active {
+  background: #e5e7eb;
+}
+
+/* アイコンモード用：名前編集コンテナ */
+.folder-name-edit-container {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.folder-name-input-icon {
+  width: 100%;
+  max-width: 100px;
+  padding: 4px 6px;
+  border: 2px solid #3b82f6;
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: center;
+  outline: none;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.folder-name-input-icon:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.edit-buttons-icon {
+  display: flex;
+  gap: 4px;
+}
+
+.edit-confirm-btn-icon,
+.edit-cancel-btn-icon {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.edit-confirm-btn-icon {
+  background: #10b981;
+  color: white;
+}
+
+.edit-confirm-btn-icon:hover {
+  background: #059669;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.edit-cancel-btn-icon {
+  background: #ef4444;
+  color: white;
+}
+
+.edit-cancel-btn-icon:hover {
+  background: #dc2626;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
 /* レスポンシブ対応 */
 @media (max-width: 768px) {
   .dnd-image-file-view-main {

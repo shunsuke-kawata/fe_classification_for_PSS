@@ -22,6 +22,7 @@ type newImageType = {
   project_id: number;
   uploaded_user_id: number;
   image_file: File;
+  folder_name?: string | null;
 };
 type projectType = {
   id: number;
@@ -181,6 +182,11 @@ const postImage = async (newImage: newImageType) => {
     formData.append("project_id", newImage.project_id.toString());
     formData.append("uploaded_user_id", newImage.uploaded_user_id.toString());
     formData.append("file", newImage.image_file);
+
+    // folder_nameが存在する場合のみ追加
+    if (newImage.folder_name) {
+      formData.append("folder_name", newImage.folder_name);
+    }
 
     const response = await axios.post(url, formData, {
       headers: {

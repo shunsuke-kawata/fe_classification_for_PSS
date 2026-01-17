@@ -8,12 +8,12 @@ const targets = [
   {
     name: "backend",
     host: process.env.BACKEND_HOST || "be-pss-app",
-    port: parseInt(process.env.BACKEND_PORT || "8000"),
+    port: parseInt(process.env.BACKEND_PORT || "8008"),
   },
   {
     name: "mysql",
-    host: process.env.DATABASE_HOST || "db-pss-app",
-    port: parseInt(process.env.DATABASE_PORT || "3306"),
+    host: process.env.MYSQL_HOST || "db-pss-app",
+    port: 3306, // コンテナ内部ポート
   },
   {
     name: "mongo",

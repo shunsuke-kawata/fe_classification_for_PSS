@@ -14,6 +14,16 @@ interface BreadcrumbsProps {
   result: {
     [topLevelNodeId: string]: treeNode;
   };
+  currentFolder?: string;
+  isMeasuring?: boolean;
+  onFolderClick?: (
+    folderId: string,
+    currentFolderId: string,
+    source: "breadcrumb" | "list",
+    isUpNavigation?: boolean
+  ) => void;
+  selectedAlphabet?: string;
+  onAlphabetChange?: (alphabet: string) => void;
 }
 
 const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
@@ -21,9 +31,28 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   setSelectedFolder,
   topLevelId,
   result,
+  currentFolder,
+  isMeasuring,
+  onFolderClick,
+  selectedAlphabet,
+  onAlphabetChange,
 }) => {
   const items = parentFolders;
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const alphabets = [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+  ];
 
   // ウィンドウリサイズを監視
   useEffect(() => {
@@ -115,7 +144,24 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
           <span key={index} className="breadcrumb-wrapper">
             <span
               className="breadcrumb-item"
-              onClick={() => setSelectedFolder(item)}
+              onClick={() => {
+                // 計測モードの場合はフォルダクリックを記録（現在のフォルダと同じ場合は除外）
+                if (isMeasuring && onFolderClick && currentFolder) {
+                  // 現在のフォルダのインデックスを取得
+                  const currentIndex = items.findIndex(
+                    (folder) => folder === currentFolder
+                  );
+                  // クリックされたフォルダが現在のフォルダより前（上位階層）かどうか
+                  const isUpNavigation = index < currentIndex;
+                  onFolderClick(
+                    item,
+                    currentFolder,
+                    "breadcrumb",
+                    isUpNavigation
+                  );
+                }
+                setSelectedFolder(item);
+              }}
               title={folderName} // ホバー時に完全な名前を表示
             >
               {displayName}
@@ -127,6 +173,26 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
           </span>
         );
       })}
+      {onAlphabetChange && (
+        <select
+          value={selectedAlphabet || "A"}
+          onChange={(e) => onAlphabetChange(e.target.value)}
+          style={{
+            marginLeft: "auto",
+            padding: "4px 8px",
+            fontSize: "14px",
+            border: "1px solid #ccc",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          {alphabets.map((alpha) => (
+            <option key={alpha} value={alpha}>
+              {alpha}
+            </option>
+          ))}
+        </select>
+      )}
     </div>
   );
 };

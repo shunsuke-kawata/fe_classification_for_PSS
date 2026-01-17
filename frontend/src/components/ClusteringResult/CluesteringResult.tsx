@@ -15,6 +15,20 @@ type clusteringResultProps = {
   userId: number;
   selectedClusteringCount?: number | null;
   imageClusteringCounts?: { [clustering_id: string]: number };
+  isMeasuring?: boolean;
+  onFolderClick?: (
+    folderId: string,
+    currentFolderId: string,
+    source: "breadcrumb" | "list",
+    isUpNavigation?: boolean
+  ) => void;
+  onLeafFolderOpen?: (folderId?: string) => void;
+  onScroll?: (scrollTop: number) => void;
+  selectedAlphabet?: string;
+  onAlphabetChange?: (alphabet: string) => void;
+  selectedFileName?: string | null;
+  onFileNamesAvailable?: (fileNames: string[]) => void;
+  onImageClickForMeasurement?: () => void;
 };
 
 interface clusteringResultType {
@@ -38,6 +52,15 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
   userId,
   selectedClusteringCount,
   imageClusteringCounts,
+  isMeasuring,
+  onFolderClick,
+  onLeafFolderOpen,
+  onScroll,
+  selectedAlphabet,
+  onAlphabetChange,
+  selectedFileName,
+  onFileNamesAvailable,
+  onImageClickForMeasurement,
 }: clusteringResultProps) => {
   const [clusteringResult, setClusteringResult] =
     useState<clusteringResultType | null>(null);
@@ -152,6 +175,15 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
             mongo_result_id={mongoResultId}
             selectedClusteringCount={selectedCount}
             imageClusteringCounts={imageClusteringCounts || {}}
+            isMeasuring={isMeasuring}
+            onFolderClick={onFolderClick}
+            onLeafFolderOpen={onLeafFolderOpen}
+            onScroll={onScroll}
+            selectedAlphabet={selectedAlphabet}
+            onAlphabetChange={onAlphabetChange}
+            selectedFileName={selectedFileName}
+            onFileNamesAvailable={onFileNamesAvailable}
+            onImageClickForMeasurement={onImageClickForMeasurement}
           />
         ) : (
           <div className="no-data-display">データがありません</div>

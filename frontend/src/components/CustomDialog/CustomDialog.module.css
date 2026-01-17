@@ -1,0 +1,159 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.dialog {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  min-width: 500px;
+  max-width: 600px;
+  padding: 0;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.header {
+  padding: 28px 32px;
+  border-bottom: 2px solid #e0e0e0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+}
+
+.content {
+  padding: 36px 32px;
+}
+
+.message {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding: 24px 32px 32px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.yesButton,
+.noButton {
+  padding: 16px 48px;
+  border: none;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.yesButton {
+  background-color: #1976d2;
+  color: white;
+  box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+}
+
+.yesButton:hover {
+  background-color: #1565c0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(25, 118, 210, 0.4);
+}
+
+.noButton {
+  background-color: #e0e0e0;
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.noButton:hover {
+  background-color: #d0d0d0;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.questionSection {
+  margin-bottom: 28px;
+}
+
+.mainQuestion {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2c3e50;
+  text-align: center;
+  margin: 0;
+  padding: 0 0 8px 0;
+}
+
+.subQuestion {
+  font-size: 15px;
+  font-weight: 400;
+  color: #7f8c8d;
+  text-align: center;
+  margin: 0;
+  padding: 0 0 20px 0;
+  border-bottom: 2px solid #e8f4f8;
+}
+
+.optionsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+}
+
+.optionIcon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.optionText {
+  flex: 1;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #555;
+}
+
+.optionText strong {
+  color: #2c3e50;
+  font-size: 16px;
+}

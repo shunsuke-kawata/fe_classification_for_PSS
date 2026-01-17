@@ -157,3 +157,27 @@ export const getFolderName = (
   const node = findNodeById(result, folderId);
   return node?.name || folderId; // nameが存在しない場合はidをフォールバック
 };
+
+// 結果ツリー全体から全ファイルを取得する関数
+export const getAllFilesFromResult = (result: {
+  [topLevelNodeId: string]: treeNode;
+}): { [clusteringId: string]: string } => {
+  const allFiles: { [clusteringId: string]: string } = {};
+
+  const traverseNode = (node: treeNode) => {
+    if (node.is_leaf) {
+      // リーフノードの場合、ファイルを収集
+      const files = node.data as leafData;
+      Object.assign(allFiles, files);
+    } else {
+      // 非リーフノードの場合、子ノードを再帰的に探索
+      const children = node.data as { [key: string]: treeNode };
+      Object.values(children).forEach(traverseNode);
+    }
+  };
+
+  // 全トップレベルノードから探索開始
+  Object.values(result).forEach(traverseNode);
+
+  return allFiles;
+};

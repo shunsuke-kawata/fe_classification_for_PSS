@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Breadclumbs from "./Breadcrumbs/Breadcrumbs";
 import "./styles.modules.css";
 import ListView from "./ListView/ListView";
@@ -11,6 +11,7 @@ import {
   isLeaf,
   leafData,
   treeNode,
+  getAllFilesFromResult,
 } from "@/utils/result";
 
 interface finderProps {
@@ -23,6 +24,20 @@ interface finderProps {
   mongo_result_id?: string;
   selectedClusteringCount?: number | null;
   imageClusteringCounts?: { [clustering_id: string]: number };
+  isMeasuring?: boolean;
+  onFolderClick?: (
+    folderId: string,
+    currentFolderId: string,
+    source: "breadcrumb" | "list",
+    isUpNavigation?: boolean
+  ) => void;
+  onLeafFolderOpen?: (folderId?: string) => void;
+  onScroll?: (scrollTop: number) => void;
+  selectedAlphabet?: string;
+  onAlphabetChange?: (alphabet: string) => void;
+  selectedFileName?: string | null;
+  onFileNamesAvailable?: (fileNames: string[]) => void;
+  onImageClickForMeasurement?: () => void;
 }
 
 const Finder: React.FC<finderProps> = ({
@@ -33,6 +48,15 @@ const Finder: React.FC<finderProps> = ({
   mongo_result_id,
   selectedClusteringCount,
   imageClusteringCounts,
+  isMeasuring,
+  onFolderClick,
+  onLeafFolderOpen,
+  onScroll,
+  selectedAlphabet,
+  onAlphabetChange,
+  selectedFileName,
+  onFileNamesAvailable,
+  onImageClickForMeasurement,
 }: finderProps) => {
   const topLevelId = getTopLevelFolderId(result);
 
@@ -56,8 +80,21 @@ const Finder: React.FC<finderProps> = ({
   // 選択された画像のパスを管理
   const [selectedImagePath, setSelectedImagePath] = useState<string>("");
 
+  // スクロール位置を保存するMap（フォルダIDごと）
+  const scrollPositions = useRef<Map<string, number>>(new Map());
+  // ListViewのref
+  const listViewRef = useRef<HTMLDivElement>(null);
+
   // カスタムなフォルダ変更関数（パラメータ更新を確実に実行）
   const handleFolderChange = (folderId: string) => {
+    // 現在のスクロール位置を保存
+    if (listViewRef.current) {
+      scrollPositions.current.set(
+        selectedFolder,
+        listViewRef.current.scrollTop
+      );
+    }
+
     setSelectedFolder(folderId);
 
     // フォルダ変更をコールバックで通知
@@ -139,6 +176,39 @@ const Finder: React.FC<finderProps> = ({
     // 状態更新の監視（デバッグ用のログを削除）
   }, [currentFolderState]);
 
+  // 結果ツリー全体からクラスタリング回数に該当するファイル名を抽出して親に通知
+  useEffect(() => {
+    if (onFileNamesAvailable) {
+      // selectedClusteringCountがnullまたはundefinedの場合は空配列を返す
+      if (
+        selectedClusteringCount === null ||
+        selectedClusteringCount === undefined
+      ) {
+        onFileNamesAvailable([]);
+        return;
+      }
+
+      // 全体の結果から全ファイルを取得
+      const allFiles = getAllFilesFromResult(result);
+
+      // 選択されたクラスタリング回数に該当するファイル名のみを抽出
+      const filteredFileNames = Object.entries(allFiles)
+        .filter(([clusteringId, fileName]) => {
+          if (!imageClusteringCounts) return false;
+          const imageCount = imageClusteringCounts[clusteringId];
+          return imageCount === selectedClusteringCount;
+        })
+        .map(([clusteringId, fileName]) => fileName);
+
+      onFileNamesAvailable(filteredFileNames);
+    }
+  }, [
+    result,
+    selectedClusteringCount,
+    imageClusteringCounts,
+    onFileNamesAvailable,
+  ]);
+
   return (
     <>
       <div className="finder-div-main">
@@ -146,9 +216,15 @@ const Finder: React.FC<finderProps> = ({
           parentFolders={currentFolderState.parentFolders}
           setSelectedFolder={handleBreadcrumbFolderChange}
           result={result}
+          currentFolder={selectedFolder}
+          isMeasuring={isMeasuring}
+          onFolderClick={onFolderClick}
+          selectedAlphabet={selectedAlphabet}
+          onAlphabetChange={onAlphabetChange}
         />
         <div className="finder-view-main">
           <ListView
+            ref={listViewRef}
             isLeaf={isLeaf(result, selectedFolder)}
             folders={
               isLeaf(result, selectedFolder)
@@ -160,6 +236,13 @@ const Finder: React.FC<finderProps> = ({
             onImageSelect={handleImageSelect}
             selectedImagePath={selectedImagePath}
             mongo_result_id={mongo_result_id}
+            currentFolder={selectedFolder}
+            isMeasuring={isMeasuring}
+            onFolderClick={onFolderClick}
+            onLeafFolderOpen={onLeafFolderOpen}
+            onScroll={onScroll}
+            scrollPosition={scrollPositions.current.get(selectedFolder) || 0}
+            originalImageFolderPath={originalImageFolderPath}
           />
           <ImageFileView
             files={currentFolderState.files}
@@ -168,6 +251,9 @@ const Finder: React.FC<finderProps> = ({
             onImageSelect={handleImageSelect}
             selectedClusteringCount={selectedClusteringCount}
             imageClusteringCounts={imageClusteringCounts}
+            selectedFileName={selectedFileName}
+            isMeasuring={isMeasuring}
+            onImageClickForMeasurement={onImageClickForMeasurement}
           />
         </div>
       </div>

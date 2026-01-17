@@ -15,6 +15,7 @@ type uploadingFile = {
   file: File;
   uploadStatus: "waiting" | "uploading" | "success" | "failed";
   retryCount: number;
+  folder_name: string | null; // カレントフォルダ名
 };
 const UploadImageModal: React.FC<uploadImageModalProps> = ({
   projectId,
@@ -42,8 +43,30 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
 
   const handleChangeUploadImages = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return;
-    let tmpInputImages = e.target.files;
-    setInputImages(tmpInputImages);
+
+    // ファイル選択の場合もフォルダ名を抽出して追加
+    const filesWithFolderName: File[] = [];
+    Array.from(e.target.files).forEach((file) => {
+      let folderName: string | null = null;
+
+      // webkitRelativePathからフォルダ名を取得（ドラッグ&ドロップの場合）
+      if (file.webkitRelativePath) {
+        const pathParts = file.webkitRelativePath.split("/");
+        if (pathParts.length >= 2) {
+          folderName = pathParts[pathParts.length - 2];
+        }
+      }
+
+      // folder_nameをFileオブジェクトに追加（カスタムプロパティ）
+      (file as any).folder_name = folderName;
+      filesWithFolderName.push(file);
+    });
+
+    // FileListのような構造を作成
+    const dt = new DataTransfer();
+    filesWithFolderName.forEach((file) => dt.items.add(file));
+    setInputImages(dt.files);
+
     // ファイル選択時はフォルダ選択をクリア
     if (folderInputRef.current) folderInputRef.current.value = "";
   };
@@ -53,6 +76,7 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
 
     // フォルダから画像ファイルのみをフィルタリング
     const imageFiles: File[] = [];
+    const folderNames: (string | null)[] = [];
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
 
     Array.from(e.target.files).forEach((file) => {
@@ -60,6 +84,16 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
         allowedTypes.includes(file.type.toLowerCase()) ||
         /\.(jpg|jpeg|png)$/i.test(file.name)
       ) {
+        // webkitRelativePathからカレントフォルダ名（直接の親フォルダ）を抽出
+        let folderName: string | null = null;
+        if (file.webkitRelativePath) {
+          const pathParts = file.webkitRelativePath.split("/");
+          // 最後がファイル名、その一つ手前がカレントフォルダ名
+          if (pathParts.length >= 2) {
+            folderName = pathParts[pathParts.length - 2];
+          }
+        }
+
         // ファイル名からパス部分を除去（最後の / または \ 以降のファイル名のみを取得）
         const fileName = file.webkitRelativePath
           ? file.webkitRelativePath.split("/").pop() || file.name
@@ -71,7 +105,11 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
           lastModified: file.lastModified,
         });
 
+        // folder_nameをFileオブジェクトに追加（カスタムプロパティ）
+        (renamedFile as any).folder_name = folderName;
+
         imageFiles.push(renamedFile);
+        folderNames.push(folderName);
       }
     });
 
@@ -102,6 +140,7 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
           file: inputImage,
           uploadStatus: "waiting",
           retryCount: 0,
+          folder_name: (inputImage as any).folder_name || null,
         };
       }
     );
@@ -138,6 +177,7 @@ const UploadImageModal: React.FC<uploadImageModalProps> = ({
           project_id: projectId,
           image_file: imageData.file,
           uploaded_user_id: loginedUser.id,
+          folder_name: imageData.folder_name,
         };
 
         const res = await postImage(tmpNewImage);
