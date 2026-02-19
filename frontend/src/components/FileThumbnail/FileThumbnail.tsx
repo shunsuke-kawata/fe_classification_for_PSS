@@ -11,7 +11,7 @@ const FileThumbnail: React.FC<FileThumbnailProps> = ({
   imagePath,
   width = 150,
   height = 150,
-  padding = 4,
+  padding = 2,
 }: FileThumbnailProps) => {
   return (
     <div

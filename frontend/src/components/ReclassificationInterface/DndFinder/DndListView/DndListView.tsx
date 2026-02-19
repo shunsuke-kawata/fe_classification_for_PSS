@@ -68,7 +68,7 @@ const DndListView: React.FC<dndListViewProps> = ({
     }
   };
 
-  // 空フォルダかどうかを判定する関数
+  // 空フォルダかどうかを再帰的に判定する関数
   const isFolderEmpty = (folderName: string): boolean => {
     if (!result) return false;
     const node = findNodeById(result, folderName);
@@ -84,8 +84,17 @@ const DndListView: React.FC<dndListViewProps> = ({
       return validEntries.length === 0;
     }
 
-    // is_leafでない場合は従来通り、dataが空のオブジェクト{}かどうかを判定
-    return Object.keys(node.data).length === 0;
+    // is_leafでない場合は、全ての子フォルダを再帰的にチェック
+    const childNodes = node.data as { [key: string]: treeNode };
+    const childKeys = Object.keys(childNodes);
+
+    // 子フォルダが存在しない場合は空
+    if (childKeys.length === 0) {
+      return true;
+    }
+
+    // 全ての子フォルダが空かどうかを再帰的にチェック
+    return childKeys.every((childKey) => isFolderEmpty(childKey));
   };
 
   const folderItems = getFolderItems();
@@ -95,18 +104,14 @@ const DndListView: React.FC<dndListViewProps> = ({
     e: React.DragEvent<HTMLDivElement>,
     imagePath: string
   ) => {
-    // 右のFinderがisLeafでない場合はドラッグを無効化
-    if (finderType === "before") {
-      const data = JSON.stringify({
-        path: imagePath,
-        sourceType: finderType,
-        sourceFolder: currentFolder,
-        selectedImages: isMultiSelectMode ? selectedImages : [],
-      });
-      e.dataTransfer.setData("text/plain", data);
-    } else {
-      e.preventDefault();
-    }
+    // 双方向ドラッグを許可: before と after の両方でドラッグ可能
+    const data = JSON.stringify({
+      path: imagePath,
+      sourceType: finderType,
+      sourceFolder: currentFolder,
+      selectedImages: isMultiSelectMode ? selectedImages : [],
+    });
+    e.dataTransfer.setData("text/plain", data);
   };
 
   const handleImageClick = (imagePath: string) => {
@@ -119,26 +124,15 @@ const DndListView: React.FC<dndListViewProps> = ({
     e: React.DragEvent<HTMLDivElement>,
     folderId: string
   ) => {
-    if (finderType === "before") {
-      const data = JSON.stringify({
-        type: "folder",
-        folderId: folderId,
-        sourceType: finderType,
-        sourceFolder: currentFolder,
-        selectedFolders: isMultiSelectMode ? selectedImages : [],
-      });
-      e.dataTransfer.setData("text/plain", data);
-    } else {
-      // 右側のFinderでもフォルダのドラッグを許可
-      const data = JSON.stringify({
-        type: "folder",
-        folderId: folderId,
-        sourceType: finderType,
-        sourceFolder: currentFolder,
-        selectedFolders: isMultiSelectMode ? selectedImages : [],
-      });
-      e.dataTransfer.setData("text/plain", data);
-    }
+    // 双方向ドラッグを許可: before と after の両方でフォルダのドラッグが可能
+    const data = JSON.stringify({
+      type: "folder",
+      folderId: folderId,
+      sourceType: finderType,
+      sourceFolder: currentFolder,
+      selectedFolders: isMultiSelectMode ? selectedImages : [],
+    });
+    e.dataTransfer.setData("text/plain", data);
   };
 
   const handleFolderClick = (folderId: string) => {
@@ -652,24 +646,46 @@ const DndListView: React.FC<dndListViewProps> = ({
             <div className="dnd-image-file-view-main">
               {/* 移動された画像を表示 */}
               {movedImages.map((imagePath, idx) => (
-                <div key={`moved-${idx}`} className="dnd-image-file-item">
+                <div
+                  key={`moved-${idx}`}
+                  className={`dnd-image-file-item ${
+                    isMultiSelectMode ? "selectable" : ""
+                  } ${selectedImages.includes(imagePath) ? "selected" : ""}`}
+                  draggable={true}
+                  onDragStart={(e) => handleDragStart(e, imagePath)}
+                  onClick={() => handleImageClick(imagePath)}
+                >
                   <FileThumbnail
                     imagePath={`${baseOriginalImageFolderPath}/${imagePath}`}
                     width={80}
                     height={80}
                     padding={1}
                   />
+                  {selectedImages.includes(imagePath) && (
+                    <div className="selection-indicator">✓</div>
+                  )}
                 </div>
               ))}
               {/* 元のフォルダの画像も表示 */}
               {folderItems.map((item, idx) => (
-                <div key={idx} className="dnd-image-file-item">
+                <div
+                  key={idx}
+                  className={`dnd-image-file-item ${
+                    isMultiSelectMode ? "selectable" : ""
+                  } ${selectedImages.includes(item.key) ? "selected" : ""}`}
+                  draggable={true}
+                  onDragStart={(e) => handleDragStart(e, item.key)}
+                  onClick={() => handleImageClick(item.key)}
+                >
                   <FileThumbnail
                     imagePath={`${baseOriginalImageFolderPath}/${item.value}`}
                     width={80}
                     height={80}
                     padding={1}
                   />
+                  {selectedImages.includes(item.key) && (
+                    <div className="selection-indicator">✓</div>
+                  )}
                 </div>
               ))}
             </div>

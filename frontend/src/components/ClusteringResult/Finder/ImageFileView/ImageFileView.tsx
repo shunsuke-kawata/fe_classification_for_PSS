@@ -48,36 +48,9 @@ const ImageFileView: React.FC<imageFileViewProps> = ({
     return true;
   };
 
-  // クラスタリング回数に基づいて枠線スタイルを取得（選択画像に赤い太線を適用）
+  // クラスタリング回数に基づいて枠線スタイルを取得（ハイライト表示は無効化）
   const getBorderStyle = (clusteringId: string, fileName: string): string => {
-    // 1つ目のプルダウンが「全て」の場合はハイライトなし
-    if (
-      selectedClusteringCount === null ||
-      selectedClusteringCount === undefined
-    ) {
-      return "none";
-    }
-
-    // クラスタリング回数に該当するかチェック
-    const matchesClusteringCount = imageClusteringCounts
-      ? imageClusteringCounts[clusteringId] === selectedClusteringCount
-      : false;
-
-    // 2つ目のプルダウンで特定のファイル名が選択されている場合
-    if (selectedFileName) {
-      // そのファイル名のみをハイライト
-      if (fileName === selectedFileName) {
-        return "4px solid #FF0000"; // 赤色
-      }
-      return "none";
-    }
-
-    // 2つ目のプルダウンが「全て」の場合
-    // 1つ目の条件に該当する全てのファイルをハイライト
-    if (matchesClusteringCount) {
-      return "4px solid #FF0000"; // 赤色
-    }
-
+    // ハイライト表示を無効化（内部の選択状態は維持）
     return "none";
   };
 
@@ -121,6 +94,7 @@ const ImageFileView: React.FC<imageFileViewProps> = ({
           >
             <FileThumbnail
               imagePath={`${baseOriginalImageFolderPath}/${file}`}
+              padding={2}
             />
           </div>
         );

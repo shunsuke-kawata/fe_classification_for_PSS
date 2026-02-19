@@ -88,13 +88,13 @@
 .list-view-main .list-view-item.selected {
   background-color: #4a90e2;
   color: #FFFFFF;
-  border-left: 4px solid #357abd;
+  border-left: 2px solid #357abd !important;
 }
 
 .list-view-main .list-view-item-odd.selected {
   background-color: #4a90e2;
   color: #FFFFFF;
-  border-left: 4px solid #357abd;
+  border-left: 2px solid #357abd !important;
 }
 
 /* 選択された項目のホバー状態 - さらに高い特異性 */

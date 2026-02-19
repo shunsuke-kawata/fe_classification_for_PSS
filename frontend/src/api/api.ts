@@ -267,8 +267,18 @@ const executeContinuousClustering = async (
 
 const getClusteringResult = async (mongo_result_id: string) => {
   try {
+    console.log("🔍 getClusteringResult API 呼び出し開始");
+    console.log("  - mongo_result_id:", mongo_result_id);
+
     const url = `${config.backend_base_url}/action/clustering/result/${mongo_result_id}`;
+    console.log("  - URL:", url);
+
     const response = await axios.get(url);
+
+    console.log("🔍 getClusteringResult API レスポンス受信");
+    console.log("  - response.status:", response.status);
+    console.log("  - response.data type:", typeof response.data);
+    console.log("  - response.data keys:", Object.keys(response.data || {}));
 
     // バックエンドから直接dataが返されるので、response.dataを返す
     return response.data;

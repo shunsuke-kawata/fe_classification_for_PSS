@@ -20,7 +20,7 @@ type clusteringResultProps = {
     folderId: string,
     currentFolderId: string,
     source: "breadcrumb" | "list",
-    isUpNavigation?: boolean
+    isUpNavigation?: boolean,
   ) => void;
   onLeafFolderOpen?: (folderId?: string) => void;
   onScroll?: (scrollTop: number) => void;
@@ -29,6 +29,8 @@ type clusteringResultProps = {
   selectedFileName?: string | null;
   onFileNamesAvailable?: (fileNames: string[]) => void;
   onImageClickForMeasurement?: () => void;
+  onFolderImagesUpdate?: (images: string[]) => void;
+  onCurrentFolderPathUpdate?: (path: string) => void;
 };
 
 interface clusteringResultType {
@@ -61,6 +63,8 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
   selectedFileName,
   onFileNamesAvailable,
   onImageClickForMeasurement,
+  onFolderImagesUpdate,
+  onCurrentFolderPathUpdate,
 }: clusteringResultProps) => {
   const [clusteringResult, setClusteringResult] =
     useState<clusteringResultType | null>(null);
@@ -77,17 +81,43 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
     if (initClusteringState !== clusteringStatus.Finished) return;
 
     const fetchClusteringResult = async (mongo_result_id: string) => {
+      console.log("🔍 ClusteringResult: データ取得開始");
+      console.log("  - mongo_result_id:", mongo_result_id);
+      console.log("  - initClusteringState:", initClusteringState);
+
       setIsLoading(true);
       setError(null);
 
       try {
         const resultRes = await getClusteringResult(mongo_result_id);
 
+        console.log("🔍 ClusteringResult: API レスポンス受信");
+        console.log("  - resultRes type:", typeof resultRes);
+        console.log("  - resultRes is null:", resultRes === null);
+        console.log("  - resultRes is undefined:", resultRes === undefined);
+
         if (resultRes && typeof resultRes === "object") {
+          console.log("  - resultRes keys:", Object.keys(resultRes));
+          console.log("  - resultRes.result exists:", !!resultRes.result);
+          console.log(
+            "  - resultRes.all_nodes exists:",
+            !!(resultRes as any).all_nodes,
+          );
+
           if (resultRes.result) {
+            console.log("  - resultRes.result type:", typeof resultRes.result);
+            console.log(
+              "  - resultRes.result keys count:",
+              Object.keys(resultRes.result).length,
+            );
+            console.log("✅ ClusteringResult: データ取得成功");
             setClusteringResult(resultRes);
           } else {
             console.error("❌ resultRes.result が存在しません");
+            console.error(
+              "  - resultRes 全体:",
+              JSON.stringify(resultRes, null, 2),
+            );
             setError("データの取得に失敗しました: result field not found");
           }
         } else {
@@ -97,6 +127,11 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
       } catch (error) {
         console.error("=== ClusteringResult: データ取得エラー ===");
         console.error("Error:", error);
+        console.error("Error type:", typeof error);
+        if (error instanceof Error) {
+          console.error("Error message:", error.message);
+          console.error("Error stack:", error.stack);
+        }
         setError("データの取得中にエラーが発生しました");
       } finally {
         setIsLoading(false);
@@ -184,6 +219,8 @@ const ClusteringResult: React.FC<clusteringResultProps> = ({
             selectedFileName={selectedFileName}
             onFileNamesAvailable={onFileNamesAvailable}
             onImageClickForMeasurement={onImageClickForMeasurement}
+            onFolderImagesUpdate={onFolderImagesUpdate}
+            onCurrentFolderPathUpdate={onCurrentFolderPathUpdate}
           />
         ) : (
           <div className="no-data-display">データがありません</div>

@@ -3,6 +3,7 @@ import Breadclumbs from "./Breadcrumbs/Breadcrumbs";
 import "./styles.modules.css";
 import ListView from "./ListView/ListView";
 import ImageFileView from "./ImageFileView/ImageFileView";
+import config from "@/config/config.json";
 import {
   findPathToNode,
   getFilesInFolder,
@@ -29,7 +30,7 @@ interface finderProps {
     folderId: string,
     currentFolderId: string,
     source: "breadcrumb" | "list",
-    isUpNavigation?: boolean
+    isUpNavigation?: boolean,
   ) => void;
   onLeafFolderOpen?: (folderId?: string) => void;
   onScroll?: (scrollTop: number) => void;
@@ -38,6 +39,8 @@ interface finderProps {
   selectedFileName?: string | null;
   onFileNamesAvailable?: (fileNames: string[]) => void;
   onImageClickForMeasurement?: () => void;
+  onFolderImagesUpdate?: (images: string[]) => void;
+  onCurrentFolderPathUpdate?: (path: string) => void;
 }
 
 const Finder: React.FC<finderProps> = ({
@@ -57,6 +60,8 @@ const Finder: React.FC<finderProps> = ({
   selectedFileName,
   onFileNamesAvailable,
   onImageClickForMeasurement,
+  onFolderImagesUpdate,
+  onCurrentFolderPathUpdate,
 }: finderProps) => {
   const topLevelId = getTopLevelFolderId(result);
 
@@ -73,9 +78,8 @@ const Finder: React.FC<finderProps> = ({
     return topLevelId;
   };
 
-  const [selectedFolder, setSelectedFolder] = useState<string>(
-    getInitialFolder()
-  );
+  const [selectedFolder, setSelectedFolder] =
+    useState<string>(getInitialFolder());
 
   // 選択された画像のパスを管理
   const [selectedImagePath, setSelectedImagePath] = useState<string>("");
@@ -91,7 +95,7 @@ const Finder: React.FC<finderProps> = ({
     if (listViewRef.current) {
       scrollPositions.current.set(
         selectedFolder,
-        listViewRef.current.scrollTop
+        listViewRef.current.scrollTop,
       );
     }
 
@@ -105,7 +109,7 @@ const Finder: React.FC<finderProps> = ({
 
   // Breadcrumbs用のラッパー関数（React.Dispatch型に対応）
   const handleBreadcrumbFolderChange = (
-    value: React.SetStateAction<string>
+    value: React.SetStateAction<string>,
   ) => {
     const newFolderId =
       typeof value === "function" ? value(selectedFolder) : value;
@@ -150,6 +154,26 @@ const Finder: React.FC<finderProps> = ({
     getNodesInCurrentFolder(selectedFolder);
     // フォルダが変更されたら選択されている画像をリセット
     setSelectedImagePath("");
+
+    // 現在のフォルダがリーフフォルダの場合、画像一覧を親に通知
+    if (isLeaf(result, selectedFolder)) {
+      const files = getFilesInFolder(result, selectedFolder);
+      if (files && onFolderImagesUpdate) {
+        const imageNames = Object.values(files);
+        onFolderImagesUpdate(imageNames);
+      }
+
+      // 画像フォルダのパスを通知
+      if (onCurrentFolderPathUpdate) {
+        const imagePath = `${config.backend_base_url}/images/${originalImageFolderPath}`;
+        onCurrentFolderPathUpdate(imagePath);
+      }
+    } else {
+      // リーフフォルダでない場合は画像一覧をクリア
+      if (onFolderImagesUpdate) {
+        onFolderImagesUpdate([]);
+      }
+    }
   }, [selectedFolder]);
 
   // 初回アクセス時にrootディレクトリをc_folderパラメータに設定

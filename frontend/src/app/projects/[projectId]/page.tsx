@@ -26,6 +26,7 @@ import ClusteringResult from "@/components/ClusteringResult/CluesteringResult";
 import ReclassificationInterface from "@/components/ReclassificationInterface/ReclassificationInterface";
 import CustomDialog from "@/components/CustomDialog/CustomDialog";
 import { clusteringStatus } from "@/config";
+import config from "@/config/config.json";
 
 const statusString: {
   [key in "object" | "group" | "reclassification"]: string;
@@ -132,7 +133,7 @@ const ProjectDetail: React.FC = () => {
   // 計測モード用のstate
   const [isMeasuring, setIsMeasuring] = useState<boolean>(false);
   const [measurementData, setMeasurementData] = useState<MeasurementEvent[]>(
-    []
+    [],
   );
   const [isMeasurementComplete, setIsMeasurementComplete] =
     useState<boolean>(false);
@@ -165,6 +166,9 @@ const ProjectDetail: React.FC = () => {
   // カスタムダイアログ用の状態
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const pendingMeasurementDataRef = useRef<MeasurementEvent[] | null>(null);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string>("");
+  const [folderImagesList, setFolderImagesList] = useState<string[]>([]);
+  const [currentFolderPath, setCurrentFolderPath] = useState<string>("");
 
   // デバッグ: isDialogOpenの変更を監視
   useEffect(() => {
@@ -176,7 +180,7 @@ const ProjectDetail: React.FC = () => {
     status: "object" | "group" | "reclassification",
     targetFolder?: string,
     destinationFolder?: string,
-    currentFolder?: string
+    currentFolder?: string,
   ) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("display", status);
@@ -209,7 +213,7 @@ const ProjectDetail: React.FC = () => {
   // フォルダ移動後のリダイレクト用関数
   const handleFolderMoveRedirect = (
     targetFolder: string,
-    destinationFolder: string
+    destinationFolder: string,
   ) => {
     // 再分類画面にリダイレクトし、移動に関連するパラメータを追加
     updateQueryParam("reclassification", targetFolder, destinationFolder);
@@ -218,7 +222,7 @@ const ProjectDetail: React.FC = () => {
   // フォルダ変更時の関数（再分類画面で常にt_folder, d_folderを更新）
   const handleFolderChange = (
     beforeFolderId: string,
-    afterFolderId: string
+    afterFolderId: string,
   ) => {
     if (displayStatus === "reclassification") {
       updateQueryParam("reclassification", beforeFolderId, afterFolderId);
@@ -296,7 +300,7 @@ const ProjectDetail: React.FC = () => {
         });
         const countsRes = await getClusteringCounts(
           Number(projectId),
-          loginedUser.id as number
+          loginedUser.id as number,
         );
         console.log("🔍 クラスタリング回数取得レスポンス:", countsRes);
         if (countsRes && countsRes.data) {
@@ -332,7 +336,7 @@ const ProjectDetail: React.FC = () => {
   };
 
   const handleChangeDisplayStatus = (
-    status: "object" | "group" | "reclassification"
+    status: "object" | "group" | "reclassification",
   ) => {
     setDisplayStatus(status);
     updateQueryParam(status);
@@ -348,7 +352,7 @@ const ProjectDetail: React.FC = () => {
       if (response && response.data) {
         // 自分以外のユーザーをフィルタリング（自分自身にデータがあっても他のユーザーからコピー可能）
         const otherUsers = response.data.filter(
-          (user: any) => user.user_id !== loginedUser.id
+          (user: any) => user.user_id !== loginedUser.id,
         );
         if (otherUsers.length === 0) {
           alert("コピー可能な他のユーザーが見つかりませんでした");
@@ -568,7 +572,7 @@ const ProjectDetail: React.FC = () => {
       "time_to_first_action:",
       timeToFirstAction,
       "idle_time:",
-      idleTimeAfterLastAction
+      idleTimeAfterLastAction,
     );
 
     return newMeasurementData;
@@ -594,6 +598,14 @@ const ProjectDetail: React.FC = () => {
     // カスタムダイアログを表示
     setTimeout(() => {
       console.log("🎯 ダイアログを表示します");
+
+      // 選択された画像のURLを構築
+      if (project && selectedFileName) {
+        const imageUrl = `${config.backend_base_url}/images/${project.original_images_folder_path}/${selectedFileName}`;
+        setSelectedImageUrl(imageUrl);
+        console.log("🖼️ 画像URL設定:", imageUrl);
+      }
+
       pendingMeasurementDataRef.current = data;
       setIsDialogOpen(true);
       console.log("🎯 isDialogOpen を true に設定しました");
@@ -603,7 +615,7 @@ const ProjectDetail: React.FC = () => {
   // ダイアログで「はい」を選択
   const handleDialogYes = () => {
     console.log(
-      "✅ ダイアログで「はい」が選択されました（直感に合っている = 修正不要）"
+      "✅ ダイアログで「はい」が選択されました（直感に合っている = 修正不要）",
     );
     setIsDialogOpen(false);
     if (pendingMeasurementDataRef.current) {
@@ -616,7 +628,7 @@ const ProjectDetail: React.FC = () => {
   // ダイアログで「いいえ」を選択
   const handleDialogNo = () => {
     console.log(
-      "❌ ダイアログで「いいえ」が選択されました（直感に合っていない = 修正必要）"
+      "❌ ダイアログで「いいえ」が選択されました（直感に合っていない = 修正必要）",
     );
     setIsDialogOpen(false);
     if (pendingMeasurementDataRef.current) {
@@ -629,7 +641,7 @@ const ProjectDetail: React.FC = () => {
   // CSV出力関数（データを受け取るバージョン）
   const downloadMeasurementCSVWithData = (
     data: MeasurementEvent[],
-    needsCustomization: boolean
+    needsCustomization: boolean,
   ) => {
     if (data.length === 0) {
       alert("計測データがありません");
@@ -682,7 +694,7 @@ const ProjectDetail: React.FC = () => {
     link.setAttribute("href", url);
     link.setAttribute(
       "download",
-      `${selectedAlphabet}_${username}_${filenamePart}_${timestamp}.csv`
+      `${selectedAlphabet}_${username}_${filenamePart}_${timestamp}.csv`,
     );
     link.style.visibility = "hidden";
     document.body.appendChild(link);
@@ -715,7 +727,7 @@ const ProjectDetail: React.FC = () => {
     folderId: string,
     currentFolderId: string,
     source: "breadcrumb" | "list",
-    isUpNavigation: boolean = false
+    isUpNavigation: boolean = false,
   ) => {
     if (!isMeasuring) return;
 
@@ -818,7 +830,7 @@ const ProjectDetail: React.FC = () => {
         console.log(
           `スクロール完了: ${scrollDiff}px移動, 累計回数: ${
             scrollCount + 1
-          }回, 累計距離: ${totalScrollDistance + scrollDiff}px`
+          }回, 累計距離: ${totalScrollDistance + scrollDiff}px`,
         );
       } else {
         console.log(`微細なスクロール(${scrollDiff}px)は除外`);
@@ -872,7 +884,7 @@ const ProjectDetail: React.FC = () => {
     link.setAttribute("href", url);
     link.setAttribute(
       "download",
-      `${selectedAlphabet}_${username}_${filenamePart}_${timestamp}.csv`
+      `${selectedAlphabet}_${username}_${filenamePart}_${timestamp}.csv`,
     );
     link.style.visibility = "hidden";
     document.body.appendChild(link);
@@ -932,7 +944,7 @@ const ProjectDetail: React.FC = () => {
                           key={key}
                           onClick={() =>
                             handleChangeDisplayStatus(
-                              key as "object" | "group" | "reclassification"
+                              key as "object" | "group" | "reclassification",
                             )
                           }
                         >
@@ -1081,7 +1093,7 @@ const ProjectDetail: React.FC = () => {
                                   alt=""
                                   onClick={() =>
                                     setIsFileNameDropdownOpen(
-                                      !isFileNameDropdownOpen
+                                      !isFileNameDropdownOpen,
                                     )
                                   }
                                 />
@@ -1233,7 +1245,7 @@ const ProjectDetail: React.FC = () => {
                                 firstOpenedFolderRef.current = null;
                                 setIsFirstFolderCorrect(false);
                                 console.log(
-                                  "リセット - 計測データをクリアしました"
+                                  "リセット - 計測データをクリアしました",
                                 );
                               }}
                               style={{
@@ -1276,7 +1288,7 @@ const ProjectDetail: React.FC = () => {
                                     await downloadClassificationResult(
                                       project.id,
                                       loginedUser.id,
-                                      project.name
+                                      project.name,
                                     );
                                   } catch (error) {
                                     console.error("ダウンロードエラー:", error);
@@ -1312,7 +1324,7 @@ const ProjectDetail: React.FC = () => {
                                       executeInitClustering(
                                         project.id,
                                         loginedUser.id as number,
-                                        useHierarchicalClassification
+                                        useHierarchicalClassification,
                                       );
                                       window.location.reload();
                                     }
@@ -1344,7 +1356,7 @@ const ProjectDetail: React.FC = () => {
                                       checked={useHierarchicalClassification}
                                       onChange={(e) =>
                                         setUseHierarchicalClassification(
-                                          e.target.checked
+                                          e.target.checked,
                                         )
                                       }
                                       className="toggle-checkbox"
@@ -1365,7 +1377,7 @@ const ProjectDetail: React.FC = () => {
                                       ? () => {
                                           executeContinuousClustering(
                                             project.id,
-                                            loginedUser.id as number
+                                            loginedUser.id as number,
                                           );
                                           window.location.reload();
                                         }
@@ -1405,7 +1417,8 @@ const ProjectDetail: React.FC = () => {
                           <label className="select-status-label">
                             {selectedSourceUserId
                               ? completedUsers.find(
-                                  (u: any) => u.user_id === selectedSourceUserId
+                                  (u: any) =>
+                                    u.user_id === selectedSourceUserId,
                                 )?.user_name || "ユーザを選択"
                               : "ユーザを選択"}
                           </label>
@@ -1481,7 +1494,7 @@ const ProjectDetail: React.FC = () => {
                               const response = await copyClusteringData(
                                 selectedSourceUserId,
                                 loginedUser.id as number,
-                                Number(projectId)
+                                Number(projectId),
                               );
 
                               if (
@@ -1556,6 +1569,8 @@ const ProjectDetail: React.FC = () => {
                 selectedFileName={selectedFileName}
                 onFileNamesAvailable={setAvailableFileNames}
                 onImageClickForMeasurement={handleImageClickForMeasurement}
+                onFolderImagesUpdate={(images) => setFolderImagesList(images)}
+                onCurrentFolderPathUpdate={(path) => setCurrentFolderPath(path)}
               />
             ) : displayStatus === "reclassification" ? (
               <ReclassificationInterface
@@ -1584,6 +1599,9 @@ const ProjectDetail: React.FC = () => {
         isOpen={isDialogOpen}
         title="アンケート"
         message="この物体がある場所は直感に合っていますか？&#10;&#10;直感に合っていて階層構造の修正が必要ない場合は「はい」を、&#10;直感に合っておらず階層構造の修正が必要な場合は「いいえ」を選択してください。"
+        imageUrl={selectedImageUrl}
+        folderImages={folderImagesList}
+        imageFolderPath={currentFolderPath}
         onYes={handleDialogYes}
         onNo={handleDialogNo}
       />

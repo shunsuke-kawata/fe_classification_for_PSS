@@ -313,25 +313,6 @@ const ListView = forwardRef<HTMLDivElement, listViewProps>(
           // 画像が選択されているかチェック（is_leafの場合のみ）
           const isSelected = isLeaf && selectedImagePath === foldername;
 
-          // リーフフォルダの場合、最初の画像を取得してサムネイルとして表示
-          let thumbnailUrl = "";
-          if (!isLeaf && folderIsLeaf && !isEmpty && originalImageFolderPath) {
-            const node = findNodeById(result, foldername);
-
-            if (node && node.is_leaf) {
-              const files = node.data as { [id: string]: string };
-              const fileEntries = Object.entries(files);
-
-              if (fileEntries.length > 0) {
-                // 配列の最初の要素の値（ファイル名）を取得
-                const fileName = fileEntries[0][1];
-                // バックエンドのimagesエンドポイントを使ってURLを構築
-                thumbnailUrl = `${config.backend_base_url}/images/${originalImageFolderPath}/${fileName}`;
-                console.log("✅ サムネイルURL:", thumbnailUrl);
-              }
-            }
-          }
-
           return (
             <div
               key={idx}
@@ -382,28 +363,18 @@ const ListView = forwardRef<HTMLDivElement, listViewProps>(
             >
               {isLeaf ? <></> : <span className="arrow">{"＞"}</span>}
 
-              {/* サムネイル表示（リーフフォルダの場合） */}
-              {thumbnailUrl ? (
-                <div className="thumbnail-container">
-                  <img
-                    className="folder-thumbnail"
-                    src={thumbnailUrl}
-                    alt="thumbnail"
-                  />
-                </div>
-              ) : (
-                <img
-                  className="img-icon"
-                  src={
-                    isLeaf
-                      ? "/assets/image-file-icon.svg"
-                      : isEmpty
-                      ? "/assets/empty-folder-icon.svg" // 空フォルダの場合
-                      : "/assets/folder-icon.svg" // 通常のフォルダの場合
-                  }
-                  alt=""
-                />
-              )}
+              {/* フォルダアイコン表示 */}
+              <img
+                className="img-icon"
+                src={
+                  isLeaf
+                    ? "/assets/image-file-icon.svg"
+                    : isEmpty
+                    ? "/assets/empty-folder-icon.svg" // 空フォルダの場合
+                    : "/assets/folder-icon.svg" // 通常のフォルダの場合
+                }
+                alt=""
+              />
 
               {editingIndex === idx ? (
                 <>

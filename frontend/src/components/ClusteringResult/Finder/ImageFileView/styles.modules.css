@@ -31,7 +31,7 @@
 
 /* 選択された画像のスタイル */
 .image-file-item.selected {
-  border: 3px solid #4a90e2; /* 統一された青色の枠 */
+  border: 2px solid #4a90e2 !important; /* 統一された青色の枠 */
   box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
   transform: scale(1.05);
 }

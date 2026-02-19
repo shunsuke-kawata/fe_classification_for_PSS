@@ -1,10 +1,11 @@
 import "./styles.modules.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   treeNode,
   getImageCountInFolder,
   isLeaf,
   getFolderName,
+  findNodeById,
 } from "@/utils/result";
 import {
   createFolder,
@@ -53,7 +54,48 @@ const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
     ? getImageCountInFolder(result, currentFolder)
     : 0;
 
+  // 空フォルダかどうかを再帰的に判定する関数
+  const isFolderEmpty = (folderName: string): boolean => {
+    if (!result) return false;
+    const node = findNodeById(result, folderName);
+    if (!node || !node.data) {
+      return true; // ノードが見つからない、またはdataがない場合は空と判定
+    }
+
+    // is_leafの場合のみ、有効な文字列データのみをカウント（表示できないデータは無視）
+    if (node.is_leaf) {
+      const validEntries = Object.values(node.data).filter(
+        (value) => typeof value === "string" && value.trim() !== ""
+      );
+      return validEntries.length === 0;
+    }
+
+    // is_leafでない場合は、全ての子フォルダを再帰的にチェック
+    const childNodes = node.data as { [key: string]: treeNode };
+    const childKeys = Object.keys(childNodes);
+
+    // 子フォルダが存在しない場合は空
+    if (childKeys.length === 0) {
+      return true;
+    }
+
+    // 全ての子フォルダが空かどうかを再帰的にチェック
+    return childKeys.every((childKey) => isFolderEmpty(childKey));
+  };
+
+  // 現在のフォルダが空かどうか
+  const isEmpty = currentFolder ? isFolderEmpty(currentFolder) : false;
+
+  // ルートフォルダかどうかを判定
+  const isRootFolder = currentFolder === topLevelId;
+
+  // フォルダが変更されたときにメニューを閉じる
+  useEffect(() => {
+    setContextMenuOpen(false);
+  }, [currentFolder]);
+
   const toParentFolder = () => {
+    setContextMenuOpen(false); // メニューを閉じる
     if (items.length === 0) {
       return;
     } else if (items.length === 1) {
@@ -67,6 +109,7 @@ const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
 
   // フォルダ作成モードの切り替え
   const handleCreateModeToggle = () => {
+    setContextMenuOpen(false); // メニューを閉じる
     setIsCreateMode(!isCreateMode);
   };
 
@@ -269,6 +312,19 @@ const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
 
       if (response && response.message === "success") {
         console.log(`✅ フォルダ「${currentFolder}」を削除しました`);
+
+        // 削除後に親フォルダへ移動してからリロード
+        if (items.length === 1) {
+          // 最上位の子フォルダを削除した場合はトップレベルに移動
+          if (topLevelId) {
+            setSelectedFolder(topLevelId);
+          }
+        } else if (items.length > 1) {
+          // それ以外は一つ上の親フォルダに移動
+          setSelectedFolder(items[items.length - 2]);
+        }
+
+        // ページリロード
         window.location.reload();
       } else {
         const errorMessage = response?.message || "削除に失敗しました";
@@ -318,19 +374,22 @@ const DndBreadcrumbs: React.FC<dndBreadcrumbsProps> = ({
             {currentFolderIsLeaf && imageCount > 0 && (
               <span className="image-count">({imageCount})</span>
             )}
-            {/* 3点リーダーボタン */}
-            <button
-              className="context-menu-button-breadcrumb"
-              onClick={handleContextMenuClick}
-            >
-              ⋮
-            </button>
-            {/* コンテキストメニュー */}
-            {contextMenuOpen && (
-              <div className="context-menu-breadcrumb">
-                <button onClick={handleRenameStart}>名前の変更</button>
-                <button onClick={handleDeleteFolder}>削除</button>
-              </div>
+            {/* 3点リーダーボタン（ルートフォルダ以外のみ表示） */}
+            {!isRootFolder && (
+              <>
+                <button
+                  className="context-menu-button-breadcrumb"
+                  onClick={handleContextMenuClick}
+                >
+                  ⋮
+                </button>
+                {/* コンテキストメニュー */}
+                {contextMenuOpen && (
+                  <div className="context-menu-breadcrumb">
+                    <button onClick={handleRenameStart}>名前の変更</button>
+                  </div>
+                )}
+              </>
             )}
           </span>
         )}

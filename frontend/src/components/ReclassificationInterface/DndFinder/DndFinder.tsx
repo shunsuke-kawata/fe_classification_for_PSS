@@ -159,6 +159,18 @@ const DndFinder: React.FC<dndFinderProps> = ({
   };
 
   const getNodesInCurrentFolder = (folderId: string) => {
+    // フォルダIDが存在するかチェック
+    const folderExists = findPathToNode(result, folderId);
+
+    // フォルダが存在しない場合はtopLevelに戻す
+    if (!folderExists && topLevelId && folderId !== topLevelId) {
+      console.warn(
+        `⚠️ フォルダ ${folderId} が見つかりません。トップレベルに戻ります。`
+      );
+      setSelectedFolder(topLevelId);
+      return;
+    }
+
     const folders = getFoldersInFolder(result, folderId);
     const files = getFilesInFolder(result, folderId);
     const path = findPathToNode(result, folderId) ?? [];
@@ -842,13 +854,13 @@ const DndFinder: React.FC<dndFinderProps> = ({
         return;
       }
 
-      // 画像移動の処理（既存のコード）
+      // 画像移動の処理（双方向対応）
       const imageData = dragData;
 
       // 移動先のFinderに画像を追加（isLeafフォルダにのみ移動可能）
+      // 双方向を許可: before→after または after→before
       if (
-        finderType === "after" &&
-        imageData.sourceType === "before" &&
+        imageData.sourceType !== finderType &&
         isLeaf(result, selectedFolder)
       ) {
         // 同じフォルダへのドロップをチェック
@@ -873,8 +885,7 @@ const DndFinder: React.FC<dndFinderProps> = ({
           );
         }
       } else if (
-        finderType === "after" &&
-        imageData.sourceType === "before" &&
+        imageData.sourceType !== finderType &&
         !isLeaf(result, selectedFolder)
       ) {
         // 画像をisLeafでないフォルダにドロップしようとした場合
@@ -996,25 +1007,97 @@ const DndFinder: React.FC<dndFinderProps> = ({
               </>
             ) : finderType === "after" && !isLeaf(result, selectedFolder) ? (
               <>
+                <button
+                  className={`multi-select-btn ${
+                    isMultiSelectMode ? "active" : ""
+                  }`}
+                  onClick={handleMultiSelectToggle}
+                >
+                  {isMultiSelectMode ? "選択解除" : "フォルダ選択"}
+                </button>
+                <button
+                  className="multi-select-btn select-all-btn"
+                  onClick={handleSelectAll}
+                >
+                  全て選択
+                </button>
+                {isMultiSelectMode && selectedImages.length > 0 && (
+                  <>
+                    <span className="selection-count">
+                      {selectedImages.length}個選択中
+                    </span>
+                    {canMergeFolders() && (
+                      <button
+                        className="merge-folders-btn"
+                        onClick={handleMergeFolders}
+                      >
+                        <span className="btn-full-text">統合</span>
+                        <span className="btn-short-text">統合</span>
+                      </button>
+                    )}
+                    {canMoveToParentFolder() && (
+                      <button
+                        className="move-to-parent-btn"
+                        onClick={handleMoveToParentFolder}
+                      >
+                        <span className="btn-full-text">親に移動</span>
+                        <span className="btn-short-text">親に移動</span>
+                      </button>
+                    )}
+                    {canDeleteSelectedFolders() && (
+                      <button
+                        className="delete-folders-btn"
+                        onClick={handleDeleteSelectedFolders}
+                      >
+                        <span className="btn-full-text">削除</span>
+                        <span className="btn-short-text">削除</span>
+                      </button>
+                    )}
+                  </>
+                )}
                 <div style={{ flex: 1 }}></div>
-                <div className="view-mode-toggle">
-                  <button
-                    className={`view-mode-btn ${
-                      viewMode === "list" ? "active" : ""
-                    }`}
-                    onClick={() => setViewMode("list")}
-                  >
-                    リスト
-                  </button>
-                  <button
-                    className={`view-mode-btn ${
-                      viewMode === "icon" ? "active" : ""
-                    }`}
-                    onClick={() => setViewMode("icon")}
-                  >
-                    アイコン
-                  </button>
-                </div>
+                {!isMultiSelectMode && (
+                  <div className="view-mode-toggle">
+                    <button
+                      className={`view-mode-btn ${
+                        viewMode === "list" ? "active" : ""
+                      }`}
+                      onClick={() => setViewMode("list")}
+                    >
+                      リスト
+                    </button>
+                    <button
+                      className={`view-mode-btn ${
+                        viewMode === "icon" ? "active" : ""
+                      }`}
+                      onClick={() => setViewMode("icon")}
+                    >
+                      アイコン
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : finderType === "after" && isLeaf(result, selectedFolder) ? (
+              <>
+                <button
+                  className={`multi-select-btn ${
+                    isMultiSelectMode ? "active" : ""
+                  }`}
+                  onClick={handleMultiSelectToggle}
+                >
+                  {isMultiSelectMode ? "選択解除" : "画像選択"}
+                </button>
+                <button
+                  className="multi-select-btn select-all-btn"
+                  onClick={handleSelectAll}
+                >
+                  全て選択
+                </button>
+                {isMultiSelectMode && selectedImages.length > 0 && (
+                  <span className="selection-count">
+                    {selectedImages.length}個選択中
+                  </span>
+                )}
               </>
             ) : (
               <></>
