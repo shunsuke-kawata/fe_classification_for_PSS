@@ -1,17 +1,49 @@
 .image-file-view-main{
-    width:60%;
-    height:100%;
-    overflow-y: scroll;
+  width: 60%;
+  height: 100%;
+  overflow-y: auto;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
-  gap: 6px 10px;
-
-  max-height: 100%;
-
+  align-content: flex-start;
+  gap: 20px 10px;
+  background-color: #ffffff;
+  padding: 10px;
+  box-sizing: border-box;
+  min-width: 300px; /* 最小幅を設定 */
 }
 
 .image-file-item{
-    width: 150px;
-    height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  position: relative;
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.image-file-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 選択された画像のスタイル */
+.image-file-item.selected {
+  border: 2px solid #4a90e2 !important; /* 統一された青色の枠 */
+  box-shadow: 0 0 10px rgba(74, 144, 226, 0.3);
+  transform: scale(1.05);
+}
+
+.image-file-item.selected:hover {
+  transform: scale(1.05); /* 選択時はホバー時の拡大を抑制 */
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .image-file-view-main {
+        width: 100%;
+        height: calc(100% - 200px); /* リストビューの高さ分を引く */
+    }
 }

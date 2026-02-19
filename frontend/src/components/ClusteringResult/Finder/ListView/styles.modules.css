@@ -1,37 +1,298 @@
 .list-view-main{
-    width:40%;
-    height:100%;
-    border-right:0.5px #a9a9a9 solid;
-    overflow-y: scroll;
+    width: 40%;
+    height: 100%;
+    border-right: 0.5px #e1e5e9 solid;
+    overflow-y: auto;
+    background-color: #ffffff;
+    min-width: 200px; /* 最小幅を設定 */
+    box-sizing: border-box;
+    padding-top: 2px; /* 上部に少し余白を追加 */
 }
 
+/* 基本スタイル */
 .list-view-item{
+    height: 30px !important;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left:10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: #ffffff;
+}
+
+.list-view-item-odd{
     height: 30px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
     padding-left:10px;
-}
-.arrow{
-}
-.list-view-item-even{
-
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background-color: #f8f9fa;
 }
 
-.list-view-item-odd{
-    background-color: #f4f4f4;
+/* 通常のホバー効果 */
+.list-view-item:hover {
+    background-color: #f0f0f0;
 }
 
-.folder-icon{
-
+.list-view-item-odd:hover {
+    background-color: #f0f0f0;
 }
 
 .img-icon{
     display:block;
     margin-left: 5px;
-    width: 20px;
+    width: 32px;
+}
+
+.thumbnail-container {
+    display: block;
+    margin-left: 5px;
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+    border-radius: 4px;
+    border: 1px solid #e1e5e9;
+}
+
+.folder-thumbnail {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .folder-name-span{
     margin-left: 10px;
+    font-size: 16px;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .list-view-main {
+        width: 100%;
+        height: 200px; /* モバイルでは固定高さ */
+        border-right: none;
+        border-bottom: 0.5px #e1e5e9 solid;
+    }
+}
+
+.image-count {
+  color: #666;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+/* 選択された項目のスタイル - より高い特異性で定義 */
+.list-view-main .list-view-item.selected {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+  border-left: 2px solid #357abd !important;
+}
+
+.list-view-main .list-view-item-odd.selected {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+  border-left: 2px solid #357abd !important;
+}
+
+/* 選択された項目のホバー状態 - さらに高い特異性 */
+.list-view-main .list-view-item.selected:hover {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+}
+
+.list-view-main .list-view-item-odd.selected:hover {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+}
+
+/* 選択された項目のフォーカスとアクティブ状態 */
+.list-view-main .list-view-item.selected:focus,
+.list-view-main .list-view-item.selected:active {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+}
+
+.list-view-main .list-view-item-odd.selected:focus,
+.list-view-main .list-view-item-odd.selected:active {
+  background-color: #4a90e2;
+  color: #FFFFFF;
+}
+
+/* 選択された項目内のテキスト要素 */
+.list-view-main .list-view-item.selected .folder-name-span,
+.list-view-main .list-view-item-odd.selected .folder-name-span {
+  color: #FFFFFF;
+}
+
+.list-view-main .list-view-item.selected .image-count,
+.list-view-main .list-view-item-odd.selected .image-count {
+  color: #FFFFFF;
+}
+
+/* 選択された項目でのコンテキストメニューボタンスタイル */
+.list-view-main .list-view-item.selected .context-menu-button,
+.list-view-main .list-view-item-odd.selected .context-menu-button {
+  color: #FFFFFF;
+}
+
+.list-view-main .list-view-item.selected:hover .context-menu-button,
+.list-view-main .list-view-item-odd.selected:hover .context-menu-button {
+  opacity: 1;
+  visibility: visible;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+}
+
+/* 3点リーダーメニューのスタイル */
+.list-view-item, .list-view-item-odd {
+  position: relative;
+}
+
+.context-menu-button {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #6c757d;
+  transition: all 0.2s ease;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.list-view-item:hover .context-menu-button,
+.list-view-item-odd:hover .context-menu-button {
+  opacity: 1;
+  visibility: visible;
+}
+
+.context-menu-button:hover {
+  background-color: #f8f9fa;
+  color: #495057;
+}
+
+.context-menu-button:active {
+  background-color: #e9ecef;
+}
+
+.context-menu {
+  position: absolute;
+  right: 8px;
+  top: 100%;
+  background: white;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  min-width: 140px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #495057;
+  transition: background-color 0.15s ease;
+}
+
+.context-menu button:hover {
+  background-color: #f8f9fa;
+}
+
+.context-menu button:first-child {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.context-menu button:last-child {
+  color: #1A2421;
+}
+
+.context-menu button:last-child:hover {
+  background-color: #fff5f5;
+}
+
+/* 編集モード用スタイル */
+.folder-name-input {
+  padding: 2px 6px;
+  border: 1px solid #dee2e6;
+  border-radius: 3px;
+  font-size: 12px;
+  background-color: #ffffff;
+  margin-left: 10px;
+  width: 250px;
+  height: 18px;
+  box-sizing: border-box;
+  color: #495057;
+  flex: 0 0 auto;
+}
+
+.folder-name-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 1px rgba(74, 144, 226, 0.15);
+}
+
+.edit-buttons-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  padding-right: 8px;
+  flex: 0 0 auto;
+}
+
+.edit-confirm-btn, .edit-cancel-btn {
+  padding: 4px 8px;
+  border: 1px solid #4a90e2;
+  border-radius: 4px;
+  background-color: #ffffff;
+  color: #4a90e2;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-confirm-btn:hover {
+  background-color: #f0f7ff;
+  border-color: #357abd;
+  color: #357abd;
+}
+
+.edit-cancel-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #6c757d;
+  color: #6c757d;
+}
+
+/* 編集モードのレスポンシブ対応 */
+@media (max-width: 768px) {
+  .folder-name-input {
+    width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .folder-name-input {
+    width: 150px;
+  }
 }

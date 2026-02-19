@@ -18,7 +18,6 @@ const Signup: React.FC = () => {
       dispatch(setLoginedUser(user));
       dispatch(setSidebarStatus(false));
       setIsLoading(false);
-      console.log(user);
     };
 
     initializeUser();

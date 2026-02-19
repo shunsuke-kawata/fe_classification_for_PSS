@@ -1,16 +1,62 @@
 .project-main-div{
-    position:relative;
-    width:900px;
-    height: 800px;
+    position: relative;
+    width: 90%;
+    max-width: 900px;
+    min-width: 320px;
+    height: calc(100vh - 80px - 20px); /* ヘッダー高さとマージン考慮 */
     margin: 10px auto;
+    margin-top: calc(80px + 10px); /* ヘッダー高さ + マージン */
+    padding: 20px 20px 0 20px; /* 上部パディングを調整 */
+    box-sizing: border-box;
 }
 
 .add-project-button{
-    position:absolute;
-    top:-50px;
-    right:-30px;
-    width:120px;
+    position: absolute;
+    top: 10px; /* 上部に配置 */
+    right: 20px; /* 右側に配置（パディングと合わせる） */
+    width: 120px;
     height: 40px;
     font-size: 18px;
-    border-radius:5px;
+    border-radius: 5px;
+    z-index: 10; /* ボタンが他の要素より前に表示されるようにする */
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+    .project-main-div {
+        width: 95%;
+        height: calc(100vh - 60px - 20px); /* モバイル用ヘッダー高さ */
+        margin-top: calc(60px + 10px);
+        padding: 50px 10px 0 10px; /* 上部にボタン用スペース確保 */
+    }
+    
+    .add-project-button {
+        position: absolute; /* absoluteに戻す */
+        top: 10px; /* 上部に配置 */
+        right: 10px; /* 右側に配置 */
+        margin-bottom: 0; /* マージンを削除 */
+        width: 120px; /* デスクトップと同じサイズに統一 */
+        height: 40px; /* デスクトップと同じ高さに統一 */
+        font-size: 18px; /* デスクトップと同じフォントサイズに統一 */
+        max-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .project-main-div {
+        width: 98%;
+        height: calc(100vh - 50px - 20px); /* 小画面用ヘッダー高さ */
+        margin-top: calc(50px + 10px);
+        padding: 50px 5px 0 5px; /* 上部にボタン用スペース確保 */
+    }
+    
+    .add-project-button {
+        position: absolute; /* absoluteを維持 */
+        top: 10px; /* 上部に配置 */
+        right: 5px; /* 右側に配置 */
+        width: 120px; /* デスクトップと同じサイズに統一 */
+        height: 40px; /* デスクトップと同じ高さに統一 */
+        font-size: 18px; /* デスクトップと同じフォントサイズに統一 */
+        max-width: 120px; /* 最大幅も同じ値に設定 */
+    }
 }

@@ -48,6 +48,7 @@ const Projects: React.FC = () => {
         const url = `${config.backend_base_url}/projects`;
         const allProjects = await getData(url, { user_id: userId });
         setProjects(allProjects.data);
+        // setProjects([]); //一旦画像作成用に修正
       } catch (error) {
         console.error("Failed to get projects:", error);
       }

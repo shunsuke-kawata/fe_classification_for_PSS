@@ -113,7 +113,6 @@ const UserForm: React.FC<UserFromProps> = ({ formType }) => {
     if (res.status === 200) {
       //cookieにログイン情報を追加
       const userData = res.data.data;
-      console.log(userData);
 
       const loginedUserInfo: LoginUserState = {
         id: userData.id,

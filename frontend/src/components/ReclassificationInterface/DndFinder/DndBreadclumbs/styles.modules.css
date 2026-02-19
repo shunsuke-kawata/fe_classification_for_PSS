@@ -1,0 +1,246 @@
+.dnd-breadcrumbs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* ← これで親 flex の子は縦中央に */
+  padding: 6px 12px;
+  background-color: #ebe9e6;
+  /* border:0.5px #a9a9a9 solid;s */
+}
+
+.breadcrumbs-left {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumbs-right {
+  display: flex;
+  align-items: center;
+}
+
+.breadcrumb-item {
+  margin: 0 5px;
+  color:#4d4d4d;
+  font-size: 20px;
+  font-weight:600;
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+}
+
+
+.parent-folder-button {
+  width: 30px;
+  height: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; 
+  font-size: 24px;
+  background-color: #FFFFFF;
+  border: #4d4d4d solid 0.1px;
+  margin-right: 10px;
+  border-radius: 3px;
+}
+
+
+.parent-folder-button span {
+  position: relative;
+  top: -12px; 
+  color: #4d4d4d;
+}
+
+.parent-folder-button span.parent-folder-button-span-disabled{
+  color:#ebe9e6;
+}
+
+.image-count {
+  color: #666;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+/* フォルダ作成ボタン */
+.create-folder-btn {
+  padding: 6px 12px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.create-folder-btn:hover {
+  background-color: #357abd;
+}
+
+/* 作成モードのボタンコンテナ */
+.create-mode-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* カテゴリ作成ボタン */
+.create-category-btn {
+  padding: 6px 12px;
+  background-color: #FFFFFF;
+  color: #28a745;
+  border: 1px solid #28a745;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* ファイル作成ボタン */
+.create-file-btn {
+  padding: 6px 12px;
+  background-color: #FFFFFF;
+  color: #fd7e14;
+  border: 1px solid #fd7e14;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* キャンセルボタン */
+.cancel-btn {
+  padding: 6px 12px;
+  background-color: #FFFFFF;
+  color: #6c757d;
+  border: 1px solid #6c757d;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* 削除ボタン */
+.delete-btn {
+  padding: 6px 12px;
+  background-color: #FF0000;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.delete-btn:hover {
+  background-color: #CC0000;
+}
+
+/* パンくずリスト用のコンテキストメニューボタン */
+.context-menu-button-breadcrumb {
+  margin-left: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #6b7280;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  transition: all 0.2s ease;
+  vertical-align: middle;
+}
+
+.context-menu-button-breadcrumb:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #374151;
+  border-color: #9ca3af;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* パンくずリスト用のコンテキストメニュー */
+.context-menu-breadcrumb {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 120px;
+  overflow: hidden;
+}
+
+.context-menu-breadcrumb button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  color: #374151;
+  transition: background 0.15s ease;
+}
+
+.context-menu-breadcrumb button:hover {
+  background: #f3f4f6;
+}
+
+.context-menu-breadcrumb button:active {
+  background: #e5e7eb;
+}
+
+/* パンくずリスト用の名前編集コンテナ */
+.folder-name-edit-container-breadcrumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 5px;
+}
+
+.folder-name-input-breadcrumb {
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 16px;
+  width: 200px;
+}
+
+.folder-name-edit-buttons-breadcrumb {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.confirm-btn {
+  padding: 4px 8px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.confirm-btn:hover {
+  background-color: #218838;
+}
+
+.cancel-edit-btn {
+  padding: 4px 8px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cancel-edit-btn:hover {
+  background-color: #5a6268;
+}

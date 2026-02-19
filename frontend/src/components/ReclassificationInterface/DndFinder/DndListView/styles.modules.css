@@ -1,0 +1,650 @@
+.list-view-main{
+    width: 100%;
+    height: 100%; /* 親コンテナーの残り高さを使用 */
+    border: 0.5px #e1e5e9 solid;
+    overflow-y: auto;
+    flex: 1; /* 残りのスペースを占有 */
+    background-color: #ffffff;
+    box-sizing: border-box;
+    /* スクロールバーのカスタマイズ */
+    scrollbar-width: thin;
+    scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Webkitベースブラウザ用スクロールバーカスタマイズ */
+.list-view-main::-webkit-scrollbar {
+    width: 8px;
+}
+
+.list-view-main::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.list-view-main::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.list-view-main::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.list-view-item{
+    height: 30px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left:10px;
+}
+
+.list-view-item-odd{
+    background-color: #f8f9fa;
+}
+
+.list-view-item.selectable:hover {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+.img-icon{
+    display:block;
+    margin-left: 5px;
+    width: 20px;
+}
+
+.folder-name-span{
+    margin-left: 10px;
+}
+
+.dnd-image-file-view-main {
+  border: 0.5px #e1e5e9 solid;
+  width: 100%;
+  height: 100%; /* 親コンテナーの残り高さを使用 */
+  overflow-y: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-content: flex-start;
+  gap: 20px 10px;
+  flex: 1; /* 残りのスペースを占有 */
+  background-color: #ffffff;
+  padding: 10px;
+  box-sizing: border-box;
+  /* スクロールバーのカスタマイズ */
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Webkitベースブラウザ用スクロールバーカスタマイズ */
+.dnd-image-file-view-main::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dnd-image-file-view-main::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.dnd-image-file-view-main::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.dnd-image-file-view-main::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.dnd-listview-div-main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex: 1;
+}
+
+.dnd-image-file-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.dnd-image-file-item.selectable {
+  cursor: pointer;
+}
+
+.dnd-image-file-item.selectable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dnd-image-file-item.selected {
+  border: 3px solid #4a90e2;
+  border-radius: 8px;
+  background-color: rgba(74, 144, 226, 0.1);
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+}
+
+.selection-indicator {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #4a90e2;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.dnd-folder-icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 120px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* 大画面での画像表示サイズ拡大 */
+@media (min-width: 1400px) {
+  .dnd-folder-icon-item {
+    width: 140px; /* 大画面では幅を拡大 */
+    height: 160px; /* 大画面では高さを拡大 */
+  }
+  
+  .dnd-image-file-view-main {
+    gap: 25px 15px; /* 大画面では間隔も広げる */
+    padding: 15px; /* パディングも拡大 */
+  }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .dnd-folder-icon-item {
+    width: 120px; /* 中画面では中間サイズ */
+    height: 140px;
+  }
+  
+  .dnd-image-file-view-main {
+    gap: 22px 12px;
+    padding: 12px;
+  }
+}
+
+.dnd-folder-icon-item:hover {
+  transform: scale(1.05);
+}
+
+.dnd-folder-icon-item.selected {
+  border: 3px solid #4a90e2;
+  border-radius: 8px;
+  background-color: rgba(74, 144, 226, 0.1);
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+}
+
+.dnd-folder-icon-item.selectable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.folder-icon-container {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.folder-icon-large {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  z-index: 1;
+}
+
+.folder-preview-overlay {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.folder-name-label {
+  margin-top: 8px;
+  font-size: 12px;
+  text-align: center;
+  color: #374151;
+  word-break: break-all;
+  line-height: 1.2;
+  max-width: 100px;
+  font-weight: 500;
+}
+
+/* アップロードプログレス関連 */
+.upload-progress-container {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.upload-progress-header {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.file-upload-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.file-upload-progress:last-child {
+  border-bottom: none;
+}
+
+.file-upload-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.file-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+.file-name-display {
+  font-size: 13px;
+  color: #6c757d;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress-bar-container {
+  width: 100px;
+  height: 6px;
+  background: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #20c997);
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+/* アップロード結果表示 */
+.upload-results-container {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.upload-results-header h3 {
+  margin: 0 0 16px 0;
+  color: #343a40;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.upload-results-stats {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.result-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.result-stat.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.result-stat.failed {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f1b2b7;
+}
+
+.result-stat.total {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.stat-icon {
+  font-weight: bold;
+}
+
+/* ファイルアイテムの改善 */
+.enhanced-file-item {
+  position: relative;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background: #fff;
+  border: 1px solid #e9ecef;
+  overflow: hidden;
+}
+
+.enhanced-file-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #007bff;
+}
+
+.enhanced-file-item.selected {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.file-thumbnail-container {
+  position: relative;
+  width: 100%;
+}
+
+.selection-indicator {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #007bff;
+  color: white;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.file-name-label {
+  padding: 8px;
+  background: #f8f9fa;
+  border-top: 1px solid #e9ecef;
+}
+
+.file-name-label span {
+  font-size: 12px;
+  color: #495057;
+  font-weight: 500;
+  line-height: 1.2;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selectable.enhanced-file-item {
+  cursor: pointer;
+}
+
+.selectable.enhanced-file-item:hover .file-name-label {
+  background: #e9ecef;
+}
+
+/* アイコンモード用：コンテキストメニューボタン */
+.context-menu-button-icon {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #6b7280;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  transition: all 0.2s ease;
+}
+
+.context-menu-button-icon:hover {
+  background: rgba(255, 255, 255, 1);
+  color: #374151;
+  border-color: #9ca3af;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* アイコンモード用：コンテキストメニュー */
+.context-menu-icon {
+  position: absolute;
+  top: 28px;
+  right: 2px;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 120px;
+  overflow: hidden;
+}
+
+.context-menu-icon button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  color: #374151;
+  transition: background 0.15s ease;
+}
+
+.context-menu-icon button:hover {
+  background: #f3f4f6;
+}
+
+.context-menu-icon button:active {
+  background: #e5e7eb;
+}
+
+/* アイコンモード用：名前編集コンテナ */
+.folder-name-edit-container {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.folder-name-input-icon {
+  width: 100%;
+  max-width: 100px;
+  padding: 4px 6px;
+  border: 2px solid #3b82f6;
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: center;
+  outline: none;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.folder-name-input-icon:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.edit-buttons-icon {
+  display: flex;
+  gap: 4px;
+}
+
+.edit-confirm-btn-icon,
+.edit-cancel-btn-icon {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.edit-confirm-btn-icon {
+  background: #10b981;
+  color: white;
+}
+
+.edit-confirm-btn-icon:hover {
+  background: #059669;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.edit-cancel-btn-icon {
+  background: #ef4444;
+  color: white;
+}
+
+.edit-cancel-btn-icon:hover {
+  background: #dc2626;
+  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .dnd-image-file-view-main {
+    gap: 15px 8px;
+    padding: 8px;
+  }
+  
+  .dnd-image-file-item {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .dnd-folder-icon-item {
+    width: 80px;
+    height: 100px;
+  }
+  
+  .folder-icon-container {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .folder-icon-large {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .folder-name-label {
+    font-size: 11px;
+    max-width: 80px;
+  }
+  
+  .list-view-item {
+    height: 25px;
+    padding-left: 8px;
+  }
+  
+  .img-icon {
+    width: 16px;
+  }
+  
+  .folder-name-span {
+    margin-left: 8px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dnd-image-file-view-main {
+    gap: 10px 5px;
+    padding: 5px;
+  }
+  
+  .dnd-image-file-item {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .dnd-folder-icon-item {
+    width: 70px;
+    height: 90px;
+  }
+  
+  .folder-icon-container {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .folder-icon-large {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .folder-name-label {
+    font-size: 10px;
+    max-width: 70px;
+  }
+  
+  .list-view-item {
+    height: 22px;
+    padding-left: 6px;
+  }
+  
+  .img-icon {
+    width: 14px;
+  }
+  
+  .folder-name-span {
+    margin-left: 6px;
+    font-size: 12px;
+  }
+  
+  .selection-indicator {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+  }
+}

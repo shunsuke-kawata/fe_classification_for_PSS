@@ -11,5 +11,10 @@ COPY ./frontend/package.json /app/package.json
 COPY ./frontend/package-lock.json /app/package-lock.json
 RUN npm install
 
-#フロントエンドの起動
-ENTRYPOINT ["npm", "run", "dev"]
+# copy wait scripts and entrypoint
+COPY ./wait /wait
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh || true
+
+# フロントエンドの起動 (entrypoint が依存サービスを待機します)
+ENTRYPOINT ["/entrypoint.sh"]

@@ -22,6 +22,7 @@ type newImageType = {
   project_id: number;
   uploaded_user_id: number;
   image_file: File;
+  folder_name?: string | null;
 };
 type projectType = {
   id: number;
@@ -31,6 +32,7 @@ type projectType = {
   root_folder_id: string;
   original_images_folder_path: string;
   init_clustering_state: number;
+  continuous_clustering_state: number;
   mongo_result_id: string;
   joined: boolean;
 };
@@ -181,6 +183,11 @@ const postImage = async (newImage: newImageType) => {
     formData.append("uploaded_user_id", newImage.uploaded_user_id.toString());
     formData.append("file", newImage.image_file);
 
+    // folder_nameが存在する場合のみ追加
+    if (newImage.folder_name) {
+      formData.append("folder_name", newImage.folder_name);
+    }
+
     const response = await axios.post(url, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -227,9 +234,13 @@ const executeJoinProject = async (
   }
 };
 
-const executeInitClustering = async (project_id: number, user_id: number) => {
+const executeInitClustering = async (
+  project_id: number,
+  user_id: number,
+  use_hierarchical: boolean = false
+) => {
   try {
-    const url = `${config.backend_base_url}/action/clustering/init/${project_id}?user_id=${user_id}`;
+    const url = `${config.backend_base_url}/action/clustering/init/${project_id}?user_id=${user_id}&use_hierarchical=${use_hierarchical}`;
     const response = await axios.get(url);
     return response;
   } catch (error) {
@@ -239,12 +250,108 @@ const executeInitClustering = async (project_id: number, user_id: number) => {
   }
 };
 
-const getinitClusteringResult = async (mongo_result_id: string) => {
+const executeContinuousClustering = async (
+  project_id: number,
+  user_id: number
+) => {
   try {
-    const url = `${config.backend_base_url}/action/clustering/result/${mongo_result_id}`;
+    const url = `${config.backend_base_url}/action/clustering/continuous/${project_id}?user_id=${user_id}`;
     const response = await axios.get(url);
-    return response.data.data;
+    return response;
   } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+  }
+};
+
+const getClusteringResult = async (mongo_result_id: string) => {
+  try {
+    console.log("🔍 getClusteringResult API 呼び出し開始");
+    console.log("  - mongo_result_id:", mongo_result_id);
+
+    const url = `${config.backend_base_url}/action/clustering/result/${mongo_result_id}`;
+    console.log("  - URL:", url);
+
+    const response = await axios.get(url);
+
+    console.log("🔍 getClusteringResult API レスポンス受信");
+    console.log("  - response.status:", response.status);
+    console.log("  - response.data type:", typeof response.data);
+    console.log("  - response.data keys:", Object.keys(response.data || {}));
+
+    // バックエンドから直接dataが返されるので、response.dataを返す
+    return response.data;
+  } catch (error) {
+    console.error("=== getClusteringResult API Error ===");
+    console.error("Error:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      console.error("Error response:", error.response);
+      console.error("Error response data:", error.response.data);
+      console.error("Error response status:", error.response.status);
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
+const moveClusteringItems = async (
+  mongo_result_id: string,
+  source_type: "folders" | "images",
+  sources: string[],
+  destination_folder: string
+) => {
+  try {
+    const url = `${config.backend_base_url}/action/clustering/move/${mongo_result_id}`;
+
+    // パラメータを手動で構築して配列の形式を制御
+    const params = new URLSearchParams();
+    params.append("source_type", source_type);
+    params.append("destination_folder", destination_folder);
+
+    // 配列の各要素を個別に追加
+    sources.forEach((source) => {
+      params.append("sources", source);
+    });
+
+    const response = await axios.put(url, null, {
+      params: params,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("=== API呼び出しエラー ===");
+    console.error("error:", error);
+
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
+const deleteEmptyFolders = async (
+  mongo_result_id: string,
+  folder_ids: string[]
+) => {
+  try {
+    const url = `${config.backend_base_url}/action/folders/${mongo_result_id}`;
+
+    // パラメータを手動で構築して配列の形式を制御
+    const params = new URLSearchParams();
+
+    // 配列の各要素をsourcesパラメータとして追加
+    folder_ids.forEach((folder_id) => {
+      params.append("sources", folder_id);
+    });
+
+    const response = await axios.delete(url, {
+      params: params,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("=== フォルダ削除API呼び出しエラー ===");
+    console.error("error:", error);
+
     if (axios.isAxiosError(error) && error.response) {
       return error.response;
     }
@@ -263,6 +370,169 @@ export type {
   loginUserType,
   joinUserType,
 };
+
+// フォルダまたはファイルの名前を変更
+const renameFolderOrFile = async (
+  mongo_result_id: string,
+  node_id: string,
+  new_name: string,
+  is_leaf?: boolean
+) => {
+  try {
+    const params = new URLSearchParams({
+      name: new_name,
+    });
+
+    if (is_leaf !== undefined) {
+      params.append("is_leaf", is_leaf.toString());
+    }
+
+    const response = await axios.put(
+      `${
+        config.backend_base_url
+      }/action/folders/${mongo_result_id}/${node_id}?${params.toString()}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("名前変更エラー:", error);
+    throw error;
+  }
+};
+
+// プロジェクト内の全ユーザーのcontinuous_clustering_stateを更新（画像アップロード時）
+const updateAllMembersContinuousState = async (project_id: number) => {
+  try {
+    const url = `${config.backend_base_url}/project_memberships/state/${project_id}`;
+    const response = await axios.put(url);
+    return response.data;
+  } catch (error) {
+    console.error("continuous_clustering_state更新エラー:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
+// 初期クラスタリング完了ユーザー一覧を取得
+const getCompletedClusteringUsers = async (project_id: number) => {
+  try {
+    const url = `${config.backend_base_url}/project_memberships/completed_users/${project_id}`;
+    const response = await axios.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("完了ユーザー取得エラー:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
+// クラスタリングデータをコピー
+const copyClusteringData = async (
+  source_user_id: number,
+  target_user_id: number,
+  project_id: number
+) => {
+  try {
+    const url = `${config.backend_base_url}/action/clustering/copy`;
+    const response = await axios.post(url, null, {
+      params: {
+        source_user_id,
+        target_user_id,
+        project_id,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("データコピーエラー:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
+// 分類結果をダウンロード
+const downloadClassificationResult = async (
+  project_id: number,
+  user_id: number,
+  project_name: string
+) => {
+  try {
+    const url = `${config.backend_base_url}/action/clustering/download/${project_id}`;
+    const response = await axios.get(url, {
+      params: { user_id },
+      responseType: "blob", // ZIPファイルをBlobとして受信
+    });
+
+    // Blobからダウンロードリンクを作成
+    const blob = new Blob([response.data], { type: "application/zip" });
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = `${project_name}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+
+    return { success: true };
+  } catch (error) {
+    console.error("ダウンロードエラー:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
+// クラスタリング回数情報を取得
+const getClusteringCounts = async (project_id: number, user_id: number) => {
+  try {
+    const url = `${config.backend_base_url}/action/clustering/counts/${project_id}`;
+    const response = await axios.get(url, {
+      params: { user_id },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("クラスタリング回数情報取得エラー:", error);
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
+// 新しいフォルダを作成
+const createFolder = async (
+  mongo_result_id: string,
+  parent_folder_id: string,
+  is_leaf: boolean
+) => {
+  try {
+    const url = `${config.backend_base_url}/action/folders/${mongo_result_id}`;
+
+    const params = new URLSearchParams();
+    params.append("parent_folder_id", parent_folder_id);
+    params.append("is_leaf", is_leaf.toString());
+
+    const response = await axios.post(url, null, {
+      params: params,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("=== フォルダ作成API呼び出しエラー ===");
+    console.error("error:", error);
+
+    if (axios.isAxiosError(error) && error.response) {
+      return error.response;
+    }
+    return Promise.reject(error);
+  }
+};
+
 export {
   getData,
   getProject,
@@ -275,5 +545,15 @@ export {
   executeLogin,
   executeJoinProject,
   executeInitClustering,
-  getinitClusteringResult,
+  executeContinuousClustering,
+  getClusteringResult,
+  moveClusteringItems,
+  deleteEmptyFolders,
+  createFolder,
+  renameFolderOrFile,
+  updateAllMembersContinuousState,
+  getCompletedClusteringUsers,
+  copyClusteringData,
+  downloadClassificationResult,
+  getClusteringCounts,
 };

@@ -1,5 +1,36 @@
 .result-div-main{
-    width:100%;
-    margin-top:20px;
-    height:90%;
+    position: relative; /* 絶対位置指定された子要素の基準点 */
+    width: 100%;
+    margin: 20px auto 20px auto; /* top, right, bottom, left - 左右をautoで中央揃え */
+    height: calc(100vh - 240px); /* ビューポート高さからヘッダーやマージン分を引く（bottom margin分も追加） */
+    padding: 0 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center; /* 中央揃え */
+    align-items: flex-start;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 1200px) {
+    .result-div-main {
+        margin: 20px auto 20px auto; /* 左右をautoで中央揃え */
+        padding: 0 15px;
+        height: calc(100vh - 220px); /* ビューポート高さからヘッダーやマージン分を引く（bottom margin分も追加） */
+    }
+}
+
+@media (max-width: 768px) {
+    .result-div-main {
+        margin: 15px auto 15px auto; /* 左右をautoで中央揃え */
+        padding: 0 10px;
+        height: calc(100vh - 190px); /* ビューポート高さからヘッダーやマージン分を引く（bottom margin分も追加） */
+    }
+}
+
+@media (max-width: 480px) {
+    .result-div-main {
+        margin: 10px auto 10px auto; /* 左右をautoで中央揃え */
+        padding: 0 5px;
+        height: calc(100vh - 160px); /* ビューポート高さからヘッダーやマージン分を引く（bottom margin分も追加） */
+    }
 }
